@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/tb_emergency"
+        android:icon="@drawable/ic_emergency_white_24dp"
+        android:title="@string/tb_emergency"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/tb_settings"
+        android:title="@string/tb_settings"
+        app:showAsAction="never"/>
+</menu>
