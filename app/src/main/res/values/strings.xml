@@ -10,4 +10,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tb_emergency">Emergency Info</string>
     <string name="tb_settings">Settings</string>
+    <string name="tb_favourite">Favourite</string>
+    <string name="tb_map">View on map</string>
 </resources>

@@ -1,11 +1,10 @@
 package com.ganderson.exploreni.fragments
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.models.Location
@@ -25,8 +24,15 @@ class LookAroundFragment : Fragment() {
     private var loadingFinished = false
 
     private val location1 = Location(
-        "", "Belfast Castle", 123f, "",
-        "54.64276", "-5.942225"
+        "",
+        "Belfast Castle",
+        123f,
+        "",
+        "54.64276",
+        "-5.942225",
+        "Test description",
+        "https://farm6.staticflickr.com/5580/15249161785_52eca1a13e_b.jpg",
+        "Image by antxoa, licensed under CC BY-NC-SA 2.0."
     )
     private val locationList = ArrayList<Location>()
 
@@ -34,6 +40,7 @@ class LookAroundFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as MainActivity).supportActionBar?.title = "AR Mode"
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_look_around, container, false)
     }
@@ -100,11 +107,18 @@ class LookAroundFragment : Fragment() {
         locationName.text = location.name
 
         nodeLayout.setOnTouchListener { _, _ ->
-            Toast.makeText(this.activity, location.name, Toast.LENGTH_SHORT).show()
+            val attractionDetailFragment = AttractionDetailFragment(location)
+            val mainActivity = this.activity as MainActivity
+            mainActivity.displayFragment(attractionDetailFragment)
             false
         }
 
         return node
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onResume() {

@@ -1,7 +1,6 @@
 package com.ganderson.exploreni
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         checkLocationPermission()
     }
 
-    private fun displayFragment(fragment: Fragment) {
+    fun displayFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.flFragment, fragment)
@@ -65,29 +64,6 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton("OK") { dialog, _ -> dialog?.dismiss() }
                 .show()
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_toolbar, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.tb_emergency -> {
-                Toast.makeText(this, "Emergency selected",
-                    Toast.LENGTH_SHORT).show()
-                return true
-            }
-
-            R.id.tb_settings -> {
-                Toast.makeText(
-                    this, "Settings selected",
-                    Toast.LENGTH_SHORT).show()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun checkLocationPermission() {

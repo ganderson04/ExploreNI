@@ -7,10 +7,11 @@ class Utils {
     companion object {
         private const val EARTH_RADIUS = 6372.8 // Earth's radius in kilometres
 
-        fun getStraightLineDistance(x: Float, y: Float, z: Float) : Float {
-            return sqrt(x.pow(2) + y.pow(2) + z.pow(2))
-        }
-
+        /**
+         * Calculates the Great Circle distance between locations using the Haversine
+         * formula.
+         * Adapted from: https://rosettacode.org/wiki/Haversine_formula#Kotlin
+         */
         fun getHaversineGCD(lat1: Double, lon1: Double, lat2: Double, lon2: Double) : Double {
             val lat1Radians = Math.toRadians(lat1)
             val lat2Radians = Math.toRadians(lat2)
