@@ -22,7 +22,7 @@ class Utils {
                     sin(lonDiff / 2).pow(2) *
                     cos(lat1Radians) *
                     cos(lat2Radians)
-            return 2.0 * asin(sqrt(a))
+            return 2.0 * EARTH_RADIUS * asin(sqrt(a))
         }
     }
 }
