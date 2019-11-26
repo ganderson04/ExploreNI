@@ -18,7 +18,15 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as MainActivity).supportActionBar?.title = "Explore NI"
+        // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
+        // as an object of MainActivity.
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.title = "Home"
+
+        // Hide the back button in the toolbar on top-level menu options.
+        actionBar?.setDisplayHomeAsUpEnabled(false)
+        actionBar?.setDisplayShowHomeEnabled(false)
+
         setHasOptionsMenu(true)
 
         // Inflate the layout for this fragment

@@ -20,9 +20,16 @@ class AttractionDetailFragment(private val location: Location) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        // Set name of attraction as the toolbar title. The Fragment's Activity must first be
-        // cast to an object of type MainActivity.
-        (activity as MainActivity).supportActionBar?.title = location.name
+        // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
+        // as an object of MainActivity.
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.title = location.name
+
+        // Show and enable back arrow in the toolbar.
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.setDisplayShowHomeEnabled(true)
+
+        // States that this Fragment will set up its own toolbar menu.
         setHasOptionsMenu(true)
 
         return inflater.inflate(R.layout.fragment_attraction_detail, container, false)
@@ -52,6 +59,11 @@ class AttractionDetailFragment(private val location: Location) : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
+            // This option is for the back arrow.
+            android.R.id.home -> {
+                goBack()
+            }
+
             R.id.tb_favourite -> {
                 Toast.makeText(this.activity!!, "Favourite",
                     Toast.LENGTH_SHORT).show()
@@ -66,5 +78,10 @@ class AttractionDetailFragment(private val location: Location) : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun goBack() {
+        val mainActivity = activity as MainActivity
+        mainActivity.supportFragmentManager.popBackStackImmediate()
     }
 }

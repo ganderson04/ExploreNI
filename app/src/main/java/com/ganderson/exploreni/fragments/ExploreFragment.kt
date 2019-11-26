@@ -17,7 +17,15 @@ class ExploreFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (activity as MainActivity).supportActionBar?.title = "Explore"
+        // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
+        // as an object of MainActivity.
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.title = "Explore"
+
+        // Hide the back button in the toolbar on top-level menu options.
+        actionBar?.setDisplayHomeAsUpEnabled(false)
+        actionBar?.setDisplayShowHomeEnabled(false)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_explore, container, false)
     }
