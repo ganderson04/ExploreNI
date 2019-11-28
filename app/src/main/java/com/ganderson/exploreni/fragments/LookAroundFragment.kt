@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.models.Location
 import com.google.ar.core.Config
 import com.google.ar.core.Session
@@ -90,8 +91,9 @@ class LookAroundFragment : Fragment() {
                         locationScene?.mLocationMarkers?.add(locationMarker)
                         locationMarker.anchorNode?.isEnabled = true
                         locationMarker.scalingMode = LocationMarker.ScalingMode.FIXED_SIZE_ON_SCREEN
+                        locationMarker.scaleModifier = 0.75f
+
                         locationScene?.refreshAnchors()
-                        loadingFinished = true
                     }
                 }
 
@@ -110,9 +112,20 @@ class LookAroundFragment : Fragment() {
         node.renderable = lookAroundLayoutFuture.get()
 
         val nodeLayout = lookAroundLayoutFuture.get().view
-        val locationName = nodeLayout.name
+        nodeLayout.name.text = location.name
 
-        locationName.text = location.name
+        val locationDistance = Utils.getHaversineGCD(
+            locationScene!!.deviceLocation!!.currentBestLocation!!.latitude,
+            locationScene!!.deviceLocation!!.currentBestLocation!!.longitude,
+            location.lat.toDouble(),
+            location.long.toDouble()
+        )
+
+        // TODO: Add check for user's distance measurement preference. Using imperial for now.
+        val formattedDistance = Utils.DISTANCE_FORMATTER
+            .format(Utils.distanceToImperial(locationDistance))
+
+        nodeLayout.distance.text = formattedDistance + " miles"
 
         nodeLayout.setOnTouchListener { _, _ ->
             val attractionDetailFragment = AttractionDetailFragment(location)
