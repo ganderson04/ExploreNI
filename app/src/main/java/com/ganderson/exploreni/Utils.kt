@@ -1,11 +1,16 @@
 package com.ganderson.exploreni
 
+import java.text.DecimalFormat
 import kotlin.math.*
 
 class Utils {
 
+    // Kotlin does not support classes of static methods, or "library classes", in the same way
+    // Java does. "Companion objects" can be used to provide this functionality.
     companion object {
-        private const val EARTH_RADIUS = 6372.8 // Earth's radius in kilometres
+        private const val EARTH_RADIUS = 6371.0 // Earth's radius in kilometres
+        private const val DISTANCE_SCALE = 1.609 // Conversion between miles and kilometres
+        val DISTANCE_FORMATTER = DecimalFormat("0.00")
 
         /**
          * Calculates the Great Circle distance between locations using the Haversine
@@ -24,5 +29,9 @@ class Utils {
                     cos(lat2Radians)
             return 2.0 * EARTH_RADIUS * asin(sqrt(a))
         }
+
+        fun distanceToImperial(metricDistance: Double) = metricDistance / DISTANCE_SCALE
+
+        fun distanceToMetric(imperialDistance: Double) = imperialDistance * DISTANCE_SCALE
     }
 }
