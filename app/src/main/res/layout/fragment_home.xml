@@ -5,10 +5,77 @@
     android:layout_height="match_parent"
     tools:context=".fragments.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+<!--    &lt;!&ndash; TODO: Update blank fragment layout &ndash;&gt;-->
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:text="Home" />-->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Home" />
+        android:orientation="vertical"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <RelativeLayout
+                android:id="@+id/rlWeather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:clipToPadding="false"
+                android:elevation="10dp">
+
+                <TextView
+                    android:id="@+id/tvWeatherTown"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:textColor="@android:color/black"
+                    android:text="Belfast"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvWeatherDescription"
+                    android:layout_alignParentStart="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvWeatherTown"
+                    android:textSize="25sp"
+                    android:textColor="@android:color/black"
+                    android:text="Sunny"/>
+
+                <TextView
+                    android:id="@+id/tvWeatherTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textSize="40sp"
+                    android:text="10°C"
+                    android:textColor="@android:color/black"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>

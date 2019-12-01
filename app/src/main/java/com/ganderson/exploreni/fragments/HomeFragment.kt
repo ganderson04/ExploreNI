@@ -8,11 +8,24 @@ import androidx.fragment.app.Fragment
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.api.OPENWEATHERMAP_API_KEY
+import com.ganderson.exploreni.api.WeatherService
+import com.ganderson.exploreni.models.api.WeatherResponse
+import kotlinx.android.synthetic.main.fragment_home.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.round
 
 /**
  * A simple [Fragment] subclass.
  */
 class HomeFragment : Fragment() {
+
+    private lateinit var retrofit: Retrofit
+    private lateinit var weatherService: WeatherService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,8 +42,47 @@ class HomeFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
+        retrofit = Retrofit.Builder()
+            .baseUrl(WeatherService.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        weatherService = retrofit.create(WeatherService::class.java)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadWeather()
+    }
+
+    private fun loadWeather() {
+        // Assemble parameters for OpenWeatherMap API call.
+        val weatherData = HashMap<String, String>()
+        weatherData["lat"] = "54.596675" //TODO: Get user location. Using Belfast city centre.
+        weatherData["lon"] = "-5.930073"
+        weatherData["units"] = "metric" //TODO: Get user measurement preference. Using metric.
+        weatherData["APPID"] = OPENWEATHERMAP_API_KEY
+
+        // Make, enqueue and process the call.
+        val weatherCall = weatherService.getCurrentWeather(weatherData)
+        weatherCall.enqueue(object: Callback<WeatherResponse> {
+            override fun onResponse(call: Call<WeatherResponse>,
+                                    response: Response<WeatherResponse>) {
+                val weatherResponse = response.body()!! // Assert non-null
+                tvWeatherDescription.text = weatherResponse.weather[0].main
+                tvWeatherTemp.text = weatherResponse
+                    .main
+                    .temp.toInt() // Truncate decimal portion of temperature
+                    .toString() + "°C" //TODO: Change between Fahrenheit/Celsius according to prefs.
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                Toast.makeText(activity, "Weather load failed", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
