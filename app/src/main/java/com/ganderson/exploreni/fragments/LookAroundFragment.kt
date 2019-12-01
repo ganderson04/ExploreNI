@@ -92,6 +92,7 @@ class LookAroundFragment : Fragment() {
                         locationMarker.anchorNode?.isEnabled = true
                         locationMarker.scalingMode = LocationMarker.ScalingMode.FIXED_SIZE_ON_SCREEN
                         locationMarker.scaleModifier = 0.75f
+                        locationMarker.setRenderEvent { updateDistance(location, vrFuture.get()) }
 
                         locationScene?.refreshAnchors()
                     }
@@ -114,6 +115,17 @@ class LookAroundFragment : Fragment() {
         val nodeLayout = lookAroundLayoutFuture.get().view
         nodeLayout.name.text = location.name
 
+        nodeLayout.setOnTouchListener { _, _ ->
+            val attractionDetailFragment = AttractionDetailFragment(location)
+            val mainActivity = this.activity as MainActivity
+            mainActivity.displayFragment(attractionDetailFragment)
+            false
+        }
+
+        return node
+    }
+
+    private fun updateDistance(location: Location, lookAroundRenderable: ViewRenderable) {
         val locationDistance = Utils.getHaversineGCD(
             locationScene!!.deviceLocation!!.currentBestLocation!!.latitude,
             locationScene!!.deviceLocation!!.currentBestLocation!!.longitude,
@@ -125,16 +137,7 @@ class LookAroundFragment : Fragment() {
         val formattedDistance = Utils.DISTANCE_FORMATTER
             .format(Utils.distanceToImperial(locationDistance))
 
-        nodeLayout.distance.text = formattedDistance + " miles"
-
-        nodeLayout.setOnTouchListener { _, _ ->
-            val attractionDetailFragment = AttractionDetailFragment(location)
-            val mainActivity = this.activity as MainActivity
-            mainActivity.displayFragment(attractionDetailFragment)
-            false
-        }
-
-        return node
+        lookAroundRenderable.view.distance.text = formattedDistance + " miles"
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
