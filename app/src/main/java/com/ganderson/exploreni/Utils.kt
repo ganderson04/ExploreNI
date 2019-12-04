@@ -3,6 +3,9 @@ package com.ganderson.exploreni
 import java.text.DecimalFormat
 import kotlin.math.*
 
+/**
+ * Contains utility methods for use throughout the application.
+ */
 class Utils {
 
     // Kotlin does not support classes of static methods, or "library classes", in the same way

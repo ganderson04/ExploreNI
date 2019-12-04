@@ -1,9 +1,13 @@
 package com.ganderson.exploreni.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import com.ganderson.exploreni.CAMERA_PERMISSION
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
@@ -22,8 +26,8 @@ import java.util.concurrent.CompletableFuture
 
 class LookAroundFragment : Fragment() {
     private var locationScene: LocationScene? = null
-    private var loadingFinished = false
 
+    // One test location.
     private val location1 = Location(
         "",
         "Belfast Castle",
@@ -35,12 +39,11 @@ class LookAroundFragment : Fragment() {
         "https://farm6.staticflickr.com/5580/15249161785_52eca1a13e_b.jpg",
         "Image by antxoa, licensed under CC BY-NC-SA 2.0."
     )
+
     private val locationList = ArrayList<Location>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
         // as an object of MainActivity.
         val actionBar = (activity as MainActivity).supportActionBar
@@ -55,7 +58,19 @@ class LookAroundFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if(asvLookAround.session == null) {
+        if(ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED) {
+            requestCameraPermission()
+        }
+        else {
+            startAr()
+        }
+    }
+
+    private fun startAr() {
+        // The ARCore session is created here. This is the "main entry point to the ARCore API".
+        // https://developers.google.com/ar/reference/java/arcore/reference/com/google/ar/core/Session
+        if (asvLookAround.session == null) {
             val arSession = Session(this.activity)
             val config = Config(arSession)
 
@@ -72,12 +87,18 @@ class LookAroundFragment : Fragment() {
         setupMarkers()
     }
 
+    /**
+     * Create location markers and add them to the ArSceneView.
+     */
     private fun setupMarkers() {
         locationList.forEach { location ->
+            // Marker graphics must be created as ARCore ViewRenderables.
             val vrFuture = ViewRenderable.builder()
                 .setView(this.activity, R.layout.layout_look_around_location)
                 .build()
 
+            // ViewRenderable.Builder#build returns a CompleteableFuture containing the view to
+            // render. It is processed here.
             CompletableFuture.anyOf(vrFuture)
                 .handle<Any> { _, exception ->
                     if(exception != null) return@handle null
@@ -91,13 +112,18 @@ class LookAroundFragment : Fragment() {
                         locationScene?.mLocationMarkers?.add(locationMarker)
                         locationMarker.anchorNode?.isEnabled = true
                         locationMarker.scalingMode = LocationMarker.ScalingMode.FIXED_SIZE_ON_SCREEN
-                        locationMarker.scaleModifier = 0.75f
+                        locationMarker.scaleModifier = 0.75f // Size reduced.
+
+                        // Distance calculated in the marker's render event. Previously it was
+                        // calculated in "loadNode" but this caused instances where the marker
+                        // would not display at all.
                         locationMarker.setRenderEvent { updateDistance(location, vrFuture.get()) }
 
                         locationScene?.refreshAnchors()
                     }
                 }
 
+            //
             asvLookAround.scene.addOnUpdateListener {
                 val arFrame = asvLookAround.arFrame
                 if(arFrame!!.camera.trackingState == TrackingState.TRACKING) {
@@ -107,6 +133,9 @@ class LookAroundFragment : Fragment() {
         }
     }
 
+    /**
+     * Load the Node which will contain the graphic and details for the marker.
+     */
     private fun loadNode(location: Location,
                          lookAroundLayoutFuture: CompletableFuture<ViewRenderable>): Node {
         val node = Node()
@@ -115,6 +144,7 @@ class LookAroundFragment : Fragment() {
         val nodeLayout = lookAroundLayoutFuture.get().view
         nodeLayout.name.text = location.name
 
+        // Load the attraction detail screen describing the attraction on which the user tapped.
         nodeLayout.setOnTouchListener { _, _ ->
             val attractionDetailFragment = AttractionDetailFragment(location)
             val mainActivity = this.activity as MainActivity
@@ -138,6 +168,40 @@ class LookAroundFragment : Fragment() {
             .format(Utils.distanceToImperial(locationDistance))
 
         lookAroundRenderable.view.distance.text = formattedDistance + " miles"
+    }
+
+    private fun requestCameraPermission() {
+        if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            AlertDialog.Builder(context!!)
+                .setTitle("Camera access requested")
+                .setMessage("Camera access is requested to enable the AR functionality.")
+                .setCancelable(false)
+                .setPositiveButton("OK") { _, _ ->
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA),
+                        CAMERA_PERMISSION)
+                }
+                .setNegativeButton("Cancel") { dialog, _ -> dialog?.dismiss() }
+                .create()
+                .show()
+        }
+        else {
+            requestPermissions(arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
+            AlertDialog.Builder(context!!)
+                .setTitle("Caution")
+                .setMessage("Camera is required for this function.")
+                .setCancelable(false)
+                .setPositiveButton("OK") { dialog, _ -> dialog?.dismiss() }
+                .show()
+        }
+        else {
+            startAr()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

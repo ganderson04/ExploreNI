@@ -24,46 +24,48 @@
             android:layout_weight="1"
             android:gravity="center">
 
-            <RelativeLayout
-                android:id="@+id/rlWeather"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:clipToPadding="false"
-                android:elevation="10dp">
+                android:layout_marginEnd="20dp">
 
-                <TextView
-                    android:id="@+id/tvWeatherTown"
-                    android:layout_alignParentStart="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="25sp"
-                    android:textColor="@android:color/black"
-                    android:text="Belfast"
-                    android:textStyle="bold"/>
+                <RelativeLayout
+                    android:id="@+id/rlWeather"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tvWeatherDescription"
-                    android:layout_alignParentStart="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/tvWeatherTown"
-                    android:textSize="25sp"
-                    android:textColor="@android:color/black"
-                    android:text="Sunny"/>
+                    <TextView
+                        android:id="@+id/tvWeatherTown"
+                        android:layout_alignParentStart="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="25sp"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold"/>
 
-                <TextView
-                    android:id="@+id/tvWeatherTemp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:textSize="40sp"
-                    android:text="10°C"
-                    android:textColor="@android:color/black"
-                    android:layout_centerInParent="true"/>
+                    <TextView
+                        android:id="@+id/tvWeatherDescription"
+                        android:layout_alignParentStart="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvWeatherTown"
+                        android:textSize="25sp"
+                        android:textColor="@android:color/black"/>
 
-            </RelativeLayout>
+                    <TextView
+                        android:id="@+id/tvWeatherTemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:textSize="40sp"
+                        android:textColor="@android:color/black"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
