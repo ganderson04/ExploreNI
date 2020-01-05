@@ -1,4 +1,4 @@
-package com.ganderson.exploreni.api
+package com.ganderson.exploreni.api.services
 
 import com.ganderson.exploreni.models.api.WeatherResponse
 import retrofit2.Call

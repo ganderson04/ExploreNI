@@ -17,9 +17,12 @@ import com.ganderson.exploreni.FINE_LOCATION_PERMISSION
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.api.GOOGLE_API_KEY
+import com.ganderson.exploreni.api.services.GeocodingService
 import com.ganderson.exploreni.api.OPENWEATHERMAP_API_KEY
-import com.ganderson.exploreni.api.WeatherService
+import com.ganderson.exploreni.api.services.WeatherService
 import com.ganderson.exploreni.models.api.WeatherResponse
+import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,8 +37,10 @@ import kotlin.collections.HashMap
  */
 class HomeFragment : Fragment() {
 
-    private lateinit var retrofit: Retrofit
-    private lateinit var weatherService: WeatherService
+    // "by lazy" initialises a variable when it is first required, not at runtime.
+    private val weatherService by lazy { setupWeatherService() }
+    private val geocodingService by lazy { setupGeocodingService() }
+
     private var locationManager: LocationManager? = null
     private var location: Location? = null
 
@@ -55,10 +60,6 @@ class HomeFragment : Fragment() {
         // Declares that this fragment will set its own menu.
         setHasOptionsMenu(true)
 
-        setupRetrofit()
-
-        weatherService = retrofit.create(WeatherService::class.java)
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
@@ -75,11 +76,24 @@ class HomeFragment : Fragment() {
         else requestLocationPermission()
     }
 
-    private fun setupRetrofit() {
-        retrofit = Retrofit.Builder()
+    private fun setupWeatherService() : WeatherService {
+        return Retrofit.Builder()
             .baseUrl(WeatherService.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+            .create(WeatherService::class.java)
+    }
+
+    private fun setupGeocodingService() : GeocodingService {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(String::class.java, GeocodingService.GeocodingDeserialiser())
+            .create()
+
+        return Retrofit.Builder()
+            .baseUrl(GeocodingService.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+            .create(GeocodingService::class.java)
     }
 
     private fun getLocation() {
@@ -97,20 +111,44 @@ class HomeFragment : Fragment() {
                 else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
-
-                tvWeatherTown.text = getLocationName()
+                setLocationName()
+//                tvWeatherTown.text = setLocationName()
             }
         }
     }
 
-    private fun getLocationName() : String {
-        // Geocoder can be used to fetch the location name.
-        val geocoder = Geocoder(activity, Locale.getDefault())
+    private fun setLocationName() {
+        // Attempt to get name via geolocation service.
+        val geocodingData = HashMap<String, String>()
+        geocodingData["latlng"] = location!!.latitude.toString() + "," + location!!.longitude.toString()
+        geocodingData["result_type"] = GeocodingService.RESULT_TYPE
+        geocodingData["key"] = GOOGLE_API_KEY
 
-        val addressList = geocoder
-            .getFromLocation(location!!.latitude, location!!.longitude, 1)
-        val address = addressList[0]
-        return address.subAdminArea
+        val geocodingCall = geocodingService.reverseGeocode(geocodingData)
+        geocodingCall.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                response.body()?.let {
+                    tvWeatherTown.text = response.body().toString()
+                }
+            }
+
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                // Attempt to use Geocoder. It may sometimes return null.
+                val geocoder: Geocoder? = Geocoder(activity, Locale.getDefault())
+
+                if(geocoder != null) {
+                    val addressList = geocoder
+                        .getFromLocation(location!!.latitude, location!!.longitude, 1)
+                    val address = addressList[0]
+                    tvWeatherTown.text = address.subAdminArea
+                }
+                else {
+                    tvWeatherTown.text = "Northern Ireland"
+                    Toast.makeText(context, "Cannot retrieve location",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
     private fun loadWeather() {
@@ -128,7 +166,6 @@ class HomeFragment : Fragment() {
                 override fun onResponse(call: Call<WeatherResponse>,
                                         response: Response<WeatherResponse>) {
                     response.body()?.let {
-                        // Assert non-null
                         tvWeatherDescription.text = it.weather[0].main
                         tvWeatherTemp.text = it.main.temp
                             .toInt() // Truncate decimal portion of temperature
