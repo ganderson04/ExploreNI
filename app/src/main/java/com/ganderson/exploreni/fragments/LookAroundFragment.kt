@@ -12,7 +12,7 @@ import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
-import com.ganderson.exploreni.models.Location
+import com.ganderson.exploreni.models.NiLocation
 import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
@@ -28,7 +28,7 @@ class LookAroundFragment : Fragment() {
     private var locationScene: LocationScene? = null
 
     // One test location.
-    private val location1 = Location(
+    private val location1 = NiLocation(
         "",
         "Belfast Castle",
         123f,
@@ -40,7 +40,7 @@ class LookAroundFragment : Fragment() {
         "Image by antxoa, licensed under CC BY-NC-SA 2.0."
     )
 
-    private val locationList = ArrayList<Location>()
+    private val locationList = ArrayList<NiLocation>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -136,7 +136,7 @@ class LookAroundFragment : Fragment() {
     /**
      * Load the Node which will contain the graphic and details for the marker.
      */
-    private fun loadNode(location: Location,
+    private fun loadNode(location: NiLocation,
                          lookAroundLayoutFuture: CompletableFuture<ViewRenderable>): Node {
         val node = Node()
         node.renderable = lookAroundLayoutFuture.get()
@@ -146,7 +146,7 @@ class LookAroundFragment : Fragment() {
 
         // Load the attraction detail screen describing the attraction on which the user tapped.
         nodeLayout.setOnTouchListener { _, _ ->
-            val attractionDetailFragment = AttractionDetailFragment(location)
+            val attractionDetailFragment = AttractionDetailFragment(location, false)
             val mainActivity = this.activity as MainActivity
             mainActivity.displayFragment(attractionDetailFragment)
             false
@@ -155,7 +155,7 @@ class LookAroundFragment : Fragment() {
         return node
     }
 
-    private fun updateDistance(location: Location, lookAroundRenderable: ViewRenderable) {
+    private fun updateDistance(location: NiLocation, lookAroundRenderable: ViewRenderable) {
         val locationDistance = Utils.getHaversineGCD(
             locationScene!!.deviceLocation!!.currentBestLocation!!.latitude,
             locationScene!!.deviceLocation!!.currentBestLocation!!.longitude,

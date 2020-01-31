@@ -9,13 +9,15 @@ import com.bumptech.glide.Glide
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.models.Location
+import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.models.api.Main
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
 /**
  * A simple [Fragment] subclass.
  */
-class AttractionDetailFragment(private val location: Location) : Fragment() {
+class AttractionDetailFragment(private val location: NiLocation,
+                               private val cameFromMap: Boolean) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -54,6 +56,9 @@ class AttractionDetailFragment(private val location: Location) : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.attraction_toolbar, menu)
+        if(cameFromMap) {
+            menu.findItem(R.id.tb_map).isVisible = false
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -82,6 +87,6 @@ class AttractionDetailFragment(private val location: Location) : Fragment() {
 
     private fun goBack() {
         val mainActivity = activity as MainActivity
-        mainActivity.supportFragmentManager.popBackStackImmediate()
+        mainActivity.supportFragmentManager.popBackStack()
     }
 }

@@ -3,12 +3,15 @@ package com.ganderson.exploreni.fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -17,9 +20,7 @@ import com.ganderson.exploreni.FINE_LOCATION_PERMISSION
 import com.ganderson.exploreni.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.api.GOOGLE_API_KEY
 import com.ganderson.exploreni.api.services.GeocodingService
-import com.ganderson.exploreni.api.OPENWEATHERMAP_API_KEY
 import com.ganderson.exploreni.api.services.WeatherService
 import com.ganderson.exploreni.models.api.WeatherResponse
 import com.google.gson.GsonBuilder
@@ -74,6 +75,12 @@ class HomeFragment : Fragment() {
             loadWeather()
         }
         else requestLocationPermission()
+
+        btnNearby.setOnClickListener {
+            val nearbyFragment = NearbyFragment(location!!)
+            val mainActivity = this.activity as MainActivity
+            mainActivity.displayFragment(nearbyFragment)
+        }
     }
 
     private fun setupWeatherService() : WeatherService {
@@ -103,7 +110,7 @@ class HomeFragment : Fragment() {
             // If the LocationManager has been instantiated, check for providers. Kotlin "?"
             // performs a null check and ".let" runs the code inside the block if the object
             // under consideration is not null.
-            locationManager?.let{
+            locationManager?.let {
                 // "it" refers to locationManager. "let" blocks are similar to lambdas.
                 if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -122,7 +129,7 @@ class HomeFragment : Fragment() {
         val geocodingData = HashMap<String, String>()
         geocodingData["latlng"] = location!!.latitude.toString() + "," + location!!.longitude.toString()
         geocodingData["result_type"] = GeocodingService.RESULT_TYPE
-        geocodingData["key"] = GOOGLE_API_KEY
+        geocodingData["key"] = resources.getString(R.string.google_api_key)
 
         val geocodingCall = geocodingService.reverseGeocode(geocodingData)
         geocodingCall.enqueue(object : Callback<String> {
@@ -158,7 +165,7 @@ class HomeFragment : Fragment() {
             weatherData["lat"] = location!!.latitude.toString()
             weatherData["lon"] = location!!.longitude.toString()
             weatherData["units"] = "metric" //TODO: Get user measurement preference. Using metric.
-            weatherData["APPID"] = OPENWEATHERMAP_API_KEY
+            weatherData["APPID"] = resources.getString(R.string.openweathermap_api_key)
 
             // Make, enqueue and process the call.
             val weatherCall = weatherService.getCurrentWeather(weatherData)
@@ -185,6 +192,23 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun showEmergencyDialog() {
+        val emergencyLayout = layoutInflater.inflate(R.layout.dialog_emergency, null)
+        val number = emergencyLayout.findViewById<LinearLayout>(R.id.llNumber)
+        number.setOnClickListener {
+            val callIntent = Intent(Intent.ACTION_DIAL)
+            callIntent.data = Uri.parse("tel:999")
+            startActivity(callIntent)
+        }
+
+        AlertDialog.Builder(this.context!!)
+            .setView(emergencyLayout)
+            .setPositiveButton("Close") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -193,8 +217,7 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.tb_emergency -> {
-                Toast.makeText(this.activity!!, "Emergency selected",
-                    Toast.LENGTH_SHORT).show()
+                showEmergencyDialog()
                 return true
             }
 
