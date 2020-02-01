@@ -23,7 +23,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.api.services.GeocodingService
 import com.ganderson.exploreni.api.services.WeatherService
-import com.ganderson.exploreni.models.api.WeatherResponse
+import com.ganderson.exploreni.models.api.Weather
 import com.ganderson.exploreni.ui.activities.SettingsActivity
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -181,18 +181,18 @@ class HomeFragment : Fragment() {
 
             // Make, enqueue and process the call.
             val weatherCall = weatherService.getCurrentWeather(weatherData)
-            weatherCall.enqueue(object : Callback<WeatherResponse> {
-                override fun onResponse(call: Call<WeatherResponse>,
-                                        response: Response<WeatherResponse>) {
+            weatherCall.enqueue(object : Callback<Weather> {
+                override fun onResponse(call: Call<Weather>,
+                                        response: Response<Weather>) {
                     response.body()?.let {
-                        tvWeatherDescription.text = it.weather[0].main
-                        tvWeatherTemp.text = it.main.temp
+                        tvWeatherDescription.text = it.desc
+                        tvWeatherTemp.text = it.temp
                             .toInt() // Truncate decimal portion of temperature
-                            .toString() + "$symbol" //TODO: Change between Fahrenheit/Celsius.
+                            .toString() + "$symbol"
                     }
                 }
 
-                override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                override fun onFailure(call: Call<Weather>, t: Throwable) {
                     Toast.makeText(activity, "Weather load failed", Toast.LENGTH_SHORT).show()
                 }
             })
@@ -286,10 +286,5 @@ class HomeFragment : Fragment() {
             getLocation()
             loadWeather()
         }
-    }
-
-    override fun onResume() {
-        Toast.makeText(this.context, "Resumed!!!", Toast.LENGTH_SHORT).show()
-        super.onResume()
     }
 }
