@@ -86,9 +86,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupWeatherService() : WeatherService {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Weather::class.java, WeatherService.WeatherDeserialiser())
+            .create()
+
         return Retrofit.Builder()
             .baseUrl(WeatherService.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(WeatherService::class.java)
     }
