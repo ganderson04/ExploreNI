@@ -14,6 +14,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.api.services.ExploreService
 import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -94,15 +95,22 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
     private fun getNearbyLocations() {
         val nearbyCall = exploreService.getNearbyLocations(userLocation.latitude,
             userLocation.longitude)
+        val loadingDialog = LoadingDialog(context!!, "Loading locations, please wait.")
+        loadingDialog.show()
+
         nearbyCall.enqueue(object: Callback<List<NiLocation>> {
             override fun onResponse(call: Call<List<NiLocation>>,
                                     response: Response<List<NiLocation>>) {
+                loadingDialog.dismiss()
+
                 response.body()?.let {
                     constructMap(it)
                 }
             }
 
             override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
+                loadingDialog.dismiss()
+
                 Toast.makeText(this@NearbyFragment.context,
                     "Unable to load locations.", Toast.LENGTH_SHORT).show()
             }
