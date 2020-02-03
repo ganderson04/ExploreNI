@@ -7,6 +7,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.CAMERA_PERMISSION
 import com.ganderson.exploreni.ui.activities.MainActivity
 
@@ -163,11 +164,20 @@ class LookAroundFragment : Fragment() {
             location.long.toDouble()
         )
 
-        // TODO: Add check for user's distance measurement preference. Using imperial for now.
-        val formattedDistance = Utils.DISTANCE_FORMATTER
-            .format(Utils.distanceToImperial(locationDistance))
+        val formattedDistance: String
 
-        lookAroundRenderable.view.distance.text = formattedDistance + " miles"
+        // The Haversine formula returns the distance in kilometres. If the user has elected to use
+        // kilometres, do no conversion. Otherwise, convert to miles.
+        if(PreferenceManager.getDefaultSharedPreferences(this.context!!)
+                .getBoolean("measurement_distance", false)) {
+            formattedDistance = Utils.DISTANCE_FORMATTER.format(locationDistance) + " km"
+        }
+        else {
+            formattedDistance = Utils.DISTANCE_FORMATTER
+                .format(Utils.distanceToImperial(locationDistance)) + " miles"
+        }
+
+        lookAroundRenderable.view.distance.text = formattedDistance
     }
 
     private fun requestCameraPermission() {
