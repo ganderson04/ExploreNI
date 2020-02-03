@@ -46,6 +46,7 @@ class HomeFragment : Fragment() {
 
     private var locationManager: LocationManager? = null
     private var location: Location? = null
+    private var useFahrenheit = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -168,8 +169,6 @@ class HomeFragment : Fragment() {
         if(location != null) {
             var units = "metric"
             var symbol = "°C"
-            val useFahrenheit = PreferenceManager.getDefaultSharedPreferences(this.context)
-                .getBoolean("measurement_temperature", false)
 
             if(useFahrenheit) {
                 units = "imperial"
@@ -290,5 +289,16 @@ class HomeFragment : Fragment() {
             getLocation()
             loadWeather()
         }
+    }
+
+    override fun onResume() {
+        // Check for settings change for temperature units
+        if (PreferenceManager.getDefaultSharedPreferences(this.context)
+            .getBoolean("measurement_temperature", false) != useFahrenheit) {
+            useFahrenheit = !useFahrenheit
+            loadWeather()
+        }
+
+        super.onResume()
     }
 }
