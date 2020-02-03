@@ -1,4 +1,4 @@
-package com.ganderson.exploreni.models.api
+package com.ganderson.exploreni.entities.api
 
 /**
  * Represents the parts of the OpenWeatherMap API response that are used for this app. Through the

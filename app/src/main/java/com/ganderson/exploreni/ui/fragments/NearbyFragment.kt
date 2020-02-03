@@ -13,7 +13,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.api.services.ExploreService
-import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.entities.NiLocation
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

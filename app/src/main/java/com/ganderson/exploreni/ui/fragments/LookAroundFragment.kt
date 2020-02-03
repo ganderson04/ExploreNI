@@ -12,7 +12,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
-import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.entities.NiLocation
 import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState

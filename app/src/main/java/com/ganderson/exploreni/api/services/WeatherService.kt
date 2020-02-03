@@ -1,6 +1,6 @@
 package com.ganderson.exploreni.api.services
 
-import com.ganderson.exploreni.models.api.Weather
+import com.ganderson.exploreni.entities.api.Weather
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement

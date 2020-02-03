@@ -23,7 +23,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.api.services.GeocodingService
 import com.ganderson.exploreni.api.services.WeatherService
-import com.ganderson.exploreni.models.api.Weather
+import com.ganderson.exploreni.entities.api.Weather
 import com.ganderson.exploreni.ui.activities.SettingsActivity
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_home.*

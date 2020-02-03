@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.entities.NiLocation
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
 /**

@@ -1,6 +1,6 @@
 package com.ganderson.exploreni.api.services
 
-import com.ganderson.exploreni.models.NiLocation
+import com.ganderson.exploreni.entities.NiLocation
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
