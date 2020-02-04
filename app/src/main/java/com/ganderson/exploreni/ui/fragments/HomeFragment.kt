@@ -79,7 +79,7 @@ class HomeFragment : Fragment() {
         }
         else requestLocationPermission()
 
-        btnNearby.setOnClickListener {
+        cvNearby.setOnClickListener {
             val nearbyFragment = NearbyFragment(location!!)
             val mainActivity = this.activity as MainActivity
             mainActivity.displayFragment(nearbyFragment)
