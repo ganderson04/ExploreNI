@@ -16,33 +16,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.FINE_LOCATION_PERMISSION
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.api.services.GeocodingService
-import com.ganderson.exploreni.api.services.WeatherService
-import com.ganderson.exploreni.entities.api.Weather
+import com.ganderson.exploreni.ui.viewmodels.HomeViewModel
 import com.ganderson.exploreni.ui.activities.SettingsActivity
-import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * A simple [Fragment] subclass.
  */
 class HomeFragment : Fragment() {
-
-    // "by lazy" initialises a variable when it is first required, not at runtime.
-    private val weatherService by lazy { setupWeatherService() }
-    private val geocodingService by lazy { setupGeocodingService() }
+    private val viewModel = HomeViewModel()
 
     private var locationManager: LocationManager? = null
     private var location: Location? = null
@@ -75,7 +64,7 @@ class HomeFragment : Fragment() {
             locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
                     as LocationManager
             getLocation()
-            loadWeather()
+            getWeather()
         }
         else requestLocationPermission()
 
@@ -84,30 +73,6 @@ class HomeFragment : Fragment() {
             val mainActivity = this.activity as MainActivity
             mainActivity.displayFragment(nearbyFragment)
         }
-    }
-
-    private fun setupWeatherService() : WeatherService {
-        val gson = GsonBuilder()
-            .registerTypeAdapter(Weather::class.java, WeatherService.WeatherDeserialiser())
-            .create()
-
-        return Retrofit.Builder()
-            .baseUrl(WeatherService.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-            .create(WeatherService::class.java)
-    }
-
-    private fun setupGeocodingService() : GeocodingService {
-        val gson = GsonBuilder()
-            .registerTypeAdapter(String::class.java, GeocodingService.GeocodingDeserialiser())
-            .create()
-
-        return Retrofit.Builder()
-            .baseUrl(GeocodingService.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-            .create(GeocodingService::class.java)
     }
 
     private fun getLocation() {
@@ -126,27 +91,23 @@ class HomeFragment : Fragment() {
                     location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
                 setLocationName()
-//                tvWeatherTown.text = setLocationName()
             }
         }
     }
 
     private fun setLocationName() {
-        // Attempt to get name via geolocation service.
-        val geocodingData = HashMap<String, String>()
-        geocodingData["latlng"] = location!!.latitude.toString() + "," + location!!.longitude.toString()
-        geocodingData["result_type"] = GeocodingService.RESULT_TYPE
-        geocodingData["key"] = resources.getString(R.string.google_api_key)
+        if(location != null) {
 
-        val geocodingCall = geocodingService.reverseGeocode(geocodingData)
-        geocodingCall.enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                response.body()?.let {
-                    tvWeatherTown.text = response.body().toString()
+            try {
+                viewModel.getLocationName(
+                    location!!.latitude,
+                    location!!.longitude,
+                    resources.getString(R.string.google_api_key)
+                ).observe(viewLifecycleOwner) {
+                    tvWeatherTown.text = it
                 }
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            catch(e: Exception) {
                 // Attempt to use Geocoder. It may sometimes return null.
                 val geocoder: Geocoder? = Geocoder(activity, Locale.getDefault())
 
@@ -162,43 +123,27 @@ class HomeFragment : Fragment() {
                         Toast.LENGTH_SHORT).show()
                 }
             }
-        })
+
+        }
     }
 
-    private fun loadWeather() {
+    private fun getWeather() {
         if(location != null) {
-            var units = "metric"
-            var symbol = "°C"
 
-            if(useFahrenheit) {
-                units = "imperial"
-                symbol = "°F"
+            viewModel.getWeather(location!!.latitude,
+                location!!.longitude,
+                useFahrenheit,
+                resources.getString(R.string.openweathermap_api_key)
+            ).observe(viewLifecycleOwner) {
+                var symbol = "°C"
+                if(useFahrenheit) symbol = "°F"
+
+                tvWeatherDescription.text = it.desc
+
+                // Decimal portion of temperature truncated.
+                tvWeatherTemp.text = "${it.temp.toInt()}$symbol"
             }
 
-            // Assemble parameters for OpenWeatherMap API call.
-            val weatherData = HashMap<String, String>()
-            weatherData["lat"] = location!!.latitude.toString()
-            weatherData["lon"] = location!!.longitude.toString()
-            weatherData["units"] = units
-            weatherData["APPID"] = resources.getString(R.string.openweathermap_api_key)
-
-            // Make, enqueue and process the call.
-            val weatherCall = weatherService.getCurrentWeather(weatherData)
-            weatherCall.enqueue(object : Callback<Weather> {
-                override fun onResponse(call: Call<Weather>,
-                                        response: Response<Weather>) {
-                    response.body()?.let {
-                        tvWeatherDescription.text = it.desc
-                        tvWeatherTemp.text = it.temp
-                            .toInt() // Truncate decimal portion of temperature
-                            .toString() + "$symbol"
-                    }
-                }
-
-                override fun onFailure(call: Call<Weather>, t: Throwable) {
-                    Toast.makeText(activity, "Weather load failed", Toast.LENGTH_SHORT).show()
-                }
-            })
         }
         else {
             tvWeatherTown.text = "Unknown"
@@ -287,7 +232,7 @@ class HomeFragment : Fragment() {
             locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
                     as LocationManager
             getLocation()
-            loadWeather()
+            getWeather()
         }
     }
 
@@ -296,7 +241,7 @@ class HomeFragment : Fragment() {
         if (PreferenceManager.getDefaultSharedPreferences(this.context)
             .getBoolean("measurement_temperature", false) != useFahrenheit) {
             useFahrenheit = !useFahrenheit
-            loadWeather()
+            getWeather()
         }
 
         super.onResume()

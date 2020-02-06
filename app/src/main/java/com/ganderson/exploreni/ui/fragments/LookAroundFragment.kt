@@ -2,11 +2,15 @@ package com.ganderson.exploreni.ui.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.CAMERA_PERMISSION
 import com.ganderson.exploreni.ui.activities.MainActivity
@@ -14,6 +18,8 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.entities.NiLocation
+import com.ganderson.exploreni.ui.components.LoadingDialog
+import com.ganderson.exploreni.ui.viewmodels.LookAroundViewModel
 import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
@@ -23,25 +29,12 @@ import kotlinx.android.synthetic.main.fragment_look_around.*
 import kotlinx.android.synthetic.main.layout_look_around_location.view.*
 import uk.co.appoly.arcorelocation.LocationMarker
 import uk.co.appoly.arcorelocation.LocationScene
+import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
 
 class LookAroundFragment : Fragment() {
+    private val viewModel = LookAroundViewModel()
     private var locationScene: LocationScene? = null
-
-    // One test location.
-    private val location1 = NiLocation(
-        "",
-        "Belfast Castle",
-        123f,
-        "",
-        "54.64276",
-        "-5.942225",
-        "Test description",
-        "https://farm6.staticflickr.com/5580/15249161785_52eca1a13e_b.jpg",
-        "Image by antxoa, licensed under CC BY-NC-SA 2.0."
-    )
-
-    private val locationList = ArrayList<NiLocation>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -84,14 +77,26 @@ class LookAroundFragment : Fragment() {
         locationScene!!.setMinimalRefreshing(true)
         locationScene!!.setOffsetOverlapping(true)
 
-        locationList.add(location1)
-        setupMarkers()
+        val locationTask = LocationTask(WeakReference(this))
+        locationTask.execute(locationScene!!)
+    }
+
+    private fun getNearbyLocations(location: DoubleArray) {
+        val loadingDialog = LoadingDialog(this.context!!, "Loading locations, please wait.")
+        loadingDialog.show()
+
+        viewModel
+            .getNearbyLocations(location[0], location[1])
+            .observe(viewLifecycleOwner) {
+                loadingDialog.dismiss()
+                setupMarkers(it)
+            }
     }
 
     /**
      * Create location markers and add them to the ArSceneView.
      */
-    private fun setupMarkers() {
+    private fun setupMarkers(locationList: List<NiLocation>) {
         locationList.forEach { location ->
             // Marker graphics must be created as ARCore ViewRenderables.
             val vrFuture = ViewRenderable.builder()
@@ -124,7 +129,6 @@ class LookAroundFragment : Fragment() {
                     }
                 }
 
-            //
             asvLookAround.scene.addOnUpdateListener {
                 val arFrame = asvLookAround.arFrame
                 if(arFrame!!.camera.trackingState == TrackingState.TRACKING) {
@@ -231,5 +235,30 @@ class LookAroundFragment : Fragment() {
         super.onPause()
         locationScene?.pause()
         asvLookAround.pause()
+    }
+
+    class LocationTask(private val fragment: WeakReference<LookAroundFragment>)
+        : AsyncTask<LocationScene, Unit, DoubleArray>() {
+
+        override fun doInBackground(vararg params: LocationScene?): DoubleArray {
+            val array = DoubleArray(2)
+            var latitude: Double?
+            var longitude: Double?
+
+            do {
+                latitude = params[0]?.deviceLocation?.currentBestLocation?.latitude
+                longitude = params[0]?.deviceLocation?.currentBestLocation?.longitude
+            } while (latitude == null || longitude == null)
+
+            array[0] = latitude
+            array[1] = longitude
+
+            return array
+        }
+
+        override fun onPostExecute(result: DoubleArray?) {
+            fragment.get()!!.getNearbyLocations(result!!)
+            super.onPostExecute(result)
+        }
     }
 }

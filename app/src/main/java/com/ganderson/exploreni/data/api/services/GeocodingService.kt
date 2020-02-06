@@ -1,4 +1,4 @@
-package com.ganderson.exploreni.api.services
+package com.ganderson.exploreni.data.api.services
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

@@ -1,4 +1,4 @@
-package com.ganderson.exploreni.api.services
+package com.ganderson.exploreni.data.api.services
 
 import com.ganderson.exploreni.entities.api.Weather
 import com.google.gson.JsonDeserializationContext
