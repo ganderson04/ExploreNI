@@ -36,7 +36,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.fragment:fragment-ktx:1.2.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
     implementation "androidx.preference:preference-ktx:1.1.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
@@ -47,8 +47,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     // ARCore libraries
-    implementation 'com.google.ar:core:1.14.0'
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.14.0'
+    implementation 'com.google.ar:core:1.15.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.15.0'
 
     // Appoly ARCore-Location
     implementation 'com.github.appoly:ARCore-Location:1.2'
