@@ -12,7 +12,7 @@ import androidx.lifecycle.observe
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.NiLocation
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.viewmodels.NearbyViewModel
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.google.android.gms.maps.CameraUpdateFactory

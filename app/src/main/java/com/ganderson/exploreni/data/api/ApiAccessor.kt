@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import com.ganderson.exploreni.data.api.services.ExploreService
 import com.ganderson.exploreni.data.api.services.GeocodingService
 import com.ganderson.exploreni.data.api.services.WeatherService
-import com.ganderson.exploreni.entities.NiLocation
+import com.ganderson.exploreni.entities.api.Event
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
 import com.google.gson.GsonBuilder
 import retrofit2.Call
@@ -17,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ApiAccessor {
     companion object {
         private val exploreLocationService by lazy { constructExploreLocationService() }
+        private val exploreEventService by lazy { constructExploreEventService() }
         private val geocodingService by lazy { constructGeocodingService() }
         private val weatherService by lazy { constructWeatherService() }
 
@@ -33,6 +35,24 @@ class ApiAccessor {
                                         response: Response<List<NiLocation>>) {
                     data.value = response.body()
                 }
+            })
+
+            return data
+        }
+
+        fun getEvents() : LiveData<List<Event>> {
+            val data = MutableLiveData<List<Event>>()
+
+            val call = exploreEventService.getEvents()
+            call.enqueue(object: Callback<List<Event>> {
+                override fun onFailure(call: Call<List<Event>>, t: Throwable) {
+                    throw t
+                }
+
+                override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
+                    data.value = response.body()
+                }
+
             })
 
             return data
@@ -102,6 +122,18 @@ class ApiAccessor {
             return Retrofit.Builder()
                 .baseUrl(ExploreService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(locationDeserialiser))
+                .build()
+                .create(ExploreService::class.java)
+        }
+
+        fun constructExploreEventService() : ExploreService {
+            val eventDeserialiser = GsonBuilder()
+                .registerTypeAdapter(Event::class.java, ExploreService.EventDeserialiser())
+                .create()
+
+            return Retrofit.Builder()
+                .baseUrl(ExploreService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(eventDeserialiser))
                 .build()
                 .create(ExploreService::class.java)
         }

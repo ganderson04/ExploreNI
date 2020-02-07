@@ -8,8 +8,6 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.CAMERA_PERMISSION
@@ -17,7 +15,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
-import com.ganderson.exploreni.entities.NiLocation
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.viewmodels.LookAroundViewModel
 import com.google.ar.core.Config
@@ -256,8 +254,8 @@ class LookAroundFragment : Fragment() {
             return array
         }
 
-        override fun onPostExecute(result: DoubleArray?) {
-            fragment.get()!!.getNearbyLocations(result!!)
+        override fun onPostExecute(result: DoubleArray) {
+            fragment.get()?.getNearbyLocations(result)
             super.onPostExecute(result)
         }
     }

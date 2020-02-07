@@ -2,7 +2,7 @@ package com.ganderson.exploreni.data
 
 import androidx.lifecycle.LiveData
 import com.ganderson.exploreni.data.api.ApiAccessor
-import com.ganderson.exploreni.entities.NiLocation
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
 
 class ExploreRepository {

@@ -1,6 +1,8 @@
 package com.ganderson.exploreni.data.api.services
 
-import com.ganderson.exploreni.entities.NiLocation
+import android.icu.text.SimpleDateFormat
+import com.ganderson.exploreni.entities.api.Event
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -18,15 +20,16 @@ import java.lang.reflect.Type
 interface ExploreService {
     companion object {
         const val BASE_URL = "https://explore-ni-api.herokuapp.com/api/"
+        val eventDateFormat = SimpleDateFormat("E, d LLL Y kk:mm:ss z")
     }
-
-    @GET("locations")
-    fun getAllLocations() : List<NiLocation>
 
     @POST("locations/nearby")
     @FormUrlEncoded
     fun getNearbyLocations(@Field("lat") lat: Double,
                            @Field("lon") lon: Double) : Call<List<NiLocation>>
+
+    @GET("events")
+    fun getEvents() : Call<List<Event>>
 
     class LocationDeserialiser : JsonDeserializer<NiLocation> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
@@ -52,9 +55,47 @@ interface ExploreService {
                 val lat = coordArray[1].asString
                 val long = coordArray[0].asString
 
-                return NiLocation(id, name, elevation, town, lat, long, desc, imgUrl, imgAttr)
+                return NiLocation(
+                    id,
+                    name,
+                    elevation,
+                    town,
+                    lat,
+                    long,
+                    desc,
+                    imgUrl,
+                    imgAttr
+                )
             }
             return null
         }
+    }
+
+    class EventDeserialiser : JsonDeserializer<Event> {
+        override fun deserialize(json: JsonElement?, typeOfT: Type?,
+                                 context: JsonDeserializationContext?): Event? {
+            json?.let {
+                val eventResponse = it.asJsonObject
+
+                val id = eventResponse.get("_id").asString
+                val name = eventResponse.get("name").asString
+                val desc = eventResponse.get("date").asString
+                val startDate =
+                    eventDateFormat.parse(
+                        eventResponse.get("startDate").asString
+                    )
+                val endDate =
+                    eventDateFormat.parse(
+                        eventResponse.get("endDate").asString
+                    )
+                val imgUrl = eventResponse.get("imgUrl").asString
+                val imgAttr = eventResponse.get("imgAttr").asString
+                val website = eventResponse.get("website").asString
+
+                return Event(id, name, desc, startDate, endDate, imgUrl, imgAttr, website)
+            }
+            return null
+        }
+
     }
 }
