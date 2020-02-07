@@ -18,9 +18,6 @@ interface GeocodingService {
     @GET("json?")
     fun reverseGeocode(@QueryMap params: Map<String, String>) : Call<String>
 
-    @GET("json?")
-    suspend fun reverseGeocode1(@QueryMap params: Map<String, String>) : String
-
     class GeocodingDeserialiser : JsonDeserializer<String> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
             context: JsonDeserializationContext?): String? {
