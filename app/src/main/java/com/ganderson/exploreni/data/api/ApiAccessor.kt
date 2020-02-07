@@ -114,7 +114,7 @@ class ApiAccessor {
             return data
         }
 
-        fun constructExploreLocationService() : ExploreService {
+        private fun constructExploreLocationService() : ExploreService {
             val locationDeserialiser = GsonBuilder()
                 .registerTypeAdapter(NiLocation::class.java, ExploreService.LocationDeserialiser())
                 .create()
@@ -126,7 +126,7 @@ class ApiAccessor {
                 .create(ExploreService::class.java)
         }
 
-        fun constructExploreEventService() : ExploreService {
+        private fun constructExploreEventService() : ExploreService {
             val eventDeserialiser = GsonBuilder()
                 .registerTypeAdapter(Event::class.java, ExploreService.EventDeserialiser())
                 .create()
@@ -138,7 +138,7 @@ class ApiAccessor {
                 .create(ExploreService::class.java)
         }
 
-        fun constructGeocodingService() : GeocodingService {
+        private fun constructGeocodingService() : GeocodingService {
             val geocodingDeserialiser = GsonBuilder()
                 .registerTypeAdapter(String::class.java, GeocodingService.GeocodingDeserialiser())
                 .create()
@@ -150,7 +150,7 @@ class ApiAccessor {
                 .create(GeocodingService::class.java)
         }
 
-        fun constructWeatherService() : WeatherService {
+        private fun constructWeatherService() : WeatherService {
             val weatherDeserialiser = GsonBuilder()
                 .registerTypeAdapter(Weather::class.java, WeatherService.WeatherDeserialiser())
                 .create()
