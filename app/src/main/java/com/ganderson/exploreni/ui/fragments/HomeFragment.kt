@@ -73,6 +73,12 @@ class HomeFragment : Fragment() {
             val mainActivity = this.activity as MainActivity
             mainActivity.displayFragment(nearbyFragment)
         }
+
+        cvEvents.setOnClickListener {
+            val eventFragment = EventFragment()
+            val mainActivity = this.activity as MainActivity
+            mainActivity.displayFragment(eventFragment)
+        }
     }
 
     private fun getLocation() {
@@ -97,7 +103,6 @@ class HomeFragment : Fragment() {
 
     private fun setLocationName() {
         if(location != null) {
-
             try {
                 viewModel.getLocationName(
                     location!!.latitude,
