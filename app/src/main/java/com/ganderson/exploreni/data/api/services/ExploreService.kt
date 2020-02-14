@@ -29,6 +29,10 @@ interface ExploreService {
     fun getNearbyLocations(@Field("lat") lat: Double,
                            @Field("lon") lon: Double) : Call<List<NiLocation>>
 
+    @POST("locations")
+    @FormUrlEncoded
+    fun getLocationsByType(@Field("type") type: String) : Call<List<NiLocation>>
+
     @GET("events")
     fun getEvents() : Call<List<Event>>
 

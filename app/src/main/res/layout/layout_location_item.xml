@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cvEvent"
+        android:id="@+id/cvLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -17,34 +17,25 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/ivEvent"
+                android:id="@+id/ivLocation"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:scaleType="fitCenter"/>
 
             <TextView
-                android:id="@+id/tvEventName"
+                android:id="@+id/tvLocationName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:text="Test"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#000000"/>
 
-            <TextView
-                android:id="@+id/tvEventDates"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="5dp"
-                android:text="Dates"
-                android:textSize="15sp"
-                android:textStyle="italic"/>
-
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
-</RelativeLayout>
+</LinearLayout>

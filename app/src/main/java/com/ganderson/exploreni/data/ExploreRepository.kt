@@ -12,6 +12,10 @@ class ExploreRepository {
             return ApiAccessor.getNearbyLocations(lat, lon)
         }
 
+        fun getLocationsByType(type: String) : LiveData<List<NiLocation>> {
+            return ApiAccessor.getLocationsByType(type)
+        }
+
         fun getLocationName(lat: Double, lon: Double, apiKey: String) : LiveData<String> {
             return ApiAccessor.getLocationName(lat, lon, apiKey)
         }

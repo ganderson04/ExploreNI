@@ -40,6 +40,24 @@ class ApiAccessor {
             return data
         }
 
+        fun getLocationsByType(type: String) : LiveData<List<NiLocation>> {
+            val data = MutableLiveData<List<NiLocation>>()
+
+            val call = exploreLocationService.getLocationsByType(type)
+            call.enqueue(object: Callback<List<NiLocation>> {
+                override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
+                    throw t
+                }
+
+                override fun onResponse(call: Call<List<NiLocation>>,
+                                        response: Response<List<NiLocation>>) {
+                    data.value = response.body()
+                }
+            })
+
+            return data
+        }
+
         fun getEvents() : LiveData<List<Event>> {
             val data = MutableLiveData<List<Event>>()
 

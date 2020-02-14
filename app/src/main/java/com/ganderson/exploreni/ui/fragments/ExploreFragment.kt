@@ -7,16 +7,16 @@ import androidx.fragment.app.Fragment
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.entities.LocationType
+import kotlinx.android.synthetic.main.fragment_explore.*
 
 /**
  * A simple [Fragment] subclass.
  */
 class ExploreFragment : Fragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
         // as an object of MainActivity.
         val actionBar = (activity as MainActivity).supportActionBar
@@ -30,10 +30,33 @@ class ExploreFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_explore, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        cvSee.setOnClickListener {
+            showCategory(LocationType.SEE)
+        }
+
+        cvDo.setOnClickListener {
+            showCategory(LocationType.DO)
+        }
+
+        cvStay.setOnClickListener {
+            showCategory(LocationType.STAY)
+        }
+
+        cvEat.setOnClickListener {
+            showCategory(LocationType.EAT)
+        }
+    }
+
+    private fun showCategory(locationType: LocationType) {
+        val categoryFragment = ExploreCategoryFragment(locationType)
+        val mainActivity = activity as MainActivity
+        mainActivity.displayFragment(categoryFragment)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         super.onCreateOptionsMenu(menu, inflater)
     }
-
-
 }
