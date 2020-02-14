@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_explore_category.*
  */
 class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
     private val viewModel = ExploreViewModel()
+    private lateinit var locationList: ArrayList<NiLocation>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -47,13 +48,12 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getLocations(locationType)
-            .observe(viewLifecycleOwner) {
-                val linearLayoutManager = LinearLayoutManager(this.context,
-                    LinearLayoutManager.VERTICAL, false)
-                val locationAdapter = LocationAdapter(it.sortedBy { it.name })
+            .observe(viewLifecycleOwner) { list ->
+                locationList = ArrayList(list)
+                locationList.sortBy { it.name }
 
-                rvLocations.layoutManager = linearLayoutManager
-                rvLocations.adapter = locationAdapter
+                rvLocations.layoutManager = LinearLayoutManager(this.context)
+                rvLocations.adapter = LocationAdapter(locationList)
             }
     }
 
