@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
+import android.widget.Toast
 import androidx.lifecycle.observe
+import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
@@ -21,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.fragment_nearby.*
 
 /**
  * A simple [Fragment] subclass.
@@ -28,6 +32,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class NearbyFragment(private val userLocation: Location) : Fragment() {
     private val viewModel: NearbyViewModel =
         NearbyViewModel()
+    private var useMetric = false
+    private var currentSeekRadius = 5
     private lateinit var map: GoogleMap
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +58,26 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
                 as SupportMapFragment
+
+        useMetric = PreferenceManager
+            .getDefaultSharedPreferences(this.context)
+            .getBoolean("measurement_distance", false)
+
+        skbNearbyRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
+                                           fromUser: Boolean) {}
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                seekBar?.let {
+                    if (it.progress != currentSeekRadius) {
+                        currentSeekRadius = it.progress
+                        getNearbyLocations()
+                    }
+                }
+            }
+        })
 
         frgMap.getMapAsync {
             this.map = it
@@ -80,10 +106,19 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
         loadingDialog.show()
 
         viewModel
-            .getNearbyLocations(userLocation.latitude, userLocation.longitude)
+            .getNearbyLocations(userLocation.latitude, userLocation.longitude, currentSeekRadius)
             .observe(viewLifecycleOwner) {
                 loadingDialog.dismiss()
-                constructMap(it)
+                if(it.isNotEmpty()) {
+                    constructMap(it)
+                }
+                else {
+                    map.clear()
+
+                    Toast
+                        .makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
     }
 

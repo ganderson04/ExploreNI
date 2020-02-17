@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.*
+import android.widget.SeekBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -33,6 +35,9 @@ import java.util.concurrent.CompletableFuture
 class LookAroundFragment : Fragment() {
     private val viewModel = LookAroundViewModel()
     private var locationScene: LocationScene? = null
+    private var locationReady = false
+    private var useMetric = false
+    private var currentSeekRadius = 5
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -56,6 +61,27 @@ class LookAroundFragment : Fragment() {
         }
         else {
             startAr()
+            useMetric = PreferenceManager
+                .getDefaultSharedPreferences(this.context)
+                .getBoolean("measurement_distance", false)
+
+            skbArRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
+                    fromUser: Boolean) {}
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    if(locationReady) {
+                        seekBar?.let {
+                            if (it.progress != currentSeekRadius) {
+                                currentSeekRadius = it.progress
+                                getNearbyLocations()
+                            }
+                        }
+                    }
+                }
+            })
         }
     }
 
@@ -76,18 +102,36 @@ class LookAroundFragment : Fragment() {
         locationScene!!.setOffsetOverlapping(true)
 
         val locationTask = LocationTask(WeakReference(this))
-        locationTask.execute(locationScene!!)
+        locationTask.execute(locationScene)
     }
 
-    private fun getNearbyLocations(location: DoubleArray) {
+    private fun locationIsReady(ready: Boolean) {
+        locationReady = ready
+        getNearbyLocations()
+    }
+
+    private fun getNearbyLocations() {
         val loadingDialog = LoadingDialog(this.context!!, "Loading locations, please wait.")
         loadingDialog.show()
 
+        val lat = locationScene!!.deviceLocation.currentBestLocation.latitude
+        val lon = locationScene!!.deviceLocation.currentBestLocation.longitude
+
         viewModel
-            .getNearbyLocations(location[0], location[1])
+            .getNearbyLocations(lat, lon, currentSeekRadius)
             .observe(viewLifecycleOwner) {
                 loadingDialog.dismiss()
-                setupMarkers(it)
+
+                if(it.isNotEmpty()) {
+                    setupMarkers(it)
+                }
+                else {
+                    locationScene!!.clearMarkers()
+
+                    Toast
+                        .makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
     }
 
@@ -170,13 +214,14 @@ class LookAroundFragment : Fragment() {
 
         // The Haversine formula returns the distance in kilometres. If the user has elected to use
         // kilometres, do no conversion. Otherwise, convert to miles.
-        if(PreferenceManager.getDefaultSharedPreferences(this.context!!)
-                .getBoolean("measurement_distance", false)) {
+        if(useMetric) {
             formattedDistance = Utils.DISTANCE_FORMATTER.format(locationDistance) + " km"
         }
         else {
             formattedDistance = Utils.DISTANCE_FORMATTER
-                .format(Utils.distanceToImperial(locationDistance)) + " miles"
+                .format(
+                    Utils.distanceToImperial(locationDistance)
+                ) + " miles"
         }
 
         lookAroundRenderable.view.distance.text = formattedDistance
@@ -236,9 +281,9 @@ class LookAroundFragment : Fragment() {
     }
 
     class LocationTask(private val fragment: WeakReference<LookAroundFragment>)
-        : AsyncTask<LocationScene, Unit, DoubleArray>() {
+        : AsyncTask<LocationScene, Unit, Boolean>() {
 
-        override fun doInBackground(vararg params: LocationScene?): DoubleArray {
+        override fun doInBackground(vararg params: LocationScene?): Boolean {
             val array = DoubleArray(2)
             var latitude: Double?
             var longitude: Double?
@@ -251,11 +296,11 @@ class LookAroundFragment : Fragment() {
             array[0] = latitude
             array[1] = longitude
 
-            return array
+            return true
         }
 
-        override fun onPostExecute(result: DoubleArray) {
-            fragment.get()?.getNearbyLocations(result)
+        override fun onPostExecute(result: Boolean) {
+            fragment.get()?.locationIsReady(result)
             super.onPostExecute(result)
         }
     }

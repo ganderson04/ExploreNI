@@ -7,7 +7,7 @@ import com.ganderson.exploreni.entities.api.NiLocation
 
 class NearbyViewModel : ViewModel() {
 
-    fun getNearbyLocations(lat: Double, lon: Double) : LiveData<List<NiLocation>> {
-        return ExploreRepository.getNearbyLocations(lat, lon)
+    fun getNearbyLocations(lat: Double, lon: Double, radius: Int) : LiveData<List<NiLocation>> {
+        return ExploreRepository.getNearbyLocations(lat, lon, radius)
     }
 }

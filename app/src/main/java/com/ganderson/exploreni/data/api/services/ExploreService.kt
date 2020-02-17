@@ -27,7 +27,8 @@ interface ExploreService {
     @POST("locations/nearby")
     @FormUrlEncoded
     fun getNearbyLocations(@Field("lat") lat: Double,
-                           @Field("lon") lon: Double) : Call<List<NiLocation>>
+                           @Field("lon") lon: Double,
+                           @Field("radius") radius: Int) : Call<List<NiLocation>>
 
     @POST("locations")
     @FormUrlEncoded
@@ -41,36 +42,38 @@ interface ExploreService {
                                  context: JsonDeserializationContext?): NiLocation? {
             json?.let {
                 val locationResponse = it.asJsonObject
+                if(!locationResponse.has("error")) {
 
-                val id = locationResponse.get("_id").asString
-                val name = locationResponse.get("name").asString
-                val elevation = locationResponse.get("elevation").asFloat
-                val town = locationResponse.get("town").asString
-                val desc = locationResponse.get("desc").asString
-                val imgUrl = locationResponse.get("imgUrl").asString
-                val imgAttr = locationResponse.get("imgAttr").asString
+                    val id = locationResponse.get("_id").asString
+                    val name = locationResponse.get("name").asString
+                    val elevation = locationResponse.get("elevation").asFloat
+                    val town = locationResponse.get("town").asString
+                    val desc = locationResponse.get("desc").asString
+                    val imgUrl = locationResponse.get("imgUrl").asString
+                    val imgAttr = locationResponse.get("imgAttr").asString
 
-                // MongoDB requires the coordinates of a location to be stored in an array within
-                // an inner JSON object in order to conduct geoqueries.
-                val coordObject = locationResponse.getAsJsonObject("location")
-                val coordArray = coordObject.getAsJsonArray("coordinates")
+                    // MongoDB requires the coordinates of a location to be stored in an array within
+                    // an inner JSON object in order to conduct geoqueries.
+                    val coordObject = locationResponse.getAsJsonObject("location")
+                    val coordArray = coordObject.getAsJsonArray("coordinates")
 
-                // While coordinates are typically expressed as "latitude,longitude", MongoDB
-                // requires the longitude to come first in the array.
-                val lat = coordArray[1].asString
-                val long = coordArray[0].asString
+                    // While coordinates are typically expressed as "latitude,longitude", MongoDB
+                    // requires the longitude to come first in the array.
+                    val lat = coordArray[1].asString
+                    val long = coordArray[0].asString
 
-                return NiLocation(
-                    id,
-                    name,
-                    elevation,
-                    town,
-                    lat,
-                    long,
-                    desc,
-                    imgUrl,
-                    imgAttr
-                )
+                    return NiLocation(
+                        id,
+                        name,
+                        elevation,
+                        town,
+                        lat,
+                        long,
+                        desc,
+                        imgUrl,
+                        imgAttr
+                    )
+                }
             }
             return null
         }

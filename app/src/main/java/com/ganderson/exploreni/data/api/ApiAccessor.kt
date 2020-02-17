@@ -17,15 +17,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class ApiAccessor {
     companion object {
+        private const val API_ERROR_CODE = 404
         private val exploreLocationService by lazy { constructExploreLocationService() }
         private val exploreEventService by lazy { constructExploreEventService() }
         private val geocodingService by lazy { constructGeocodingService() }
         private val weatherService by lazy { constructWeatherService() }
 
-        fun getNearbyLocations(lat: Double, lon: Double) : LiveData<List<NiLocation>> {
+        fun getNearbyLocations(lat: Double, lon: Double, radius:Int)
+                : LiveData<List<NiLocation>> {
             val data = MutableLiveData<List<NiLocation>>()
 
-            val call = exploreLocationService.getNearbyLocations(lat, lon)
+            val call = exploreLocationService.getNearbyLocations(lat, lon, radius)
             call.enqueue(object: Callback<List<NiLocation>> {
                 override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
                     throw t
@@ -33,7 +35,12 @@ class ApiAccessor {
 
                 override fun onResponse(call: Call<List<NiLocation>>,
                                         response: Response<List<NiLocation>>) {
-                    data.value = response.body()
+                    if(response.code() != API_ERROR_CODE) {
+                        data.value = response.body()
+                    }
+                    else {
+                        data.value = emptyList()
+                    }
                 }
             })
 

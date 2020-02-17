@@ -8,8 +8,8 @@ import com.ganderson.exploreni.entities.api.Weather
 
 class ExploreRepository {
     companion object {
-        fun getNearbyLocations(lat: Double, lon: Double) : LiveData<List<NiLocation>> {
-            return ApiAccessor.getNearbyLocations(lat, lon)
+        fun getNearbyLocations(lat: Double, lon: Double, radius: Int) : LiveData<List<NiLocation>> {
+            return ApiAccessor.getNearbyLocations(lat, lon, radius)
         }
 
         fun getLocationsByType(type: String) : LiveData<List<NiLocation>> {

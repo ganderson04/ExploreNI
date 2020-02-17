@@ -5,9 +5,21 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.LookAroundFragment">
 
-    <com.google.ar.sceneform.ArSceneView
-        android:id="@+id/asvLookAround"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        <com.google.ar.sceneform.ArSceneView
+            android:id="@+id/asvLookAround"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <SeekBar
+            android:id="@+id/skbArRange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:min="1"
+            android:max="5"
+            android:progress="5"/>
 
 </FrameLayout>

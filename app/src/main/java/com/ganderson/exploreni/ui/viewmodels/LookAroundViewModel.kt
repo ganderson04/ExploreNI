@@ -6,7 +6,7 @@ import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.api.NiLocation
 
 class LookAroundViewModel : ViewModel() {
-    fun getNearbyLocations(lat: Double, lon: Double) : LiveData<List<NiLocation>> {
-        return ExploreRepository.getNearbyLocations(lat, lon)
+    fun getNearbyLocations(lat: Double, lon: Double, radius: Int) : LiveData<List<NiLocation>> {
+        return ExploreRepository.getNearbyLocations(lat, lon, radius)
     }
 }
