@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.couchbase.lite.CouchbaseLite
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         // Start with the home screen.
         displayFragment(HomeFragment())
+
+        CouchbaseLite.init(this)
     }
 
     /**

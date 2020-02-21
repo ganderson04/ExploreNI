@@ -2,6 +2,7 @@ package com.ganderson.exploreni.data
 
 import androidx.lifecycle.LiveData
 import com.ganderson.exploreni.data.api.ApiAccessor
+import com.ganderson.exploreni.data.db.DbAccessor
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
@@ -27,6 +28,18 @@ class ExploreRepository {
         fun getWeather(lat: Double, lon: Double, useFahrenheit: Boolean, apiKey: String)
                 : LiveData<Weather> {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)
+        }
+
+        fun addFavouriteLocation(niLocation: NiLocation) : Boolean {
+            return DbAccessor.addFavouriteLocation(niLocation)
+        }
+
+        fun removeFavouriteLocation(locationId: String) : Boolean {
+            return DbAccessor.removeFavouriteLocation(locationId)
+        }
+
+        fun isFavouriteLocation(locationId: String): Boolean {
+            return DbAccessor.isFavouriteLocation(locationId)
         }
     }
 }
