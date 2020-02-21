@@ -1,6 +1,7 @@
 package com.ganderson.exploreni.data
 
 import androidx.lifecycle.LiveData
+import com.couchbase.lite.ResultSet
 import com.ganderson.exploreni.data.api.ApiAccessor
 import com.ganderson.exploreni.data.db.DbAccessor
 import com.ganderson.exploreni.entities.api.Event
@@ -28,6 +29,10 @@ class ExploreRepository {
         fun getWeather(lat: Double, lon: Double, useFahrenheit: Boolean, apiKey: String)
                 : LiveData<Weather> {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)
+        }
+
+        fun getFavouriteLocations() : LiveData<List<NiLocation>> {
+            return DbAccessor.getFavouriteLocations()
         }
 
         fun addFavouriteLocation(niLocation: NiLocation) : Boolean {

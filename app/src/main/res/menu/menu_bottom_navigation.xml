@@ -22,6 +22,6 @@
 
     <item
         android:id="@+id/nav_favourites"
-        android:icon="@drawable/ic_favourite_white_24dp"
+        android:icon="@drawable/ic_star_filled_white_24dp"
         android:title="@string/nav_favourites" />
 </menu>

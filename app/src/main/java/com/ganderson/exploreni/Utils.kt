@@ -45,7 +45,7 @@ fun <T> T.toHashMap() : HashMap<String, Any> {
     return convert()
 }
 
-inline fun <reified T> HashMap<String, Any>.toDataClass() : T {
+inline fun <reified T> Map<String, Any>.toDataClass() : T {
     return convert()
 }
 
