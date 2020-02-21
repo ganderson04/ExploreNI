@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.data.db.DbAccessor
 import com.ganderson.exploreni.entities.api.NiLocation
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
@@ -17,6 +18,8 @@ import kotlinx.android.synthetic.main.fragment_attraction_detail.*
  */
 class AttractionDetailFragment(private val location: NiLocation,
                                private val cameFromMap: Boolean) : Fragment() {
+    private lateinit var menu: Menu
+    private lateinit var dbAccessor: DbAccessor
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -37,6 +40,8 @@ class AttractionDetailFragment(private val location: NiLocation,
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        dbAccessor = DbAccessor(context!!)
+
         // Loading spinner to be displayed while Glide loads the attraction image.
         val loadingSpinner = CircularProgressDrawable(this.activity!!)
         loadingSpinner.strokeWidth = 5f
@@ -55,10 +60,20 @@ class AttractionDetailFragment(private val location: NiLocation,
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.attraction_toolbar, menu)
+        this.menu = menu
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        if(isFavouriteLocation()) {
+            val item = menu.findItem(R.id.tb_favourite)
+            item.setIcon(context!!.getDrawable(R.drawable.ic_star_filled_white_24dp))
+        }
+
         if(cameFromMap) {
             menu.findItem(R.id.tb_map).isVisible = false
         }
-        super.onCreateOptionsMenu(menu, inflater)
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -69,8 +84,12 @@ class AttractionDetailFragment(private val location: NiLocation,
             }
 
             R.id.tb_favourite -> {
-                Toast.makeText(this.activity!!, "Favourite",
-                    Toast.LENGTH_SHORT).show()
+                if(!isFavouriteLocation()) {
+                    addToFavourites()
+                }
+                else {
+                    removeFromFavourites()
+                }
                 return true
             }
 
@@ -82,6 +101,28 @@ class AttractionDetailFragment(private val location: NiLocation,
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun addToFavourites() {
+        if(dbAccessor.addFavouriteLocation(location)) {
+            Toast.makeText(this.activity!!, "Favourite added!",
+                Toast.LENGTH_SHORT).show()
+            val item = menu.findItem(R.id.tb_favourite)
+            item.setIcon(R.drawable.ic_star_filled_white_24dp)
+        }
+    }
+
+    private fun removeFromFavourites() {
+        if(dbAccessor.removeFavouriteLocation(location.id)) {
+            Toast.makeText(this.activity!!, "Favourite removed!",
+                Toast.LENGTH_SHORT).show()
+            val item = menu.findItem(R.id.tb_favourite)
+            item.setIcon(R.drawable.ic_star_border_white_24dp)
+        }
+    }
+
+    private fun isFavouriteLocation() : Boolean {
+        return dbAccessor.isFavouriteLocation(location.id)
     }
 
     private fun goBack() {

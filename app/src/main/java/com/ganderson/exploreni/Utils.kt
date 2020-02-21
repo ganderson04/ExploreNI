@@ -1,5 +1,7 @@
 package com.ganderson.exploreni
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.text.DecimalFormat
 import kotlin.math.*
 
@@ -37,4 +39,18 @@ class Utils {
 
         fun distanceToMetric(imperialDistance: Double) = imperialDistance * DISTANCE_SCALE
     }
+}
+
+fun <T> T.toHashMap() : HashMap<String, Any> {
+    return convert()
+}
+
+inline fun <reified T> HashMap<String, Any>.toDataClass() : T {
+    return convert()
+}
+
+inline fun <S, reified T> S.convert() : T {
+    val gson = Gson()
+    val json = gson.toJson(this)
+    return gson.fromJson(json, object: TypeToken<T>(){}.type)
 }
