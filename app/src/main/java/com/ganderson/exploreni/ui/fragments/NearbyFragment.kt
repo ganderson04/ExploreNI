@@ -1,6 +1,5 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.location.Location
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -102,7 +101,7 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
     }
 
     private fun getNearbyLocations() {
-        val loadingDialog = LoadingDialog(context!!, "Loading locations, please wait.")
+        val loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
         loadingDialog.show()
 
         viewModel

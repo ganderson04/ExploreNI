@@ -1,6 +1,5 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -59,7 +58,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(ContextCompat.checkSelfPermission(context!!,
+        if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
                     as LocationManager
@@ -82,7 +81,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun getLocation() {
-        if(ContextCompat.checkSelfPermission(context!!,
+        if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             // If the LocationManager has been instantiated, check for providers. Kotlin "?"
@@ -166,7 +165,7 @@ class HomeFragment : Fragment() {
             startActivity(callIntent)
         }
 
-        AlertDialog.Builder(this.context!!)
+        AlertDialog.Builder(requireContext())
             .setView(emergencyLayout)
             .setPositiveButton("Close") { dialog, _ ->
                 dialog.dismiss()
@@ -201,7 +200,7 @@ class HomeFragment : Fragment() {
 
     private fun requestLocationPermission() {
         if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            AlertDialog.Builder(context!!)
+            AlertDialog.Builder(requireContext())
                 .setTitle("Location requested")
                 .setMessage("Your location is requested to show nearby attractions and " +
                         "weather updates.")
@@ -226,7 +225,7 @@ class HomeFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
                                             grantResults: IntArray) {
         if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
-            AlertDialog.Builder(context!!)
+            AlertDialog.Builder(requireContext())
                 .setTitle("Caution")
                 .setMessage("Location denied. Some features of this app may not work properly.")
                 .setCancelable(false)

@@ -26,6 +26,10 @@ class ExploreRepository {
             return ApiAccessor.getEvents()
         }
 
+        fun performSearch(query: String) : LiveData<List<NiLocation>> {
+            return ApiAccessor.performSearch(query)
+        }
+
         fun getWeather(lat: Double, lon: Double, useFahrenheit: Boolean, apiKey: String)
                 : LiveData<Weather> {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)

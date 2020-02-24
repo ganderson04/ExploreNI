@@ -2,7 +2,6 @@ package com.ganderson.exploreni.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.couchbase.lite.CouchbaseLite
 import com.ganderson.exploreni.R
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_explore -> selectedFragment = ExploreFragment()
                 R.id.nav_ar -> selectedFragment = LookAroundFragment()
                 R.id.nav_plan -> selectedFragment = PlanFragment()
-                R.id.nav_favourites -> selectedFragment = FavouritesFragment()
+                R.id.nav_favourites -> selectedFragment = FavouriteFragment()
             }
 
             if(selectedFragment != null) displayFragment(selectedFragment)

@@ -1,6 +1,5 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment

@@ -10,7 +10,6 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.data.ExploreRepository
-import com.ganderson.exploreni.data.db.DbAccessor
 import com.ganderson.exploreni.entities.api.NiLocation
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
@@ -41,7 +40,7 @@ class AttractionDetailFragment(private val location: NiLocation,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // Loading spinner to be displayed while Glide loads the attraction image.
-        val loadingSpinner = CircularProgressDrawable(this.activity!!)
+        val loadingSpinner = CircularProgressDrawable(requireContext())
         loadingSpinner.strokeWidth = 5f
         loadingSpinner.centerRadius = 30f
         loadingSpinner.start()
@@ -53,7 +52,8 @@ class AttractionDetailFragment(private val location: NiLocation,
             .error(R.drawable.placeholder_no_image_available)
             .into(ivAttraction)
 
-        tvAttraction.text = location.desc + "\n" + location.imgAttr
+        val attractionText = "${location.desc}\n${location.imgAttr}"
+        tvAttraction.text = attractionText
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -65,7 +65,7 @@ class AttractionDetailFragment(private val location: NiLocation,
     override fun onPrepareOptionsMenu(menu: Menu) {
         if(isFavouriteLocation()) {
             val item = menu.findItem(R.id.tb_favourite)
-            item.icon = context!!.getDrawable(R.drawable.ic_star_filled_white_24dp)
+            item.icon = requireContext().getDrawable(R.drawable.ic_star_filled_white_24dp)
         }
 
         if(cameFromMap) {
@@ -77,9 +77,7 @@ class AttractionDetailFragment(private val location: NiLocation,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             // This option is for the back arrow.
-            android.R.id.home -> {
-                goBack()
-            }
+            android.R.id.home -> parentFragmentManager.popBackStack()
 
             R.id.tb_favourite -> {
                 if(!isFavouriteLocation()) {
@@ -92,9 +90,7 @@ class AttractionDetailFragment(private val location: NiLocation,
             }
 
             R.id.tb_map -> {
-                Toast.makeText(
-                    this.activity!!, "View on map",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "View on map", Toast.LENGTH_SHORT).show()
                 return true
             }
         }
@@ -103,7 +99,7 @@ class AttractionDetailFragment(private val location: NiLocation,
 
     private fun addToFavourites() {
         if(ExploreRepository.addFavouriteLocation(location)) {
-            Toast.makeText(this.activity!!, "Favourite added!",
+            Toast.makeText(requireContext(), "Favourite added!",
                 Toast.LENGTH_SHORT).show()
             val item = menu.findItem(R.id.tb_favourite)
             item.setIcon(R.drawable.ic_star_filled_white_24dp)
@@ -112,7 +108,7 @@ class AttractionDetailFragment(private val location: NiLocation,
 
     private fun removeFromFavourites() {
         if(ExploreRepository.removeFavouriteLocation(location.id)) {
-            Toast.makeText(this.activity!!, "Favourite removed!",
+            Toast.makeText(requireContext(), "Favourite removed!",
                 Toast.LENGTH_SHORT).show()
             val item = menu.findItem(R.id.tb_favourite)
             item.setIcon(R.drawable.ic_star_border_white_24dp)
@@ -121,10 +117,5 @@ class AttractionDetailFragment(private val location: NiLocation,
 
     private fun isFavouriteLocation() : Boolean {
         return ExploreRepository.isFavouriteLocation(location.id)
-    }
-
-    private fun goBack() {
-        val mainActivity = activity as MainActivity
-        mainActivity.supportFragmentManager.popBackStack()
     }
 }

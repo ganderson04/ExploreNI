@@ -1,8 +1,9 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.ganderson.exploreni.ui.activities.MainActivity
 
@@ -32,6 +33,21 @@ class ExploreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        etSearch.setOnEditorActionListener { _, actionId, _ ->
+            val text = etSearch.text.toString().trim()
+            if(text.isNotEmpty()) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch(text)
+                    return@setOnEditorActionListener true
+                }
+            }
+            else {
+                Toast.makeText(requireContext(), "Please enter a search term.",
+                    Toast.LENGTH_SHORT).show()
+            }
+            return@setOnEditorActionListener false
+        }
+
         cvSee.setOnClickListener {
             showCategory(LocationType.SEE)
         }
@@ -53,6 +69,12 @@ class ExploreFragment : Fragment() {
         val categoryFragment = ExploreCategoryFragment(locationType)
         val mainActivity = activity as MainActivity
         mainActivity.displayFragment(categoryFragment)
+    }
+
+    private fun performSearch(query: String) {
+        val searchFragment = SearchFragment(query)
+        val mainActivity = activity as MainActivity
+        mainActivity.displayFragment(searchFragment)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

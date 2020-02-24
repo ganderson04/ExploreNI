@@ -10,26 +10,23 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.LocationType
-import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
-import com.ganderson.exploreni.ui.viewmodels.ExploreViewModel
-import kotlinx.android.synthetic.main.fragment_explore_category.*
+import com.ganderson.exploreni.ui.viewmodels.SearchViewModel
+import kotlinx.android.synthetic.main.fragment_search.*
 
 /**
  * A simple [Fragment] subclass.
  */
-class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
-    private val viewModel = ExploreViewModel()
-    private lateinit var locationList: ArrayList<NiLocation>
+class SearchFragment(private val query: String) : Fragment() {
+    private val viewModel = SearchViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
         // as an object of MainActivity.
         val actionBar = (activity as MainActivity).supportActionBar
-        actionBar?.title = "View Locations"
+        actionBar?.title = "Results for \"$query\""
 
         // States that this Fragment will set up its own toolbar menu.
         setHasOptionsMenu(true)
@@ -38,18 +35,15 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         actionBar?.setDisplayShowHomeEnabled(true)
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_explore_category, container, false)
+        return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getLocations(locationType)
+        viewModel.performSearch(query)
             .observe(viewLifecycleOwner) { list ->
-                locationList = ArrayList(list)
-                locationList.sortBy { it.name }
-
-                rvLocations.layoutManager = LinearLayoutManager(this.context)
-                rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+                rvSearchResults.layoutManager = LinearLayoutManager(this.context)
+                rvSearchResults.adapter = LocationAdapter(requireContext(), list)
             }
     }
 

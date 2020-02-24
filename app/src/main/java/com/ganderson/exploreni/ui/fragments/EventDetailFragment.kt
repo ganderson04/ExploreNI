@@ -1,6 +1,5 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -40,7 +39,7 @@ class EventDetailFragment(private val event: Event) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Loading spinner to be displayed while Glide loads the attraction image.
-        val loadingSpinner = CircularProgressDrawable(this.activity!!)
+        val loadingSpinner = CircularProgressDrawable(requireContext())
         loadingSpinner.strokeWidth = 5f
         loadingSpinner.centerRadius = 30f
         loadingSpinner.start()
@@ -61,16 +60,9 @@ class EventDetailFragment(private val event: Event) : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> {
-                goBack()
-            }
+            android.R.id.home -> parentFragmentManager.popBackStack()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun goBack() {
-        val mainActivity = this.activity as MainActivity
-        mainActivity.supportFragmentManager.popBackStack()
     }
 
     private fun openWebsite() {

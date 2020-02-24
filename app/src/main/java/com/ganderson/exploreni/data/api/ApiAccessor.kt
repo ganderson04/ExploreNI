@@ -58,7 +58,12 @@ class ApiAccessor {
 
                 override fun onResponse(call: Call<List<NiLocation>>,
                                         response: Response<List<NiLocation>>) {
-                    data.value = response.body()
+                    if(response.code() != API_ERROR_CODE) {
+                        data.value = response.body()
+                    }
+                    else {
+                        data.value = emptyList()
+                    }
                 }
             })
 
@@ -75,9 +80,37 @@ class ApiAccessor {
                 }
 
                 override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
-                    data.value = response.body()
+                    if(response.code() != API_ERROR_CODE) {
+                        data.value = response.body()
+                    }
+                    else {
+                        data.value = emptyList()
+                    }
                 }
 
+            })
+
+            return data
+        }
+
+        fun performSearch(query: String) : LiveData<List<NiLocation>> {
+            val data = MutableLiveData<List<NiLocation>>()
+
+            val call = exploreLocationService.performSearch(query)
+            call.enqueue(object: Callback<List<NiLocation>> {
+                override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
+                    throw t
+                }
+
+                override fun onResponse(call: Call<List<NiLocation>>,
+                                        response: Response<List<NiLocation>>) {
+                    if(response.code() != API_ERROR_CODE) {
+                        data.value = response.body()
+                    }
+                    else {
+                        data.value = emptyList()
+                    }
+                }
             })
 
             return data
@@ -130,9 +163,7 @@ class ApiAccessor {
 
                 override fun onResponse(call: Call<Weather>,
                                         response: Response<Weather>) {
-                    response.body()?.let {
-                        data.value = response.body()
-                    }
+                    data.value = response.body()
                 }
             })
 

@@ -37,6 +37,10 @@ interface ExploreService {
     @GET("events")
     fun getEvents() : Call<List<Event>>
 
+    @POST("search")
+    @FormUrlEncoded
+    fun performSearch(@Field("query") query: String) : Call<List<NiLocation>>
+
     class LocationDeserialiser : JsonDeserializer<NiLocation> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
                                  context: JsonDeserializationContext?): NiLocation? {

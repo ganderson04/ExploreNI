@@ -55,7 +55,7 @@ class LookAroundFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if(ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA) !=
+        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) !=
                 PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         }
@@ -111,7 +111,7 @@ class LookAroundFragment : Fragment() {
     }
 
     private fun getNearbyLocations() {
-        val loadingDialog = LoadingDialog(this.context!!, "Loading locations, please wait.")
+        val loadingDialog = LoadingDialog(this.requireContext(), "Loading locations, please wait.")
         loadingDialog.show()
 
         val lat = locationScene!!.deviceLocation.currentBestLocation.latitude
@@ -229,7 +229,7 @@ class LookAroundFragment : Fragment() {
 
     private fun requestCameraPermission() {
         if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            AlertDialog.Builder(context!!)
+            AlertDialog.Builder(requireContext())
                 .setTitle("Camera access requested")
                 .setMessage("Camera access is requested to enable the AR functionality.")
                 .setCancelable(false)
@@ -251,7 +251,7 @@ class LookAroundFragment : Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
-            AlertDialog.Builder(context!!)
+            AlertDialog.Builder(requireContext())
                 .setTitle("Caution")
                 .setMessage("Camera is required for this function.")
                 .setCancelable(false)
