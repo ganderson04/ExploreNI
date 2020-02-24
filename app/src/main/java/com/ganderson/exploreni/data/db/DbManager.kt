@@ -1,17 +1,16 @@
 package com.ganderson.exploreni.data.db
 
-import android.content.Context
 import com.couchbase.lite.Database
 import com.couchbase.lite.DatabaseConfiguration
 
-class DbManager private constructor(context: Context) {
+class DbManager private constructor() {
     companion object {
         private const val DB_NAME = "eni_db"
         private var instance: DbManager? = null
 
-        fun getSharedInstance(context: Context) : DbManager {
+        fun getSharedInstance() : DbManager {
             if(instance == null) {
-                instance = DbManager(context)
+                instance = DbManager()
             }
             return instance!!
         }
@@ -20,9 +19,7 @@ class DbManager private constructor(context: Context) {
     var database: Database
 
     init {
-        val config = DatabaseConfiguration(context)
-        val dir = context.getDir("CBL", Context.MODE_PRIVATE)
-        config.setDirectory(dir.toString())
+        val config = DatabaseConfiguration()
         database = Database(DB_NAME, config)
     }
 }
