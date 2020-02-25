@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.EventAdapter
 import com.ganderson.exploreni.ui.viewmodels.EventViewModel
 import kotlinx.android.synthetic.main.fragment_event.*
@@ -42,13 +44,32 @@ class EventFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val loadingDialog = LoadingDialog(requireContext(), "Loading events, please wait.")
+        loadingDialog.show()
         viewModel.getEvents()
             .observe(viewLifecycleOwner) {
-                val linearLayoutManager = LinearLayoutManager(this.context)
-                val eventAdapter = EventAdapter(requireContext(), it)
+                loadingDialog.dismiss()
+                if(it.isNotEmpty()) {
+                    val linearLayoutManager = LinearLayoutManager(this.context)
+                    val eventAdapter = EventAdapter(requireContext(), it)
 
-                rvEvents.layoutManager = linearLayoutManager
-                rvEvents.adapter = eventAdapter
+                    rvEvents.layoutManager = linearLayoutManager
+                    rvEvents.adapter = eventAdapter
+                }
+                else {
+                    val alert = AlertDialog.Builder(requireContext())
+                        .setCancelable(false)
+                        .setTitle("Error")
+                        .setMessage("No events found.")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            run {
+                                dialog.dismiss()
+                                parentFragmentManager.popBackStack()
+                            }
+                        }
+                    alert.show()
+                }
             }
     }
 

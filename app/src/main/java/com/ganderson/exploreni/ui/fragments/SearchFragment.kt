@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
 import com.ganderson.exploreni.ui.viewmodels.SearchViewModel
 import kotlinx.android.synthetic.main.fragment_search.*
@@ -40,10 +42,28 @@ class SearchFragment(private val query: String) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val loadingDialog = LoadingDialog(requireContext(), "Searching...")
+        loadingDialog.show()
         viewModel.performSearch(query)
             .observe(viewLifecycleOwner) { list ->
-                rvSearchResults.layoutManager = LinearLayoutManager(this.context)
-                rvSearchResults.adapter = LocationAdapter(requireContext(), list)
+                loadingDialog.dismiss()
+                if(list.isNotEmpty()) {
+                    rvSearchResults.layoutManager = LinearLayoutManager(this.context)
+                    rvSearchResults.adapter = LocationAdapter(requireContext(), list)
+                }
+                else {
+                    val alert = AlertDialog.Builder(requireContext())
+                        .setCancelable(false)
+                        .setTitle("No results")
+                        .setMessage("Please try another search term.")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            run {
+                                dialog.dismiss()
+                                parentFragmentManager.popBackStack()
+                            }
+                        }
+                    alert.show()
+                }
             }
     }
 

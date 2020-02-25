@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.LocationType
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
 import com.ganderson.exploreni.ui.viewmodels.ExploreViewModel
 import kotlinx.android.synthetic.main.fragment_explore_category.*
@@ -43,13 +45,32 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val loadingDialog = LoadingDialog(requireContext(),
+            "Loading locations, please wait.")
+        loadingDialog.show()
         viewModel.getLocations(locationType)
             .observe(viewLifecycleOwner) { list ->
-                locationList = ArrayList(list)
-                locationList.sortBy { it.name }
+                loadingDialog.dismiss()
+                if(list.isNotEmpty()) {
+                    locationList = ArrayList(list)
+                    locationList.sortBy { it.name }
 
-                rvLocations.layoutManager = LinearLayoutManager(this.context)
-                rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+                    rvLocations.layoutManager = LinearLayoutManager(this.context)
+                    rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+                }
+                else {
+                    val alert = AlertDialog.Builder(requireContext())
+                        .setCancelable(false)
+                        .setTitle("Error")
+                        .setMessage("No locations found for this type.")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            run {
+                                dialog.dismiss()
+                                parentFragmentManager.popBackStack()
+                            }
+                        }
+                    alert.show()
+                }
             }
     }
 
