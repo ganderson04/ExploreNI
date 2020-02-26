@@ -21,7 +21,6 @@ import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
-import com.ganderson.exploreni.ui.components.adapters.SortDialog
 import com.ganderson.exploreni.ui.viewmodels.ExploreViewModel
 import kotlinx.android.synthetic.main.fragment_explore_category.*
 
@@ -29,13 +28,13 @@ import kotlinx.android.synthetic.main.fragment_explore_category.*
  * A simple [Fragment] subclass.
  */
 class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
-    private val viewModel = ExploreViewModel()
+    private val viewModel = ExploreViewModel(locationType)
     private val sortOptions = arrayOf("A-Z", "Distance")
 
     private var locationManager: LocationManager? = null
     private var location: Location? = null
     private lateinit var sortDialog: Dialog
-    private lateinit var locationList: ArrayList<NiLocation>
+    private val locationList = ArrayList<NiLocation>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -72,22 +71,23 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                 }
             }
 
-            createSortDialog()
+            // Create new Dialog only if this is a new instantiation. See the comment below.
+            if(locationList.isEmpty()) createSortDialog()
         }
 
-        val loadingDialog = LoadingDialog(requireContext(),
-            "Loading locations, please wait.")
-        loadingDialog.show()
-        viewModel.getLocations(locationType)
-            .observe(viewLifecycleOwner) { list ->
+        // If the list is empty it must be a new instantiation of this fragment, so show the
+        // loading dialog and begin observing the ViewModel's LiveData.
+        if(locationList.isEmpty()) {
+            val loadingDialog = LoadingDialog(requireContext(),
+                "Loading locations, please wait.")
+            loadingDialog.show()
+            viewModel.locations.observe(viewLifecycleOwner) { list ->
                 loadingDialog.dismiss()
-                if(list.isNotEmpty()) {
-                    locationList = ArrayList(list)
-
-                    rvLocations.layoutManager = LinearLayoutManager(this.context)
-                    rvLocations.adapter = LocationAdapter(requireContext(), locationList)
-                }
-                else {
+                if (list.isNotEmpty()) {
+                    locationList.clear()
+                    locationList.addAll(list)
+                    displayLocations()
+                } else {
                     val alert = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle("Error")
@@ -101,6 +101,15 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                     alert.show()
                 }
             }
+        }
+        else {
+            displayLocations()
+        }
+    }
+
+    private fun displayLocations() {
+        rvLocations.layoutManager = LinearLayoutManager(this.context)
+        rvLocations.adapter = LocationAdapter(requireContext(), locationList)
     }
 
     private fun createSortDialog() {
