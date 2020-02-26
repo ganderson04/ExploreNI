@@ -53,7 +53,6 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                 loadingDialog.dismiss()
                 if(list.isNotEmpty()) {
                     locationList = ArrayList(list)
-                    locationList.sortBy { it.name }
 
                     rvLocations.layoutManager = LinearLayoutManager(this.context)
                     rvLocations.adapter = LocationAdapter(requireContext(), locationList)
