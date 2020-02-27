@@ -23,18 +23,21 @@ import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
 import com.ganderson.exploreni.ui.viewmodels.ExploreViewModel
 import kotlinx.android.synthetic.main.fragment_explore_category.*
+import java.util.stream.Collectors
 
 /**
  * A simple [Fragment] subclass.
  */
-class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
+class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
     private val viewModel = ExploreViewModel(locationType)
     private val sortOptions = arrayOf("A-Z", "Distance")
 
     private var locationManager: LocationManager? = null
     private var location: Location? = null
     private lateinit var sortDialog: Dialog
+    private lateinit var filterDialog: Dialog
     private val locationList = ArrayList<NiLocation>()
+    private val currentFilterList = ArrayList<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -55,6 +58,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        rvLocations.layoutManager = LinearLayoutManager(requireContext())
 
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -87,6 +91,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                     locationList.clear()
                     locationList.addAll(list)
                     displayLocations()
+                    createFilterDialog()
                 } else {
                     val alert = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
@@ -108,8 +113,20 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
     }
 
     private fun displayLocations() {
-        rvLocations.layoutManager = LinearLayoutManager(this.context)
-        rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+        if(currentFilterList.isNotEmpty()) {
+            filterList()
+        }
+        else {
+            rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+        }
+    }
+
+    private fun getDistinctTags() : List<String> {
+        val allTags = ArrayList<String>()
+        val distinctTagList = ArrayList<String>()
+        locationList.forEach { location -> allTags.addAll(location.locTags) }
+        distinctTagList.addAll(allTags.stream().distinct().collect(Collectors.toList()))
+        return distinctTagList
     }
 
     private fun createSortDialog() {
@@ -123,6 +140,36 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         sortDialog = dialog
     }
 
+    private fun createFilterDialog() {
+        val tagList = getDistinctTags()
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Filter")
+            .setCancelable(false)
+            .setMultiChoiceItems(tagList.toTypedArray(), null) { _, which, isChecked ->
+                val item = tagList[which]
+                if(isChecked && !currentFilterList.contains(item)) {
+                    currentFilterList.add(item)
+                }
+                else if(currentFilterList.contains(item)) {
+                    currentFilterList.remove(item)
+                }
+            }
+            .setPositiveButton("Close") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setNegativeButton("Clear all") { dialog, _ ->
+                (dialog as AlertDialog).listView.clearChoices()
+                currentFilterList.clear()
+                dialog.dismiss()
+            }
+            .setOnDismissListener {
+                displayLocations()
+            }
+            .create()
+        filterDialog = dialog
+    }
+
     private fun sortList(option: Int) {
         if(option == 0) locationList.sortBy { it.name }
         else locationList.sortWith(compareBy {
@@ -130,6 +177,20 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                 it.lat.toDouble(), it.long.toDouble())
         })
         rvLocations.adapter?.notifyDataSetChanged()
+    }
+
+    private fun filterList() {
+        val filteredLocations = locationList.filter { location ->
+            run {
+                location.locTags.forEach { tag ->
+                    run {
+                        if (currentFilterList.contains(tag)) return@filter true
+                    }
+                }
+                return@filter false
+            }
+        }
+        rvLocations.adapter = LocationAdapter(requireContext(), filteredLocations)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -141,6 +202,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         when(item.itemId) {
             android.R.id.home -> parentFragmentManager.popBackStack()
             R.id.tb_sort -> sortDialog.show()
+            R.id.tb_filter -> filterDialog.show()
         }
         return super.onOptionsItemSelected(item)
     }

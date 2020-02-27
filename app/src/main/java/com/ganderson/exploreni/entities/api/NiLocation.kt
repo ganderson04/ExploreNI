@@ -11,4 +11,5 @@ data class NiLocation(val id: String,
                       val long: String,
                       val desc: String,
                       val imgUrl: String,
-                      val imgAttr: String)
+                      val imgAttr: String,
+                      val locTags: List<String>)

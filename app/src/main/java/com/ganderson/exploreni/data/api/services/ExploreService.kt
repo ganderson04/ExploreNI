@@ -2,9 +2,11 @@ package com.ganderson.exploreni.data.api.services
 
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
+import com.google.gson.Gson
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -55,6 +57,8 @@ interface ExploreService {
                     val desc = locationResponse.get("desc").asString
                     val imgUrl = locationResponse.get("imgUrl").asString
                     val imgAttr = locationResponse.get("imgAttr").asString
+                    val locTags = Gson().fromJson<List<String>>(locationResponse["locTags"],
+                        object: TypeToken<List<String>>(){}.type)
 
                     // MongoDB requires the coordinates of a location to be stored in an array within
                     // an inner JSON object in order to conduct geoqueries.
@@ -75,7 +79,8 @@ interface ExploreService {
                         long,
                         desc,
                         imgUrl,
-                        imgAttr
+                        imgAttr,
+                        locTags
                     )
                 }
             }
