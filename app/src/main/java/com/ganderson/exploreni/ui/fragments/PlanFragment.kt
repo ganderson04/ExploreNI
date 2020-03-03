@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
+import kotlinx.android.synthetic.main.fragment_plan.*
 
 /**
  * A simple [Fragment] subclass.
@@ -27,6 +28,17 @@ class PlanFragment : Fragment() {
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_plan, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnNewItinerary.setOnClickListener {
+            val fragment = ItineraryViewerFragment(true)
+            val mainActivity = activity as MainActivity
+            mainActivity.displayFragment(fragment)
+        }
+
+        btnMyItineraries.setOnClickListener {}
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

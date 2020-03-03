@@ -5,10 +5,37 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.PlanFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Plan" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnNewItinerary"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            style="?android:attr/buttonBarButtonStyle"
+            android:background="@color/colorPrimaryDark"
+            android:text="New Itinerary"
+            android:textColor="#FFFFFF"/>
+
+        <Button
+            android:id="@+id/btnMyItineraries"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            style="?android:attr/buttonBarButtonStyle"
+            android:background="@color/colorPrimaryDark"
+            android:text="My Itineraries"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
 
 </FrameLayout>
