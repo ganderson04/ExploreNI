@@ -4,22 +4,26 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.activities.MainActivity
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
 class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
+    val itemList = ArrayList<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +37,8 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         // Hide the back button in the toolbar on top-level menu options.
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setDisplayShowHomeEnabled(true)
+
+        setHasOptionsMenu(true)
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_itinerary_viewer, container, false)
@@ -82,5 +88,59 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         }
 
         dialog.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.itinerary_viewer_toolbar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        if(isNew) {
+            val item = menu.findItem(R.id.tb_edit_itinerary)
+            item.isVisible = false
+        }
+        else {
+            val item = menu.findItem(R.id.tb_add_location)
+            item.isVisible = false
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> parentFragmentManager.popBackStack()
+            R.id.tb_add_location -> add()
+            R.id.tb_edit_itinerary -> Toast
+                .makeText(requireContext(), "Edit", Toast.LENGTH_SHORT).show()
+            R.id.tb_itinerary_map -> Toast
+                .makeText(requireContext(), "Map", Toast.LENGTH_SHORT).show()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun add() {
+
+    }
+
+    class ItineraryAdapter(val context: Context, val itemList: ArrayList<String>)
+        : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
+
+        class ItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+            val cvItineraryItem = view.findViewById<CardView>(R.id.cvItineraryItem)
+            val tvItineraryItem = view.findViewById<TextView>(R.id.tvItineraryItem)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+            val view = LayoutInflater.from(context).inflate(R.layout.layout_itinerary_item,
+                parent, false)
+            return ItemViewHolder(view)
+        }
+
+        override fun getItemCount() = itemList.size
+
+        override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+            holder.tvItineraryItem.text = itemList[position]
+        }
     }
 }
