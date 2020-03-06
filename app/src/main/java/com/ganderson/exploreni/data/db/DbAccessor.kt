@@ -3,6 +3,7 @@ package com.ganderson.exploreni.data.db
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.couchbase.lite.*
+import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.toDataClass
 import com.ganderson.exploreni.toHashMap
@@ -70,6 +71,24 @@ class DbAccessor {
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
                 .where(Expression.property("id").equalTo(Expression.string(locationId)))
+            val resultSet = query.execute()
+            return resultSet.next() != null
+        }
+
+        fun addItinerary(itinerary: Itinerary) : Boolean {
+            val itineraryMap = itinerary.toHashMap()
+            itineraryMap["type"] = "itinerary"
+
+            val document = MutableDocument(itineraryMap)
+            database.save(document)
+            return true
+        }
+
+        fun isDuplicateItineraryName(name: String) : Boolean {
+            val query = QueryBuilder
+                .select(SelectResult.all())
+                .from(DataSource.database(database))
+                .where(Expression.property("name").equalTo(Expression.string(name)))
             val resultSet = query.execute()
             return resultSet.next() != null
         }
