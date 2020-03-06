@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
@@ -26,9 +27,7 @@ import java.util.*
  */
 private const val ADD_ITEM_CODE = 1
 class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
-
-    private var name = "New Itinerary"
-    private val itemList = ArrayList<NiLocation>()
+    private val itinerary = Itinerary()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -50,12 +49,12 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tvItineraryName.setOnClickListener { showInputDialog() }
-        if(itemList.isNotEmpty()) {
+        if(itinerary.itemList.isNotEmpty()) {
             tvTapAdd.visibility = View.GONE
             rvItinerary.visibility = View.VISIBLE
         }
 
-        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itemList))
+        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itinerary.itemList))
         itemTouchHelper.attachToRecyclerView(rvItinerary)
 
         val removeListener = object: ItineraryAdapter.OnRemoveClickListener {
@@ -64,7 +63,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
             }
         }
         rvItinerary.layoutManager = LinearLayoutManager(requireContext())
-        rvItinerary.adapter = ItineraryAdapter(requireContext(), itemList, removeListener)
+        rvItinerary.adapter = ItineraryAdapter(requireContext(), itinerary.itemList, removeListener)
     }
 
     private fun showInputDialog() {
@@ -83,7 +82,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
             .setOnDismissListener {
                 val name = etInput.text.toString()
                 if(name.isNotBlank()) {
-                    this.name = name
+                    itinerary.name = name
                     tvItineraryName.text = name
                 }
 
@@ -127,7 +126,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        tvItineraryName.text = name
+        tvItineraryName.text = itinerary.name
         rvItinerary.adapter?.notifyDataSetChanged()
     }
 
@@ -158,7 +157,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     }
 
     fun addItem(item: NiLocation) {
-        itemList.add(item)
+        itinerary.itemList.add(item)
     }
 
     private fun confirmItemRemoval(item: NiLocation, itemIndex: Int) {
@@ -176,9 +175,9 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     }
 
     private fun removeItem(itemIndex: Int) {
-        itemList.removeAt(itemIndex)
+        itinerary.itemList.removeAt(itemIndex)
         rvItinerary.adapter?.notifyDataSetChanged()
-        if(itemList.isEmpty()) tvTapAdd.visibility = View.VISIBLE
+        if(itinerary.itemList.isEmpty()) tvTapAdd.visibility = View.VISIBLE
     }
 
     class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,
