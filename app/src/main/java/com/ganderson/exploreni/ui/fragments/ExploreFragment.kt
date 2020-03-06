@@ -67,12 +67,16 @@ class ExploreFragment : Fragment() {
 
     private fun showCategory(locationType: LocationType) {
         val categoryFragment = ExploreCategoryFragment(locationType)
+        categoryFragment.setTargetFragment(targetFragment, ADD_ITEM_CODE)
+
         val mainActivity = activity as MainActivity
         mainActivity.displayFragment(categoryFragment)
     }
 
     private fun performSearch(query: String) {
         val searchFragment = SearchFragment(query)
+        searchFragment.setTargetFragment(targetFragment, ADD_ITEM_CODE)
+
         val mainActivity = activity as MainActivity
         mainActivity.displayFragment(searchFragment)
     }

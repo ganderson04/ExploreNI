@@ -36,6 +36,7 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
     private var location: Location? = null
     private lateinit var sortDialog: Dialog
     private lateinit var filterDialog: Dialog
+    private lateinit var adapterListener: LocationAdapter.OnLocationClickListener
     private val locationList = ArrayList<NiLocation>()
     private val currentFilterList = ArrayList<String>()
 
@@ -117,7 +118,21 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
             filterList()
         }
         else {
-            rvLocations.adapter = LocationAdapter(requireContext(), locationList)
+            adapterListener = object: LocationAdapter.OnLocationClickListener {
+                override fun onLocationClick(location: NiLocation) {
+                    val mainActivity = activity as MainActivity
+                    if(targetFragment != null) {
+                        (targetFragment as ItineraryViewerFragment).addItem(location)
+                        mainActivity.displayFragment(targetFragment!!)
+                    }
+                    else {
+                        val attractionDetailFragment = AttractionDetailFragment(location,
+                            false)
+                        mainActivity.displayFragment(attractionDetailFragment)
+                    }
+                }
+            }
+            rvLocations.adapter = LocationAdapter(requireContext(), locationList, adapterListener)
         }
     }
 
@@ -190,7 +205,7 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
                 return@filter false
             }
         }
-        rvLocations.adapter = LocationAdapter(requireContext(), filteredLocations)
+        rvLocations.adapter = LocationAdapter(requireContext(), filteredLocations, adapterListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

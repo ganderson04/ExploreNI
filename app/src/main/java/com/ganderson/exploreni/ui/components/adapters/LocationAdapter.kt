@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.ui.activities.MainActivity
-import com.ganderson.exploreni.ui.fragments.AttractionDetailFragment
 
-class LocationAdapter(private val context: Context, private val locations: List<NiLocation>)
+class LocationAdapter(private val context: Context, private val locations: List<NiLocation>,
+                      val listener: OnLocationClickListener)
     : RecyclerView.Adapter<LocationAdapter.LocationViewHolder>() {
+
+    interface OnLocationClickListener {
+        fun onLocationClick(location: NiLocation)
+    }
 
     class LocationViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val cvLocation = view.findViewById<CardView>(R.id.cvLocation)
@@ -39,11 +42,11 @@ class LocationAdapter(private val context: Context, private val locations: List<
             .into(holder.ivLocation)
 
         holder.tvLocationName.text = location.name
-        holder.cvLocation.setOnClickListener {
-            val attractionDetailFragment = AttractionDetailFragment(location, false)
-            val mainActivity = context as MainActivity
-            mainActivity.displayFragment(attractionDetailFragment)
-        }
+        holder.cvLocation.setOnClickListener { listener.onLocationClick(location) }
+//            val attractionDetailFragment = AttractionDetailFragment(location, false)
+//            val mainActivity = context as MainActivity
+//            mainActivity.displayFragment(attractionDetailFragment)
+//        }
     }
 
     override fun getItemCount() = locations.size

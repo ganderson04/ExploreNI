@@ -9,12 +9,16 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
 import java.util.*
@@ -22,13 +26,13 @@ import java.util.*
 /**
  * A simple [Fragment] subclass.
  */
+const val ADD_ITEM_CODE = 1
 class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
-    val itemList = ArrayList<String>()
+    private var name = "New Itinerary"
+    private val itemList = ArrayList<NiLocation>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View? {
         // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
         // as an object of MainActivity.
         val actionBar = (activity as MainActivity).supportActionBar
@@ -47,6 +51,8 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tvItineraryName.setOnClickListener { showInputDialog() }
+        rvItinerary.layoutManager = LinearLayoutManager(requireContext())
+        rvItinerary.adapter = ItineraryAdapter(requireContext(), itemList)
     }
 
     private fun showInputDialog() {
@@ -65,6 +71,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
             .setOnDismissListener {
                 val name = etInput.text.toString()
                 if(name.isNotBlank()) {
+                    this.name = name
                     tvItineraryName.text = name
                 }
 
@@ -86,7 +93,6 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
             }
             true
         }
-
         dialog.show()
     }
 
@@ -107,10 +113,22 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         super.onPrepareOptionsMenu(menu)
     }
 
+    override fun onResume() {
+        super.onResume()
+        tvItineraryName.text = name
+        rvItinerary.adapter?.notifyDataSetChanged()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> parentFragmentManager.popBackStack()
-            R.id.tb_add_location -> add()
+            android.R.id.home -> {
+                val mainActivity = activity as MainActivity
+                if(isNew) {
+                    mainActivity.displayFragment(PlanFragment())
+                }
+                else parentFragmentManager.popBackStack()
+            }
+            R.id.tb_add_location -> goToExplore()
             R.id.tb_edit_itinerary -> Toast
                 .makeText(requireContext(), "Edit", Toast.LENGTH_SHORT).show()
             R.id.tb_itinerary_map -> Toast
@@ -119,16 +137,25 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun add() {
+    private fun goToExplore() {
+        val exploreFragment = ExploreFragment()
+        val mainActivity = activity as MainActivity
 
+        exploreFragment.setTargetFragment(this, ADD_ITEM_CODE)
+        mainActivity.displayFragment(exploreFragment)
     }
 
-    class ItineraryAdapter(val context: Context, val itemList: ArrayList<String>)
+    fun addItem(item: NiLocation) {
+        itemList.add(item)
+    }
+
+    class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>)
         : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
 
         class ItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val cvItineraryItem = view.findViewById<CardView>(R.id.cvItineraryItem)
             val tvItineraryItem = view.findViewById<TextView>(R.id.tvItineraryItem)
+            val ivItineraryItem = view.findViewById<ImageView>(R.id.ivItineraryLocation)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -140,7 +167,15 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         override fun getItemCount() = itemList.size
 
         override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-            holder.tvItineraryItem.text = itemList[position]
+            val item = itemList[position]
+
+            Glide.with(context)
+                .load(item.imgUrl)
+                .centerCrop()
+                .error(R.drawable.placeholder_no_image_available)
+                .into(holder.ivItineraryItem)
+
+            holder.tvItineraryItem.text = item.name
         }
     }
 }

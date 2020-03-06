@@ -11,6 +11,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
@@ -48,8 +49,24 @@ class SearchFragment(private val query: String) : Fragment() {
             .observe(viewLifecycleOwner) { list ->
                 loadingDialog.dismiss()
                 if(list.isNotEmpty()) {
+                    val adapterListener = object: LocationAdapter.OnLocationClickListener {
+                        override fun onLocationClick(location: NiLocation) {
+                            val mainActivity = activity as MainActivity
+                            if(targetFragment != null) {
+                                (targetFragment as ItineraryViewerFragment).addItem(location)
+                                mainActivity.displayFragment(targetFragment!!)
+                            }
+                            else {
+                                val attractionDetailFragment = AttractionDetailFragment(location,
+                                    false)
+                                mainActivity.displayFragment(attractionDetailFragment)
+                            }
+                        }
+                    }
+
                     rvSearchResults.layoutManager = LinearLayoutManager(this.context)
-                    rvSearchResults.adapter = LocationAdapter(requireContext(), list)
+                    rvSearchResults.adapter = LocationAdapter(requireContext(), list,
+                        adapterListener)
                 }
                 else {
                     val alert = AlertDialog.Builder(requireContext())
