@@ -7,7 +7,7 @@
         android:id="@+id/cvItineraryItem"
         android:layout_width="match_parent"
         android:layout_height="75dp"
-        android:layout_margin="10dp">
+        android:layout_marginTop="5dp">
 
         <RelativeLayout
             android:layout_width="match_parent"

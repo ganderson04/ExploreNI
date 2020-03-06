@@ -8,11 +8,9 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -51,8 +49,21 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tvItineraryName.setOnClickListener { showInputDialog() }
+        if(itemList.isNotEmpty()) {
+            tvTapAdd.visibility = View.GONE
+            rvItinerary.visibility = View.VISIBLE
+        }
+
+        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itemList))
+        itemTouchHelper.attachToRecyclerView(rvItinerary)
+
+        val removeListener = object: ItineraryAdapter.OnRemoveClickListener {
+            override fun onRemoveClick(item: NiLocation, itemIndex: Int) {
+                confirmItemRemoval(item, itemIndex)
+            }
+        }
         rvItinerary.layoutManager = LinearLayoutManager(requireContext())
-        rvItinerary.adapter = ItineraryAdapter(requireContext(), itemList)
+        rvItinerary.adapter = ItineraryAdapter(requireContext(), itemList, removeListener)
     }
 
     private fun showInputDialog() {
@@ -149,13 +160,39 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         itemList.add(item)
     }
 
-    class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>)
+    private fun confirmItemRemoval(item: NiLocation, itemIndex: Int) {
+        val dialog = AlertDialog.Builder(this.context)
+            .setTitle("Confirm removal")
+            .setMessage("Remove ${item.name}?")
+            .setCancelable(false)
+            .setPositiveButton("Yes") {_, _ ->
+                run {
+                    removeItem(itemIndex)
+                }
+            }
+            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun removeItem(itemIndex: Int) {
+        itemList.removeAt(itemIndex)
+        rvItinerary.adapter?.notifyDataSetChanged()
+        if(itemList.isEmpty()) tvTapAdd.visibility = View.VISIBLE
+    }
+
+    class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,
+                           val listener: OnRemoveClickListener)
         : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
+
+        interface OnRemoveClickListener {
+            fun onRemoveClick(item: NiLocation, itemIndex: Int)
+        }
 
         class ItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val cvItineraryItem = view.findViewById<CardView>(R.id.cvItineraryItem)
             val tvItineraryItem = view.findViewById<TextView>(R.id.tvItineraryItem)
             val ivItineraryItem = view.findViewById<ImageView>(R.id.ivItineraryLocation)
+            val ibRemoveItem = view.findViewById<ImageButton>(R.id.ibRemoveItem)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -176,6 +213,22 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
                 .into(holder.ivItineraryItem)
 
             holder.tvItineraryItem.text = item.name
+            holder.ibRemoveItem.setOnClickListener { listener.onRemoveClick(item, position)  }
         }
+    }
+
+    class ItemTouchCallback(val itemList: List<NiLocation>)
+        : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder): Boolean {
+            val fromPosition = viewHolder.adapterPosition
+            val toPosition = target.adapterPosition
+            Collections.swap(itemList, fromPosition, toPosition)
+            recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     }
 }

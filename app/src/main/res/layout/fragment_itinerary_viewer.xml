@@ -7,13 +7,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="5dp">
 
         <LinearLayout
             android:id="@+id/llItineraryDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
             android:orientation="vertical">
 
             <TextView
@@ -36,11 +36,29 @@
 
         </LinearLayout>
 
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/llItineraryDetails"
+            android:background="#000000"/>
+
+        <TextView
+            android:id="@+id/tvTapAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider"
+            android:text="Tap + to add a location!"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            android:textColor="#000000"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvItinerary"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/llItineraryDetails"/>
+            android:layout_below="@+id/divider"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 
