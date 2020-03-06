@@ -24,8 +24,9 @@ import java.util.*
 /**
  * A simple [Fragment] subclass.
  */
-const val ADD_ITEM_CODE = 1
+private const val ADD_ITEM_CODE = 1
 class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
+
     private var name = "New Itinerary"
     private val itemList = ArrayList<NiLocation>()
 
