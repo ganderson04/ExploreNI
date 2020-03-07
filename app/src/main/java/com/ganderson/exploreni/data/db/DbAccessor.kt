@@ -7,6 +7,8 @@ import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.toDataClass
 import com.ganderson.exploreni.toHashMap
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DbAccessor {
     companion object {
@@ -17,7 +19,8 @@ class DbAccessor {
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
-                .where(Expression.property("type").equalTo(Expression.string("location")))
+                .where(Expression.property("type")
+                    .equalTo(Expression.string("location")))
 
             query.addChangeListener {
                 val results = it.results
@@ -75,9 +78,13 @@ class DbAccessor {
             return resultSet.next() != null
         }
 
-        fun addItinerary(itinerary: Itinerary) : Boolean {
+        fun saveItinerary(itinerary: Itinerary) : Boolean {
             val itineraryMap = itinerary.toHashMap()
             itineraryMap["type"] = "itinerary"
+
+            // Itinerary names are also stored in lowercase to be used in checking for duplicate
+            // names.
+            itineraryMap["unique_name"] = itinerary.name.toLowerCase(Locale.getDefault())
 
             val document = MutableDocument(itineraryMap)
             database.save(document)
@@ -88,9 +95,40 @@ class DbAccessor {
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
-                .where(Expression.property("name").equalTo(Expression.string(name)))
+                .where(Expression.property("unique_name").equalTo(Expression.string(name)))
             val resultSet = query.execute()
             return resultSet.next() != null
+        }
+
+        fun getItineraries(): LiveData<List<Itinerary>> {
+            val data = MutableLiveData<List<Itinerary>>()
+            val query = QueryBuilder
+                .select(SelectResult.all())
+                .from(DataSource.database(database))
+                .where(Expression.property("type")
+                    .equalTo(Expression.string("itinerary")))
+
+            query.addChangeListener {
+                val results = it.results
+                val itineraryList = ArrayList<Itinerary>()
+
+                results.forEach { result ->
+                    val valueMap = result.getDictionary(database.name).toMap()
+
+                    // type and unique_name are not part of the data class so they are removed from
+                    // the map before conversion.
+                    valueMap.remove("type")
+                    valueMap.remove("unique_name")
+
+                    val itinerary: Itinerary = valueMap.toDataClass()
+                    itineraryList.add(itinerary)
+                }
+
+                data.value = itineraryList
+            }
+
+            query.execute()
+            return data
         }
     }
 }

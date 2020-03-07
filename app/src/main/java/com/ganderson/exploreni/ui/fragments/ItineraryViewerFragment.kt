@@ -19,14 +19,16 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
 import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
-private const val ADD_ITEM_CODE = 1
+const val ADD_ITEM_CODE = 1
 class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
+    private val viewModel = ItineraryViewerViewModel()
     private val itinerary = Itinerary()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -76,14 +78,14 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         }
 
         val dialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
             .setTitle("Change itinerary name")
             .setView(etInput)
             .setPositiveButton("Done") { dialog, _ -> dialog.dismiss() }
             .setOnDismissListener {
                 val name = etInput.text.toString()
                 if(name.isNotBlank()) {
-                    itinerary.name = name
-                    tvItineraryName.text = name
+                    changeItineraryName(name)
                 }
 
                 etInput.clearFocus()
@@ -105,6 +107,22 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
             true
         }
         dialog.show()
+    }
+
+    private fun changeItineraryName(name: String) {
+        if(viewModel.isDuplicateItineraryName(name)) {
+            val dialog = AlertDialog.Builder(requireContext())
+                .setCancelable(true)
+                .setTitle("Error")
+                .setMessage("That itinerary name already exists.")
+                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                .create()
+            dialog.show()
+        }
+        else {
+            itinerary.name = name
+            tvItineraryName.text = name
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -133,11 +151,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
-                val mainActivity = activity as MainActivity
-                if(isNew) {
-                    mainActivity.displayFragment(PlanFragment())
-                }
-                else parentFragmentManager.popBackStack()
+                goBack()
             }
             R.id.tb_add_location -> goToExplore()
             R.id.tb_edit_itinerary -> Toast
@@ -146,6 +160,20 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
                 .makeText(requireContext(), "Map", Toast.LENGTH_SHORT).show()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun goBack() {
+        if(itinerary.itemList.isNotEmpty()) {
+            if (viewModel.saveItinerary(itinerary)) {
+                Toast.makeText(requireContext(), "Itinerary saved.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val mainActivity = activity as MainActivity
+        if(isNew) {
+            mainActivity.displayFragment(PlanFragment())
+        }
+        else parentFragmentManager.popBackStack()
     }
 
     private fun goToExplore() {

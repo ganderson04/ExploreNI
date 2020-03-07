@@ -20,7 +20,7 @@ class Utils {
         /**
          * Calculates the Great Circle distance between locations using the Haversine
          * formula.
-         * Adapted from: https://rosettacode.org/wiki/Haversine_formula#Kotlin
+         * Adapted from: https://rosettacode.org/wiki/Haversine_formula#Java
          */
         fun getHaversineGCD(lat1: Double, lon1: Double, lat2: Double, lon2: Double) : Double {
             val lat1Radians = Math.toRadians(lat1)
@@ -41,6 +41,11 @@ class Utils {
     }
 }
 
+// Extension functions which become part of any object, even those in the SDK. These are used
+// specifically to convert data class objects to and from Maps when storing them in and retrieving
+// them from the Couchbase database.
+// These functions are adapted from Tom Hanley's answer on StackOverflow:
+// https://stackoverflow.com/a/56347214/8100469
 fun <T> T.toHashMap() : HashMap<String, Any> {
     return convert()
 }
@@ -49,6 +54,8 @@ inline fun <reified T> Map<String, Any>.toDataClass() : T {
     return convert()
 }
 
+// Converting between data class and Map utilises Gson's ability to convert objects to and from
+// JSON.
 inline fun <S, reified T> S.convert() : T {
     val gson = Gson()
     val json = gson.toJson(this)

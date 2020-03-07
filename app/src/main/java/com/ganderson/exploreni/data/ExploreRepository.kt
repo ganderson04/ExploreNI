@@ -1,9 +1,9 @@
 package com.ganderson.exploreni.data
 
 import androidx.lifecycle.LiveData
-import com.couchbase.lite.ResultSet
 import com.ganderson.exploreni.data.api.ApiAccessor
 import com.ganderson.exploreni.data.db.DbAccessor
+import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
@@ -47,8 +47,20 @@ class ExploreRepository {
             return DbAccessor.removeFavouriteLocation(locationId)
         }
 
-        fun isFavouriteLocation(locationId: String): Boolean {
+        fun isFavouriteLocation(locationId: String) : Boolean {
             return DbAccessor.isFavouriteLocation(locationId)
+        }
+
+        fun saveItinerary(itinerary: Itinerary) : Boolean {
+            return DbAccessor.saveItinerary(itinerary)
+        }
+
+        fun isDuplicateItineraryName(name: String) : Boolean {
+            return DbAccessor.isDuplicateItineraryName(name)
+        }
+
+        fun getItineraries(): LiveData<List<Itinerary>> {
+            return DbAccessor.getItineraries()
         }
     }
 }

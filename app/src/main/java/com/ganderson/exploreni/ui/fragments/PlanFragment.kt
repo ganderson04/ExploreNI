@@ -36,7 +36,11 @@ class PlanFragment : Fragment() {
             mainActivity.displayFragment(fragment)
         }
 
-        btnMyItineraries.setOnClickListener {}
+        btnMyItineraries.setOnClickListener {
+            val fragment = MyItinerariesFragment()
+            val mainActivity = activity as MainActivity
+            mainActivity.displayFragment(fragment)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
