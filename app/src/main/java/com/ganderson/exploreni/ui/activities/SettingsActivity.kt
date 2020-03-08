@@ -24,22 +24,14 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> {
-                goBack()
-            }
+            android.R.id.home -> this.finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun goBack() {
-        this.finish()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
         }
-
-
     }
 }
