@@ -31,7 +31,7 @@ class PlanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btnNewItinerary.setOnClickListener {
-            val fragment = ItineraryViewerFragment(true)
+            val fragment = ItineraryViewerFragment(true, null)
             val mainActivity = activity as MainActivity
             mainActivity.displayFragment(fragment)
         }

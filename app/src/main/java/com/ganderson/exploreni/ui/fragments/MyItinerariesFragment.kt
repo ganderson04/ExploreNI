@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -36,6 +37,8 @@ class MyItinerariesFragment : Fragment() {
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setDisplayShowHomeEnabled(true)
 
+        setHasOptionsMenu(true)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_my_itineraries, container, false)
     }
@@ -50,6 +53,13 @@ class MyItinerariesFragment : Fragment() {
                 rvMyItineraries.layoutManager = linearLayoutManager
                 rvMyItineraries.adapter = itinerariesAdapter
             }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> parentFragmentManager.popBackStack()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     class MyItinerariesAdapter(val context: Context, val itineraryList: List<Itinerary>)
@@ -81,7 +91,8 @@ class MyItinerariesFragment : Fragment() {
             holder.tvMyItinerarySize.text = sizeText
 
             holder.cvMyItinerary.setOnClickListener {
-                Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show()
+                val mainActivity = context as MainActivity
+                mainActivity.displayFragment(ItineraryViewerFragment(false, itinerary))
             }
         }
 

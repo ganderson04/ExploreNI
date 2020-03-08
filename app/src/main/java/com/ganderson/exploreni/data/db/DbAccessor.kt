@@ -80,13 +80,32 @@ class DbAccessor {
 
         fun saveItinerary(itinerary: Itinerary) : Boolean {
             val itineraryMap = itinerary.toHashMap()
-            itineraryMap["type"] = "itinerary"
+            val document: MutableDocument?
 
+            // Check if itinerary exists and update it if so.
+            if(isDuplicateItineraryName(itinerary.name)) {
+                val query = QueryBuilder
+                    .select(SelectResult.expression(Meta.id)) // Unique ID assigned by Couchbase.
+                    .from(DataSource.database(database))
+                    .where(Expression.property("unique_name")
+                        .equalTo(Expression.string
+                            (itinerary.name.toLowerCase(Locale.getDefault())))
+                        .and(Expression.property("type")
+                            .equalTo(Expression.string("itinerary"))))
+                val resultSet = query.execute()
+                val docId = resultSet.next().getValue("id").toString()
+                document = database.getDocument(docId).toMutable()
+                document.setData(itineraryMap)
+            }
+            else {
+                document = MutableDocument(itineraryMap)
+            }
+
+            document.setString("type", "itinerary")
             // Itinerary names are also stored in lowercase to be used in checking for duplicate
             // names.
-            itineraryMap["unique_name"] = itinerary.name.toLowerCase(Locale.getDefault())
+            document.setString("unique_name", itinerary.name.toLowerCase(Locale.getDefault()))
 
-            val document = MutableDocument(itineraryMap)
             database.save(document)
             return true
         }
@@ -95,7 +114,8 @@ class DbAccessor {
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
-                .where(Expression.property("unique_name").equalTo(Expression.string(name)))
+                .where(Expression.property("unique_name")
+                    .equalTo(Expression.string(name.toLowerCase(Locale.getDefault()))))
             val resultSet = query.execute()
             return resultSet.next() != null
         }

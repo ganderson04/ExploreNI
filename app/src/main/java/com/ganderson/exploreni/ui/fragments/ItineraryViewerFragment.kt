@@ -27,9 +27,9 @@ import java.util.*
  * A simple [Fragment] subclass.
  */
 const val ADD_ITEM_CODE = 1
-class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
+class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : Fragment() {
     private val viewModel = ItineraryViewerViewModel()
-    private val itinerary = Itinerary()
+    private val itinerary = savedItinerary ?: Itinerary()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -173,7 +173,7 @@ class ItineraryViewerFragment(val isNew: Boolean) : Fragment() {
         if(isNew) {
             mainActivity.displayFragment(PlanFragment())
         }
-        else parentFragmentManager.popBackStack()
+        else mainActivity.displayFragment(MyItinerariesFragment())
     }
 
     private fun goToExplore() {
