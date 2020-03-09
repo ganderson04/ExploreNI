@@ -140,7 +140,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
-                goBack()
+                goBack(false)
             }
             R.id.tb_add_location -> goToExplore()
             R.id.tb_itinerary_map -> Toast
@@ -149,8 +149,8 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         return super.onOptionsItemSelected(item)
     }
 
-    private fun goBack() {
-        if(itinerary.itemList.isNotEmpty()) {
+    private fun goBack(wasDeleted: Boolean) {
+        if((isNew && itinerary.itemList.isNotEmpty()) || (!isNew && !wasDeleted)) {
             if (viewModel.saveItinerary(itinerary)) {
                 Toast.makeText(requireContext(), "Itinerary saved.", Toast.LENGTH_SHORT).show()
             }
@@ -188,7 +188,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
 
         dialog.setOnDismissListener {
-            if(itinerary.itemList.isEmpty()) {
+            if(!isNew && itinerary.itemList.isEmpty()) {
                 val emptyItineraryDialog = AlertDialog.Builder(requireContext())
                     .setCancelable(true)
                     .setTitle("Empty Itinerary")
@@ -211,7 +211,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
 
     private fun deleteItinerary() {
         viewModel.deleteItinerary(itinerary.dbId)
-        goBack()
+        goBack(true)
     }
 
     class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,

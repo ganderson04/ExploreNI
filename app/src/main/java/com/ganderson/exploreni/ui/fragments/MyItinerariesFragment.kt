@@ -57,7 +57,10 @@ class MyItinerariesFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> parentFragmentManager.popBackStack()
+            android.R.id.home -> {
+                val mainActivity = activity as MainActivity
+                mainActivity.displayFragment(PlanFragment())
+            }
         }
         return super.onOptionsItemSelected(item)
     }
