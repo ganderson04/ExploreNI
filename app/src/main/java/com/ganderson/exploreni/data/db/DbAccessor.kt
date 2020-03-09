@@ -83,18 +83,8 @@ class DbAccessor {
             val document: MutableDocument?
 
             // Check if itinerary exists and update it if so.
-            if(isDuplicateItineraryName(itinerary.name)) {
-                val query = QueryBuilder
-                    .select(SelectResult.expression(Meta.id)) // Unique ID assigned by Couchbase.
-                    .from(DataSource.database(database))
-                    .where(Expression.property("unique_name")
-                        .equalTo(Expression.string
-                            (itinerary.name.toLowerCase(Locale.getDefault())))
-                        .and(Expression.property("type")
-                            .equalTo(Expression.string("itinerary"))))
-                val resultSet = query.execute()
-                val docId = resultSet.next().getValue("id").toString()
-                document = database.getDocument(docId).toMutable()
+            if(itinerary.dbId.isNotBlank()) {
+                document = database.getDocument(itinerary.dbId).toMutable()
                 document.setData(itineraryMap)
             }
             else {
@@ -123,7 +113,7 @@ class DbAccessor {
         fun getItineraries(): LiveData<List<Itinerary>> {
             val data = MutableLiveData<List<Itinerary>>()
             val query = QueryBuilder
-                .select(SelectResult.all())
+                .select(SelectResult.expression(Meta.id), SelectResult.all())
                 .from(DataSource.database(database))
                 .where(Expression.property("type")
                     .equalTo(Expression.string("itinerary")))
@@ -134,6 +124,7 @@ class DbAccessor {
 
                 results.forEach { result ->
                     val valueMap = result.getDictionary(database.name).toMap()
+                    valueMap["dbId"] = result.getValue("id")
 
                     // type and unique_name are not part of the data class so they are removed from
                     // the map before conversion.

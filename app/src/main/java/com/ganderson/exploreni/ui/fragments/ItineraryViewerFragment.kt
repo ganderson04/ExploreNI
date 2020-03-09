@@ -110,18 +110,19 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun changeItineraryName(name: String) {
-        if(viewModel.isDuplicateItineraryName(name)) {
-            val dialog = AlertDialog.Builder(requireContext())
-                .setCancelable(true)
-                .setTitle("Error")
-                .setMessage("That itinerary name already exists.")
-                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-                .create()
-            dialog.show()
-        }
-        else {
-            itinerary.name = name
-            tvItineraryName.text = name
+        if(!name.equals(itinerary.name)) {
+            if (viewModel.isDuplicateItineraryName(name)) {
+                val dialog = AlertDialog.Builder(requireContext())
+                    .setCancelable(true)
+                    .setTitle("Error")
+                    .setMessage("That itinerary name already exists.")
+                    .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                    .create()
+                dialog.show()
+            } else {
+                itinerary.name = name
+                tvItineraryName.text = name
+            }
         }
     }
 
