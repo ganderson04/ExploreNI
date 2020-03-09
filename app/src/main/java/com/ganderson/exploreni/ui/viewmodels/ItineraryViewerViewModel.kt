@@ -12,4 +12,8 @@ class ItineraryViewerViewModel : ViewModel() {
     fun isDuplicateItineraryName(name: String) : Boolean {
         return ExploreRepository.isDuplicateItineraryName(name)
     }
+
+    fun deleteItinerary(dbId: String) {
+        ExploreRepository.deleteItinerary(dbId)
+    }
 }

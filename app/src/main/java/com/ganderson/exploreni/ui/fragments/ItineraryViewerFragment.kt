@@ -186,6 +186,20 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 }
             }
             .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+
+        dialog.setOnDismissListener {
+            if(itinerary.itemList.isEmpty()) {
+                val emptyItineraryDialog = AlertDialog.Builder(requireContext())
+                    .setCancelable(true)
+                    .setTitle("Empty Itinerary")
+                    .setMessage("You have removed all locations. Delete itinerary?")
+                    .setPositiveButton("Yes") { dialog, _ -> deleteItinerary() }
+                    .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+                    .create()
+                emptyItineraryDialog.show()
+            }
+        }
+
         dialog.show()
     }
 
@@ -193,6 +207,11 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         itinerary.itemList.removeAt(itemIndex)
         rvItinerary.adapter?.notifyDataSetChanged()
         if(itinerary.itemList.isEmpty()) tvTapAdd.visibility = View.VISIBLE
+    }
+
+    private fun deleteItinerary() {
+        viewModel.deleteItinerary(itinerary.dbId)
+        goBack()
     }
 
     class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,

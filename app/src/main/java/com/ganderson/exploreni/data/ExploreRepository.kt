@@ -62,5 +62,9 @@ class ExploreRepository {
         fun getItineraries(): LiveData<List<Itinerary>> {
             return DbAccessor.getItineraries()
         }
+
+        fun deleteItinerary(dbId: String) {
+            DbAccessor.deleteItinerary(dbId)
+        }
     }
 }

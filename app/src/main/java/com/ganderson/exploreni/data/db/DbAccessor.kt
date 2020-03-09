@@ -141,5 +141,10 @@ class DbAccessor {
             query.execute()
             return data
         }
+
+        fun deleteItinerary(dbId: String) {
+            val document = database.getDocument(dbId)
+            database.delete(document)
+        }
     }
 }
