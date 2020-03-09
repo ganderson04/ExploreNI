@@ -8,12 +8,6 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/tb_edit_itinerary"
-        android:icon="@drawable/ic_add_white_24dp"
-        android:title="@string/add_location"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:id="@+id/tb_itinerary_map"
         android:icon="@drawable/ic_map_white_24dp"
         android:title="@string/view_on_map"

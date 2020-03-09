@@ -131,18 +131,6 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        if(isNew) {
-            val item = menu.findItem(R.id.tb_edit_itinerary)
-            item.isVisible = false
-        }
-        else {
-            val item = menu.findItem(R.id.tb_add_location)
-            item.isVisible = false
-        }
-        super.onPrepareOptionsMenu(menu)
-    }
-
     override fun onResume() {
         super.onResume()
         tvItineraryName.text = itinerary.name
@@ -155,8 +143,6 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 goBack()
             }
             R.id.tb_add_location -> goToExplore()
-            R.id.tb_edit_itinerary -> Toast
-                .makeText(requireContext(), "Edit", Toast.LENGTH_SHORT).show()
             R.id.tb_itinerary_map -> Toast
                 .makeText(requireContext(), "Map", Toast.LENGTH_SHORT).show()
         }
