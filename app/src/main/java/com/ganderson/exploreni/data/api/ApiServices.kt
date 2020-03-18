@@ -1,7 +1,7 @@
 package com.ganderson.exploreni.data.api
 
 import com.ganderson.exploreni.data.api.services.ExploreService
-import com.ganderson.exploreni.data.api.services.GeocodingService
+import com.ganderson.exploreni.data.api.services.GoogleService
 import com.ganderson.exploreni.data.api.services.WeatherService
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
@@ -41,16 +41,16 @@ class ApiServices {
                 .create(ExploreService::class.java)
         }
 
-        private fun constructGeocodingService() : GeocodingService {
+        private fun constructGeocodingService() : GoogleService {
             val geocodingDeserialiser = GsonBuilder()
-                .registerTypeAdapter(String::class.java, GeocodingService.GeocodingDeserialiser())
+                .registerTypeAdapter(String::class.java, GoogleService.GeocodingDeserialiser())
                 .create()
 
             return Retrofit.Builder()
-                .baseUrl(GeocodingService.BASE_URL)
+                .baseUrl(GoogleService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(geocodingDeserialiser))
                 .build()
-                .create(GeocodingService::class.java)
+                .create(GoogleService::class.java)
         }
 
         private fun constructWeatherService() : WeatherService {

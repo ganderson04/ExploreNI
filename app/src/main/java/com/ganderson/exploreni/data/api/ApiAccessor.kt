@@ -2,7 +2,7 @@ package com.ganderson.exploreni.data.api
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.ganderson.exploreni.data.api.services.GeocodingService
+import com.ganderson.exploreni.data.api.services.GoogleService
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
@@ -112,7 +112,7 @@ class ApiAccessor {
 
             val geocodingData = HashMap<String, String>()
             geocodingData["latlng"] = "$lat,$lon"
-            geocodingData["result_type"] = GeocodingService.RESULT_TYPE
+            geocodingData["result_type"] = GoogleService.RESULT_TYPE
             geocodingData["key"] = apiKey
 
             val geocodingCall = ApiServices.geocodingService.reverseGeocode(geocodingData)

@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.QueryMap
 import java.lang.reflect.Type
 
-interface GeocodingService {
+interface GoogleService {
 
     companion object {
         const val BASE_URL = "https://maps.googleapis.com/maps/api/geocode/"
