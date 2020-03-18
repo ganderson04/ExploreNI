@@ -11,12 +11,15 @@ import java.lang.reflect.Type
 interface GoogleService {
 
     companion object {
-        const val BASE_URL = "https://maps.googleapis.com/maps/api/geocode/"
-        const val RESULT_TYPE = "postal_town"
+        const val BASE_URL = "https://maps.googleapis.com/maps/api/"
+        const val GEOCODING_RESULT_TYPE = "postal_town"
     }
 
-    @GET("json?")
+    @GET("geocode/json?")
     fun reverseGeocode(@QueryMap params: Map<String, String>) : Call<String>
+
+    @GET("distancematrix/json?units=imperial&")
+    fun getItineraryDuration(@QueryMap params: Map<String, String>) : Call<Int>
 
     class GeocodingDeserialiser : JsonDeserializer<String> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
@@ -35,6 +38,25 @@ interface GoogleService {
 
             return postalTown?.get("long_name")?.asString
         }
+    }
 
+    class DurationDeserialiser : JsonDeserializer<Int> {
+        override fun deserialize(json: JsonElement?, typeOfT: Type?,
+                                 context: JsonDeserializationContext?): Int? {
+            json?.let {
+                val durationResponse = it.asJsonObject
+                val rows = durationResponse.getAsJsonArray("rows")
+                var duration = 0
+                for(i in 0 until rows.size()) {
+                    val row = rows[i].asJsonObject
+                    val elements = row.getAsJsonArray("element")
+                    val element = elements[i].asJsonObject
+                    val durationObject = element.getAsJsonObject("duration")
+                    duration += durationObject.get("value").asInt
+                }
+                return duration
+            }
+            return null
+        }
     }
 }

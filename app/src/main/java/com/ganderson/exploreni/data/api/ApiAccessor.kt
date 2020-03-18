@@ -112,7 +112,7 @@ class ApiAccessor {
 
             val geocodingData = HashMap<String, String>()
             geocodingData["latlng"] = "$lat,$lon"
-            geocodingData["result_type"] = GoogleService.RESULT_TYPE
+            geocodingData["result_type"] = GoogleService.GEOCODING_RESULT_TYPE
             geocodingData["key"] = apiKey
 
             val geocodingCall = ApiServices.geocodingService.reverseGeocode(geocodingData)
