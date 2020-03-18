@@ -24,8 +24,19 @@ class ExploreFragment : Fragment() {
         actionBar?.title = "Explore"
 
         // Hide the back button in the toolbar on top-level menu options.
-        actionBar?.setDisplayHomeAsUpEnabled(false)
-        actionBar?.setDisplayShowHomeEnabled(false)
+        // In this case, the back button is shown if the user came from the itinerary planner.
+        // This will be the case if the target fragment, the fragment to which to return (i.e.
+        // ItineraryViewerFragment), is not null.
+        if(targetFragment != null) {
+            actionBar?.setDisplayHomeAsUpEnabled(true)
+            actionBar?.setDisplayShowHomeEnabled(true)
+        }
+        else {
+            actionBar?.setDisplayHomeAsUpEnabled(false)
+            actionBar?.setDisplayShowHomeEnabled(false)
+        }
+
+        setHasOptionsMenu(true)
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_explore, container, false)
@@ -81,8 +92,10 @@ class ExploreFragment : Fragment() {
         mainActivity.displayFragment(searchFragment)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> parentFragmentManager.popBackStack()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
