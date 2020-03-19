@@ -3,6 +3,7 @@ package com.ganderson.exploreni
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 import kotlin.math.*
 
 /**
@@ -38,6 +39,25 @@ class Utils {
         fun distanceToImperial(metricDistance: Double) = metricDistance / DISTANCE_SCALE
 
         fun distanceToMetric(imperialDistance: Double) = imperialDistance * DISTANCE_SCALE
+
+        fun secondsToTimeString(seconds: Int) : String {
+            val hours = seconds / 3600
+            val remainder = hours % 3600
+            val minutes = remainder / 60
+
+            var str: String = ""
+            if(hours > 0) {
+                if (hours > 1) str += "hours"
+                else str += "hour"
+            }
+
+            if(minutes > 0) {
+                if(minutes > 1) str += ", $minutes minutes"
+                else str += ", $minutes minute"
+            }
+
+            return str
+        }
     }
 }
 

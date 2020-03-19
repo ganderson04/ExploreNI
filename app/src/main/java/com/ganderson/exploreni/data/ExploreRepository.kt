@@ -35,6 +35,10 @@ class ExploreRepository {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)
         }
 
+        fun calculateDuration(itinerary: Itinerary, apiKey: String): LiveData<Int> {
+            return ApiAccessor.calculateDuration(itinerary, apiKey)
+        }
+
         fun getFavouriteLocations() : LiveData<List<NiLocation>> {
             return DbAccessor.getFavouriteLocations()
         }

@@ -49,7 +49,7 @@ interface GoogleService {
                 var duration = 0
                 for(i in 0 until rows.size()) {
                     val row = rows[i].asJsonObject
-                    val elements = row.getAsJsonArray("element")
+                    val elements = row.getAsJsonArray("elements")
                     val element = elements[i].asJsonObject
                     val durationObject = element.getAsJsonObject("duration")
                     duration += durationObject.get("value").asInt

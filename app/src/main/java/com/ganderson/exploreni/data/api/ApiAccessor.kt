@@ -1,8 +1,10 @@
 package com.ganderson.exploreni.data.api
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ganderson.exploreni.data.api.services.GoogleService
+import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.Event
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.entities.api.Weather
@@ -154,6 +156,38 @@ class ApiAccessor {
 
                 override fun onResponse(call: Call<Weather>,
                                         response: Response<Weather>) {
+                    data.value = response.body()
+                }
+            })
+
+            return data
+        }
+
+        fun calculateDuration(itinerary: Itinerary, apiKey: String): LiveData<Int> {
+            val data = MutableLiveData<Int>()
+            val origins = itinerary.itemList.subList(0, itinerary.itemList.size-1)
+                .joinToString(postfix = "|") { item ->
+                    "${item.lat},${item.long}"
+                }
+
+            val destinations = itinerary.itemList.subList(1, itinerary.itemList.size)
+                .joinToString(postfix = "|") { item ->
+                    "${item.lat},${item.long}"
+                }
+
+            val params = HashMap<String, String>()
+            params["origins"] = origins
+            params["destinations"] = destinations
+            params["key"] = apiKey
+
+            val durationCall = ApiServices.durationService.getItineraryDuration(params)
+            Log.d("DMURL", durationCall.request().url().toString())
+            durationCall.enqueue(object: Callback<Int> {
+                override fun onFailure(call: Call<Int>, t: Throwable) {
+                    throw t
+                }
+
+                override fun onResponse(call: Call<Int>, response: Response<Int>) {
                     data.value = response.body()
                 }
             })

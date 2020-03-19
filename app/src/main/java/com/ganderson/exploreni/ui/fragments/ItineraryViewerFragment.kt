@@ -10,18 +10,23 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
+import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * A simple [Fragment] subclass.
@@ -54,6 +59,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         if(itinerary.itemList.isNotEmpty()) {
             tvTapAdd.visibility = View.GONE
             rvItinerary.visibility = View.VISIBLE
+            calculateDuration()
         }
 
         val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itinerary.itemList))
@@ -206,7 +212,29 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     private fun removeItem(itemIndex: Int) {
         itinerary.itemList.removeAt(itemIndex)
         rvItinerary.adapter?.notifyDataSetChanged()
-        if(itinerary.itemList.isEmpty()) tvTapAdd.visibility = View.VISIBLE
+        if(itinerary.itemList.isEmpty()) {
+            tvTapAdd.visibility = View.VISIBLE
+            tvItineraryDuration.text = "0 hours, 0 minutes"
+        }
+        else {
+            calculateDuration()
+        }
+    }
+
+    private fun calculateDuration() {
+        if(itinerary.itemList.size > 1) {
+            val loadingDialog = LoadingDialog(
+                requireContext(),
+                "Calculating duration, please wait."
+            )
+            loadingDialog.show()
+            viewModel
+                .calculateDuration(itinerary, resources.getString(R.string.google_api_key))
+                .observe(viewLifecycleOwner) { seconds ->
+                    loadingDialog.dismiss()
+                    Utils.secondsToTimeString(seconds)
+                }
+        }
     }
 
     private fun deleteItinerary() {
@@ -254,6 +282,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     class ItemTouchCallback(val itemList: List<NiLocation>)
         : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN
             or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
+
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder): Boolean {
             val fromPosition = viewHolder.adapterPosition
