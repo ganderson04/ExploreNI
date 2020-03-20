@@ -232,7 +232,8 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 .calculateDuration(itinerary, resources.getString(R.string.google_api_key))
                 .observe(viewLifecycleOwner) { seconds ->
                     loadingDialog.dismiss()
-                    Utils.secondsToTimeString(seconds)
+                    val duration = Utils.secondsToTimeString(seconds)
+                    tvItineraryDuration.text = duration
                 }
         }
     }

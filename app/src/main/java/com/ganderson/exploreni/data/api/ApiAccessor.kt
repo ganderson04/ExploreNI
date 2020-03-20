@@ -164,16 +164,19 @@ class ApiAccessor {
         }
 
         fun calculateDuration(itinerary: Itinerary, apiKey: String): LiveData<Int> {
+            val itemList = itinerary.itemList
             val data = MutableLiveData<Int>()
-            val origins = itinerary.itemList.subList(0, itinerary.itemList.size-1)
-                .joinToString(postfix = "|") { item ->
-                    "${item.lat},${item.long}"
-                }
 
-            val destinations = itinerary.itemList.subList(1, itinerary.itemList.size)
-                .joinToString(postfix = "|") { item ->
-                    "${item.lat},${item.long}"
-                }
+            var origins = "${itemList[0].lat},${itemList[0].long}"
+            var destinations = "${itemList[1].lat},${itemList[1].long}"
+
+            for(i in 1 until itemList.size-1) {
+                origins += "|" + "${itemList[i].lat},${itemList[i].long}"
+            }
+
+            for(i in 2 until itemList.size) {
+                destinations += "|" + "${itemList[i].lat},${itemList[i].long}"
+            }
 
             val params = HashMap<String, String>()
             params["origins"] = origins

@@ -42,13 +42,13 @@ class Utils {
 
         fun secondsToTimeString(seconds: Int) : String {
             val hours = seconds / 3600
-            val remainder = hours % 3600
+            val remainder = seconds - (hours * 3600)
             val minutes = remainder / 60
 
-            var str: String = ""
+            var str = ""
             if(hours > 0) {
-                if (hours > 1) str += "hours"
-                else str += "hour"
+                if (hours > 1) str += "$hours hours"
+                else str += "$hours hour"
             }
 
             if(minutes > 0) {

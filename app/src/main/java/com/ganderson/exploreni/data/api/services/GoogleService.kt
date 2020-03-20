@@ -18,7 +18,7 @@ interface GoogleService {
     @GET("geocode/json?")
     fun reverseGeocode(@QueryMap params: Map<String, String>) : Call<String>
 
-    @GET("distancematrix/json?units=imperial&")
+    @GET("distancematrix/json?units=imperial")
     fun getItineraryDuration(@QueryMap params: Map<String, String>) : Call<Int>
 
     class GeocodingDeserialiser : JsonDeserializer<String> {

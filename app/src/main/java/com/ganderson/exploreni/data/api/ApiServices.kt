@@ -57,7 +57,7 @@ class ApiServices {
 
         private fun constructDurationService() : GoogleService {
             val durationDeserialiser = GsonBuilder()
-                .registerTypeAdapter(Int::class.java, GoogleService.DurationDeserialiser())
+                .registerTypeAdapter(Integer::class.java, GoogleService.DurationDeserialiser())
                 .create()
 
             return Retrofit.Builder()
