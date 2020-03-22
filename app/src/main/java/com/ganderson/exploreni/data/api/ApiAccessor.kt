@@ -207,7 +207,7 @@ class ApiAccessor {
             var waypoints = ""
             for(i in 1 until itemList.size) {
                 val loc = itemList[i]
-                waypoints += "via:$loc"
+                waypoints += "via:${loc.lat},${loc.long}"
                 if(i < itemList.size-1) waypoints += "|"
             }
 
@@ -219,6 +219,7 @@ class ApiAccessor {
                 params["waypoints"] = waypoints
             }
             val polylineCall = ApiServices.polylineService.getPolyline(params)
+            Log.d("PLURL", polylineCall.request().url().toString())
             polylineCall.enqueue(object: Callback<String> {
                 override fun onFailure(call: Call<String>, t: Throwable) {
                     throw t

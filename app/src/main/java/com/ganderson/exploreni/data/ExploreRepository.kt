@@ -39,6 +39,10 @@ class ExploreRepository {
             return ApiAccessor.calculateDuration(itinerary, apiKey)
         }
 
+        fun getItineraryPolyline(itinerary: Itinerary, apiKey: String): LiveData<String> {
+            return ApiAccessor.getItineraryPolyline(itinerary, apiKey)
+        }
+
         fun getFavouriteLocations() : LiveData<List<NiLocation>> {
             return DbAccessor.getFavouriteLocations()
         }

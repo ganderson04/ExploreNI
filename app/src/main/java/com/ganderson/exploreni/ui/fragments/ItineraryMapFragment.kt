@@ -2,26 +2,30 @@ package com.ganderson.exploreni.ui.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.observe
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
-import com.google.android.gms.maps.CameraUpdateFactory
+import com.ganderson.exploreni.ui.components.LoadingDialog
+import com.ganderson.exploreni.ui.viewmodels.ItineraryMapViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.android.PolyUtil
 
 /**
  * A simple [Fragment] subclass.
  */
 class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
+    private val viewModel = ItineraryMapViewModel()
     private lateinit var map: GoogleMap
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +61,13 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> parentFragmentManager.popBackStack()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun addLocations() {
         for(i in 0 until itinerary.itemList.size) {
             val item = itinerary.itemList[i]
@@ -69,11 +80,18 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
     }
 
     private fun drawRoute() {
-        val polyline = PolylineOptions()
-            .clickable(false)
-        itinerary.itemList.forEach { item ->
-            polyline.add(LatLng(item.lat.toDouble(), item.long.toDouble()))
-        }
+        val loadingDialog = LoadingDialog(requireContext(), "Loading route, please wait.")
+        loadingDialog.show()
+        viewModel
+            .getItineraryPolyline(itinerary, resources.getString(R.string.google_api_key))
+            .observe(viewLifecycleOwner) { polyString ->
+                val polyline = PolylineOptions()
+                    .clickable(false)
+                polyline.color(resources.getColor(R.color.colorPrimaryDark, null))
+                polyline.addAll(PolyUtil.decode(polyString))
+                map.addPolyline(polyline)
+                loadingDialog.dismiss()
+            }
     }
 
 }
