@@ -26,6 +26,15 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
+        // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
+        // as an object of MainActivity.
+        val actionBar = (activity as MainActivity).supportActionBar
+        actionBar?.title = "Itinerary Map"
+
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.setDisplayShowHomeEnabled(true)
+        setHasOptionsMenu(true)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_itinerary_map, container, false)
     }
@@ -54,7 +63,7 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
             val latLng = LatLng(item.lat.toDouble(), item.long.toDouble())
             val markerOptions = MarkerOptions()
             markerOptions.position(latLng)
-            markerOptions.title("$i. ${item.name}")
+            markerOptions.title("${i+1}. ${item.name}") // E.g. "1. Belfast Castle"
             map.addMarker(markerOptions)
         }
     }

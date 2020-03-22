@@ -149,8 +149,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 goBack(false)
             }
             R.id.tb_add_location -> goToExplore()
-            R.id.tb_itinerary_map -> Toast
-                .makeText(requireContext(), "Map", Toast.LENGTH_SHORT).show()
+            R.id.tb_itinerary_map -> goToMap()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -167,6 +166,13 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             mainActivity.displayFragment(PlanFragment())
         }
         else mainActivity.displayFragment(MyItinerariesFragment())
+    }
+
+    private fun goToMap() {
+        if(itinerary.itemList.size > 1) {
+            val mainActivity = activity as MainActivity
+            mainActivity.displayFragment(ItineraryMapFragment(itinerary))
+        }
     }
 
     private fun goToExplore() {
