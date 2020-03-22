@@ -184,13 +184,47 @@ class ApiAccessor {
             params["key"] = apiKey
 
             val durationCall = ApiServices.durationService.getItineraryDuration(params)
-            Log.d("DMURL", durationCall.request().url().toString())
             durationCall.enqueue(object: Callback<Int> {
                 override fun onFailure(call: Call<Int>, t: Throwable) {
                     throw t
                 }
 
                 override fun onResponse(call: Call<Int>, response: Response<Int>) {
+                    data.value = response.body()
+                }
+            })
+
+            return data
+        }
+
+        fun getItineraryPolyline(itinerary: Itinerary, apiKey: String) : LiveData<String> {
+            val itemList = itinerary.itemList
+            val data = MutableLiveData<String>()
+
+            val origin = "${itemList[0].lat},${itemList[0].long}"
+            val destination = "${itemList.last().lat},${itemList.last().long}"
+
+            var waypoints = ""
+            for(i in 1 until itemList.size) {
+                val loc = itemList[i]
+                waypoints += "via:$loc"
+                if(i < itemList.size-1) waypoints += "|"
+            }
+
+            val params = HashMap<String, String>()
+            params["origin"] = origin
+            params["destination"] = destination
+            params["key"] = apiKey
+            if(waypoints.isNotBlank()) {
+                params["waypoints"] = waypoints
+            }
+            val polylineCall = ApiServices.polylineService.getPolyline(params)
+            polylineCall.enqueue(object: Callback<String> {
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    throw t
+                }
+
+                override fun onResponse(call: Call<String>, response: Response<String>) {
                     data.value = response.body()
                 }
             })

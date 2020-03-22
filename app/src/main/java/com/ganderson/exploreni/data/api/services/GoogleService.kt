@@ -21,6 +21,9 @@ interface GoogleService {
     @GET("distancematrix/json?units=imperial")
     fun getItineraryDuration(@QueryMap params: Map<String, String>) : Call<Int>
 
+    @GET("directions/json?")
+    fun getPolyline(@QueryMap params: Map<String, String>) : Call<String>
+
     class GeocodingDeserialiser : JsonDeserializer<String> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
             context: JsonDeserializationContext?): String? {
@@ -55,6 +58,20 @@ interface GoogleService {
                     duration += durationObject.get("value").asInt
                 }
                 return duration
+            }
+            return null
+        }
+    }
+
+    class PolylineDeserialiser : JsonDeserializer<String> {
+        override fun deserialize(json: JsonElement?, typeOfT: Type?,
+                                 context: JsonDeserializationContext?): String? {
+            json?.let {
+                val polylineResponse = it.asJsonObject
+                val routesArray = polylineResponse.getAsJsonArray("routes")
+                val route = routesArray[0].asJsonObject
+                val polylineObject = route.get("overview_polyline").asJsonObject
+                return polylineObject.get("points").asString
             }
             return null
         }

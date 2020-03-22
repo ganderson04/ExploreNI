@@ -17,6 +17,7 @@ class ApiServices {
         val exploreEventService by lazy { constructExploreEventService() }
         val geocodingService by lazy { constructGeocodingService() }
         val durationService by lazy { constructDurationService() }
+        val polylineService by lazy { constructPolylineService() }
         val weatherService by lazy { constructWeatherService() }
 
         private fun constructExploreLocationService() : ExploreService {
@@ -63,6 +64,18 @@ class ApiServices {
             return Retrofit.Builder()
                 .baseUrl(GoogleService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(durationDeserialiser))
+                .build()
+                .create(GoogleService::class.java)
+        }
+
+        private fun constructPolylineService() : GoogleService {
+            val polylineDeserialiser = GsonBuilder()
+                .registerTypeAdapter(String::class.java, GoogleService.PolylineDeserialiser())
+                .create()
+
+            return Retrofit.Builder()
+                .baseUrl(GoogleService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create(polylineDeserialiser))
                 .build()
                 .create(GoogleService::class.java)
         }
