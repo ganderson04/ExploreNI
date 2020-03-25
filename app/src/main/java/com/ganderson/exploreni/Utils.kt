@@ -52,8 +52,9 @@ class Utils {
             }
 
             if(minutes > 0) {
-                if(minutes > 1) str += ", $minutes minutes"
-                else str += ", $minutes minute"
+                if(hours > 0) str +=", "
+                if(minutes > 1) str += "$minutes minutes"
+                else str += "$minutes minute"
             }
 
             return str

@@ -1,5 +1,10 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
@@ -7,12 +12,15 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.viewmodels.ItineraryMapViewModel
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -52,6 +60,22 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
             this.map = it
             map.isMyLocationEnabled = true
             map.uiSettings.isMyLocationButtonEnabled = false
+
+            val userLocation = getUserLocation()
+            val cameraUpdate: CameraUpdate
+            if(userLocation != null) {
+                cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                    LatLng(userLocation.latitude, userLocation.longitude), 10f
+                )
+            }
+            else {
+                cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                    LatLng(itinerary.itemList[0].lat.toDouble(),
+                        itinerary.itemList[0].long.toDouble()), 10f
+                )
+            }
+
+            map.animateCamera(cameraUpdate)
             map.setMapStyle(
                 MapStyleOptions
                 .loadRawResourceStyle(requireContext(), R.raw.map_style))
@@ -83,7 +107,8 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
         val loadingDialog = LoadingDialog(requireContext(), "Loading route, please wait.")
         loadingDialog.show()
         viewModel
-            .getItineraryPolyline(itinerary, resources.getString(R.string.google_api_key))
+            .getItineraryPolyline(itinerary, getUserLocation(),
+                resources.getString(R.string.google_api_key))
             .observe(viewLifecycleOwner) { polyString ->
                 val polyline = PolylineOptions()
                     .clickable(false)
@@ -94,4 +119,26 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
             }
     }
 
+    private fun getUserLocation() : Location? {
+        var location: Location? = null
+        if(ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            val locationManager: LocationManager? = (activity as MainActivity)
+                .getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+            // If the LocationManager has been instantiated, check for providers. Kotlin "?"
+            // performs a null check and ".let" runs the code inside the block if the object
+            // under consideration is not null.
+            locationManager?.let {
+                // "it" refers to locationManager. "let" blocks are similar to lambdas.
+                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                }
+                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                }
+            }
+        }
+        return location
+    }
 }

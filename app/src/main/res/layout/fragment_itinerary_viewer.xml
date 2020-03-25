@@ -30,7 +30,7 @@
                 android:id="@+id/tvItineraryDuration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Duration"
+                android:text="Travel time: 0 hours, 0 minutes"
                 android:textColor="#000000"
                 android:textSize="20sp"/>
 

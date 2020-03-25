@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.data
 
+import android.location.Location
 import androidx.lifecycle.LiveData
 import com.ganderson.exploreni.data.api.ApiAccessor
 import com.ganderson.exploreni.data.db.DbAccessor
@@ -35,12 +36,14 @@ class ExploreRepository {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)
         }
 
-        fun calculateDuration(itinerary: Itinerary, apiKey: String): LiveData<Int> {
-            return ApiAccessor.calculateDuration(itinerary, apiKey)
+        fun calculateDuration(itinerary: Itinerary, userLocation: Location?,
+                              apiKey: String): LiveData<Int> {
+            return ApiAccessor.calculateDuration(itinerary, userLocation, apiKey)
         }
 
-        fun getItineraryPolyline(itinerary: Itinerary, apiKey: String): LiveData<String> {
-            return ApiAccessor.getItineraryPolyline(itinerary, apiKey)
+        fun getItineraryPolyline(itinerary: Itinerary, userLocation: Location?,
+                                 apiKey: String): LiveData<String> {
+            return ApiAccessor.getItineraryPolyline(itinerary, userLocation, apiKey)
         }
 
         fun getFavouriteLocations() : LiveData<List<NiLocation>> {

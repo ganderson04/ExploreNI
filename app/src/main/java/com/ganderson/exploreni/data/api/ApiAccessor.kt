@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.data.api
 
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -163,18 +164,27 @@ class ApiAccessor {
             return data
         }
 
-        fun calculateDuration(itinerary: Itinerary, apiKey: String): LiveData<Int> {
+        fun calculateDuration(itinerary: Itinerary, userLocation: Location?,
+                              apiKey: String): LiveData<Int> {
             val itemList = itinerary.itemList
             val data = MutableLiveData<Int>()
 
-            var origins = "${itemList[0].lat},${itemList[0].long}"
-            var destinations = "${itemList[1].lat},${itemList[1].long}"
+            var beginIndex = 0
+            var origins: String
+            if(userLocation != null) {
+                origins = "${userLocation.latitude},${userLocation.longitude}"
+            }
+            else {
+                origins = "${itemList[0].lat},${itemList[0].long}"
+                beginIndex = 1
+            }
+            var destinations = "${itemList[beginIndex].lat},${itemList[beginIndex].long}"
 
-            for(i in 1 until itemList.size-1) {
+            for(i in beginIndex until itemList.size-1) {
                 origins += "|" + "${itemList[i].lat},${itemList[i].long}"
             }
 
-            for(i in 2 until itemList.size) {
+            for(i in beginIndex+1 until itemList.size) {
                 destinations += "|" + "${itemList[i].lat},${itemList[i].long}"
             }
 
@@ -197,15 +207,24 @@ class ApiAccessor {
             return data
         }
 
-        fun getItineraryPolyline(itinerary: Itinerary, apiKey: String) : LiveData<String> {
+        fun getItineraryPolyline(itinerary: Itinerary, userLocation: Location?,
+                                 apiKey: String) : LiveData<String> {
             val itemList = itinerary.itemList
             val data = MutableLiveData<String>()
 
-            val origin = "${itemList[0].lat},${itemList[0].long}"
+            var beginIndex = 1
+            val origin: String
+            if(userLocation != null) {
+                origin = "${userLocation.latitude},${userLocation.longitude}"
+                beginIndex = 0
+            }
+            else {
+                origin = "${itemList[0].lat},${itemList[0].long}"
+            }
             val destination = "${itemList.last().lat},${itemList.last().long}"
 
             var waypoints = ""
-            for(i in 1 until itemList.size) {
+            for(i in beginIndex until itemList.size) {
                 val loc = itemList[i]
                 waypoints += "via:${loc.lat},${loc.long}"
                 if(i < itemList.size-1) waypoints += "|"

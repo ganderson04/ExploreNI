@@ -1,7 +1,11 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.text.InputType
 import android.view.*
@@ -10,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -169,9 +174,14 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun goToMap() {
-        if(itinerary.itemList.size > 1) {
+        if(itinerary.itemList.isNotEmpty()) {
             val mainActivity = activity as MainActivity
             mainActivity.displayFragment(ItineraryMapFragment(itinerary))
+        }
+        else {
+            Toast
+                .makeText(requireContext(), "No locations to show.", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -220,7 +230,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         rvItinerary.adapter?.notifyDataSetChanged()
         if(itinerary.itemList.isEmpty()) {
             tvTapAdd.visibility = View.VISIBLE
-            tvItineraryDuration.text = "0 hours, 0 minutes"
+            tvItineraryDuration.text = "Travel time: 0 hours, 0 minutes"
         }
         else {
             calculateDuration()
@@ -228,18 +238,21 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun calculateDuration() {
-        if(itinerary.itemList.size > 1) {
+        val userLocation = getUserLocation()
+        if((itinerary.itemList.size == 1 && userLocation != null) ||
+            itinerary.itemList.size > 1) {
             val loadingDialog = LoadingDialog(
                 requireContext(),
                 "Calculating duration, please wait."
             )
             loadingDialog.show()
             viewModel
-                .calculateDuration(itinerary, resources.getString(R.string.google_api_key))
+                .calculateDuration(itinerary, userLocation, resources.getString(R.string.google_api_key))
                 .observe(viewLifecycleOwner) { seconds ->
                     loadingDialog.dismiss()
                     val duration = Utils.secondsToTimeString(seconds)
-                    tvItineraryDuration.text = duration
+                    val durationText = "Travel time: $duration"
+                    tvItineraryDuration.text = durationText
                 }
         }
     }
@@ -247,6 +260,29 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     private fun deleteItinerary() {
         viewModel.deleteItinerary(itinerary.dbId)
         goBack(true)
+    }
+
+    private fun getUserLocation() : Location? {
+        var location: Location? = null
+        if(ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            val locationManager: LocationManager? = (activity as MainActivity)
+                .getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+            // If the LocationManager has been instantiated, check for providers. Kotlin "?"
+            // performs a null check and ".let" runs the code inside the block if the object
+            // under consideration is not null.
+            locationManager?.let {
+                // "it" refers to locationManager. "let" blocks are similar to lambdas.
+                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                }
+                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                }
+            }
+        }
+        return location
     }
 
     class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,

@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.viewmodels
 
+import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.ganderson.exploreni.data.ExploreRepository
@@ -18,7 +19,8 @@ class ItineraryViewerViewModel : ViewModel() {
         ExploreRepository.deleteItinerary(dbId)
     }
 
-    fun calculateDuration(itinerary: Itinerary, apiKey: String) : LiveData<Int> {
-        return ExploreRepository.calculateDuration(itinerary, apiKey)
+    fun calculateDuration(itinerary: Itinerary, userLocation: Location?,
+                          apiKey: String) : LiveData<Int> {
+        return ExploreRepository.calculateDuration(itinerary, userLocation, apiKey)
     }
 }
