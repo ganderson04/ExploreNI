@@ -1,14 +1,12 @@
 package com.ganderson.exploreni.ui.fragments
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -23,6 +21,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.viewmodels.HomeViewModel
 import com.ganderson.exploreni.ui.activities.SettingsActivity
+import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
@@ -32,14 +31,13 @@ import java.util.*
 class HomeFragment : Fragment() {
     private val viewModel = HomeViewModel()
 
-    private var locationManager: LocationManager? = null
-    private var location: Location? = null
+    private lateinit var fusedLocationProvider: FusedLocationProviderClient
+    private var locationRequest: LocationRequest? = null
+    private var locationCallback: LocationCallback? = null
     private var useFahrenheit = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         // Obtain the toolbar via the Fragment's underlying Activity. This must first be cast
         // as an object of MainActivity.
         val actionBar = (activity as MainActivity).supportActionBar
@@ -60,18 +58,9 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
-                    as LocationManager
-            getLocation()
-            getWeather()
+            setupLocationService()
         }
         else requestLocationPermission()
-
-        cvNearby.setOnClickListener {
-            val nearbyFragment = NearbyFragment(location!!)
-            val mainActivity = this.activity as MainActivity
-            mainActivity.displayFragment(nearbyFragment)
-        }
 
         cvEvents.setOnClickListener {
             val eventFragment = EventFragment()
@@ -80,35 +69,16 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun getLocation() {
-        if(ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            // If the LocationManager has been instantiated, check for providers. Kotlin "?"
-            // performs a null check and ".let" runs the code inside the block if the object
-            // under consideration is not null.
-            locationManager?.let {
-                // "it" refers to locationManager. "let" blocks are similar to lambdas.
-                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                }
-                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                }
-                setLocationName()
-            }
-        }
-    }
-
-    private fun setLocationName() {
-        if(location != null) {
+    private fun setLocationName(locationResult: LocationResult?) {
+        if(locationResult != null) {
+            val location = locationResult.lastLocation
             try {
                 viewModel.getLocationName(
-                    location!!.latitude,
-                    location!!.longitude,
+                    location.latitude,
+                    location.longitude,
                     resources.getString(R.string.google_api_key)
-                ).observe(viewLifecycleOwner) {
-                    tvWeatherTown.text = it
+                ).observe(viewLifecycleOwner) { name ->
+                    tvWeatherTown.text = name
                 }
             }
             catch(e: Exception) {
@@ -117,7 +87,7 @@ class HomeFragment : Fragment() {
 
                 if(geocoder != null) {
                     val addressList = geocoder
-                        .getFromLocation(location!!.latitude, location!!.longitude, 1)
+                        .getFromLocation(location!!.latitude, location.longitude, 1)
                     val address = addressList[0]
                     tvWeatherTown.text = address.subAdminArea
                 }
@@ -127,15 +97,19 @@ class HomeFragment : Fragment() {
                         Toast.LENGTH_SHORT).show()
                 }
             }
-
+        }
+        else {
+            tvWeatherTown.text = "Northern Ireland"
+            Toast.makeText(context, "Cannot retrieve location",
+                Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun getWeather() {
-        if(location != null) {
-
-            viewModel.getWeather(location!!.latitude,
-                location!!.longitude,
+    private fun getWeather(locationResult: LocationResult?) {
+        if(locationResult != null) {
+            val location = locationResult.lastLocation
+            viewModel.getWeather(location.latitude,
+                location.longitude,
                 useFahrenheit,
                 resources.getString(R.string.openweathermap_api_key)
             ).observe(viewLifecycleOwner) {
@@ -144,10 +118,10 @@ class HomeFragment : Fragment() {
 
                 tvWeatherDescription.text = it.desc
 
-                // Decimal portion of temperature truncated.
-                tvWeatherTemp.text = "${it.temp.toInt()}$symbol"
+                // Decimal portion of temperature truncated with toInt().
+                val tempText = "${it.temp.toInt()}$symbol"
+                tvWeatherTemp.text = tempText
             }
-
         }
         else {
             tvWeatherTown.text = "Unknown"
@@ -233,10 +207,48 @@ class HomeFragment : Fragment() {
                 .show()
         }
         else {
-            locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
-                    as LocationManager
-            getLocation()
-            getWeather()
+            setupLocationService()
+        }
+    }
+
+    private fun setupLocationService() {
+        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireContext())
+        locationRequest = LocationRequest.create().apply {
+            // Request location in 1 minute intervals.
+            interval = 60000
+
+            // No need for high accuracy on this screen as we only wish to get the
+            // town name and weather.
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        locationCallback = object: LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                super.onLocationResult(locationResult)
+                setLocationName(locationResult)
+                getWeather(locationResult)
+
+                cvNearby.setOnClickListener {
+                    if (locationResult != null) {
+                        val nearbyFragment = NearbyFragment(locationResult.lastLocation)
+                        val mainActivity = this@HomeFragment.requireActivity() as MainActivity
+                        mainActivity.displayFragment(nearbyFragment)
+                    }
+                    else {
+                        Toast.makeText(requireContext(), "Not available with location disabled.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        fusedLocationProvider.requestLocationUpdates(locationRequest, locationCallback,
+            Looper.getMainLooper())
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Remove request for location updates as the fragment is being hidden or destroyed.
+        locationCallback?.let {
+            fusedLocationProvider.removeLocationUpdates(it)
         }
     }
 
@@ -245,7 +257,12 @@ class HomeFragment : Fragment() {
         if (PreferenceManager.getDefaultSharedPreferences(this.context)
             .getBoolean("measurement_temperature", false) != useFahrenheit) {
             useFahrenheit = !useFahrenheit
-            getWeather()
+
+            // Reinstate request for location updates as the fragment is being shown again or
+            // (re)created.
+            locationRequest?.let {
+                setupLocationService()
+            }
         }
 
         super.onResume()
