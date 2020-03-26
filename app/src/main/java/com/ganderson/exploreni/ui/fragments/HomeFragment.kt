@@ -148,7 +148,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun openSettings() {
-        val intent = Intent(this.context, SettingsActivity::class.java)
+        val intent = Intent(requireContext(), SettingsActivity::class.java)
         startActivity(intent)
     }
 

@@ -44,7 +44,7 @@ class FavouriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.getFavouriteLocations()
             .observe(viewLifecycleOwner) {
-                val linearLayoutManager = LinearLayoutManager(this.context)
+                val linearLayoutManager = LinearLayoutManager(requireContext())
                 val favouritesAdapter = FavouriteAdapter(requireContext(),
                     it,
                     object: FavouriteAdapter.OnRemoveClickListener {
@@ -65,7 +65,7 @@ class FavouriteFragment : Fragment() {
     }
 
     private fun removeFromFavourites(niLocation: NiLocation) {
-        val dialog = AlertDialog.Builder(this.context)
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Confirm removal")
             .setMessage("Remove ${niLocation.name}?")
             .setCancelable(false)
