@@ -17,6 +17,18 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
+        app:title="Recommendations"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="interests"
+            app:title="Select interests"
+            app:summary="Get recommendations by selecting your interests"
+            app:iconSpaceReserved="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         app:title="Measurement"
         app:iconSpaceReserved="false">
 

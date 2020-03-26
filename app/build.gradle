@@ -28,6 +28,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+// To inline the bytecode built with JVM target 1.8 into
+// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
 }
 
 dependencies {
@@ -61,6 +63,8 @@ dependencies {
     // Glide for downloading and displaying images
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     // Retrofit for API communication

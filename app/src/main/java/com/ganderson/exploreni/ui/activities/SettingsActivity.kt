@@ -1,9 +1,11 @@
 package com.ganderson.exploreni.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.ganderson.exploreni.R
@@ -20,6 +22,7 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.title = "Settings"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -32,6 +35,12 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            val interestPreference = findPreference<Preference>("interests")
+            interestPreference?.setOnPreferenceClickListener {
+                val intent = Intent(requireContext(), InterestActivity::class.java)
+                requireActivity().startActivity(intent)
+                true
+            }
         }
     }
 }

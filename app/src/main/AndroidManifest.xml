@@ -18,8 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.activities.InterestActivity"
+            android:label="@string/title_activity_interest"/>
+        <activity
             android:name=".ui.activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
 
         <meta-data
             android:name="com.google.ar.core"
