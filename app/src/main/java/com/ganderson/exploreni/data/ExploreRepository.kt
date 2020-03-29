@@ -77,5 +77,13 @@ class ExploreRepository {
         fun deleteItinerary(dbId: String) {
             DbAccessor.deleteItinerary(dbId)
         }
+
+        fun getInterests() : List<String>? {
+            return DbAccessor.getInterests()
+        }
+
+        fun setInterests(interests: List<String>) {
+            DbAccessor.setInterests(interests)
+        }
     }
 }

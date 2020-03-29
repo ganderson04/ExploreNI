@@ -146,5 +146,41 @@ class DbAccessor {
             val document = database.getDocument(dbId)
             database.delete(document)
         }
+
+        fun setInterests(interests: List<String>) {
+            val document: MutableDocument?
+            val query = QueryBuilder
+                .select(SelectResult.expression(Meta.id))
+                .from(DataSource.database(database))
+                .where(Expression.property("type")
+                    .equalTo(Expression.string("interests")))
+            val resultSet = query.execute()
+            val result = resultSet.next()
+            if(result != null) {
+                document = database.getDocument(result.getString("id")).toMutable()
+                document.keys
+                document.setValue("interests", interests)
+            }
+            else {
+                val interestMap = HashMap<String, Any>()
+                interestMap["interests"] = interests
+                interestMap["type"] = "interests"
+                document = MutableDocument(interestMap)
+            }
+            database.save(document)
+        }
+
+        fun getInterests() : List<String>? {
+            val query = QueryBuilder
+                .select(SelectResult.all())
+                .from(DataSource.database(database))
+                .where(Expression.property("type")
+                    .equalTo(Expression.string("interests")))
+
+            val resultSet = query.execute()
+            val result = resultSet.next()
+            val interestMap: Map<String, Any>? = result?.getDictionary(database.name)?.toMap()
+            return interestMap?.get("interests") as List<String>?
+        }
     }
 }
