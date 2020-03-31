@@ -77,8 +77,8 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         itemTouchHelper.attachToRecyclerView(rvItinerary)
 
         val removeListener = object: ItineraryAdapter.OnRemoveClickListener {
-            override fun onRemoveClick(item: NiLocation, itemIndex: Int) {
-                confirmItemRemoval(item, itemIndex)
+            override fun onRemoveClick(itemIndex: Int) {
+                confirmItemRemoval(itemIndex)
             }
         }
         rvItinerary.layoutManager = LinearLayoutManager(requireContext())
@@ -203,10 +203,10 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         itinerary.itemList.add(item)
     }
 
-    private fun confirmItemRemoval(item: NiLocation, itemIndex: Int) {
+    private fun confirmItemRemoval(itemIndex: Int) {
         val dialog = AlertDialog.Builder(this.context)
             .setTitle("Confirm removal")
-            .setMessage("Remove ${item.name}?")
+            .setMessage("Remove ${itinerary.itemList[itemIndex].name}?")
             .setCancelable(false)
             .setPositiveButton("Yes") {_, _ ->
                 run {
@@ -292,24 +292,28 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     class ItineraryAdapter(val context: Context, private val itemList: List<NiLocation>,
-                           private val listener: OnRemoveClickListener)
+                           private val removeListener: OnRemoveClickListener)
         : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
 
         interface OnRemoveClickListener {
-            fun onRemoveClick(item: NiLocation, itemIndex: Int)
+            fun onRemoveClick(itemIndex: Int)
         }
 
-        class ItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-            val cvItineraryItem = view.findViewById<CardView>(R.id.cvItineraryItem)
+        class ItemViewHolder(val view: View, val removeListener: OnRemoveClickListener)
+            : RecyclerView.ViewHolder(view) {
             val tvItineraryItem = view.findViewById<TextView>(R.id.tvItineraryItem)
             val ivItineraryItem = view.findViewById<ImageView>(R.id.ivItineraryLocation)
             val ibRemoveItem = view.findViewById<ImageButton>(R.id.ibRemoveItem)
+
+            init {
+                ibRemoveItem.setOnClickListener { removeListener.onRemoveClick(adapterPosition) }
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
             val view = LayoutInflater.from(context).inflate(R.layout.layout_itinerary_item,
                 parent, false)
-            return ItemViewHolder(view)
+            return ItemViewHolder(view, removeListener)
         }
 
         override fun getItemCount() = itemList.size
@@ -324,9 +328,6 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 .into(holder.ivItineraryItem)
 
             holder.tvItineraryItem.text = item.name
-            holder.ibRemoveItem.setOnClickListener {
-                listener.onRemoveClick(item, itemList.indexOf(item))
-            }
         }
     }
 
