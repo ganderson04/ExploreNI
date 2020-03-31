@@ -187,11 +187,17 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
 
     private fun sortList(option: Int) {
         if(option == 0) locationList.sortBy { it.name }
-        else locationList.sortWith(compareBy {
-            Utils.getHaversineGCD(location!!.latitude, location!!.longitude,
-                it.lat.toDouble(), it.long.toDouble())
-        })
+        else locationList.sortWith(
+            compareBy {
+                Utils.getHaversineGCD(location!!.latitude, location!!.longitude,
+                    it.lat.toDouble(), it.long.toDouble())
+            }
+        )
         rvLocations.adapter?.notifyDataSetChanged()
+    }
+
+    private fun recommend() {
+
     }
 
     private fun filterList() {

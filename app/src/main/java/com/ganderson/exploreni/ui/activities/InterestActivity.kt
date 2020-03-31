@@ -95,7 +95,7 @@ class InterestActivity : AppCompatActivity() {
             holder.tvInterest.text = interest
 
             val cbInterest = holder.cbInterest
-            cbInterest.isChecked = itemCheckStates[position, false]
+            cbInterest.isChecked = itemCheckStates[position, false] // [array position, default value]
             cbInterest.setOnCheckedChangeListener { _, isChecked ->
                 itemCheckStates.put(position, isChecked)
                 if(isChecked) interestActivity.addInterest(interest)
