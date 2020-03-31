@@ -67,7 +67,13 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             calculateDuration()
         }
 
-        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itinerary.itemList))
+        val itemMovedCallback = object: ItemTouchCallback.ItemMovedCallback {
+            override fun itemMoved() {
+                calculateDuration()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itinerary.itemList,
+            itemMovedCallback))
         itemTouchHelper.attachToRecyclerView(rvItinerary)
 
         val removeListener = object: ItineraryAdapter.OnRemoveClickListener {
@@ -285,8 +291,8 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         return location
     }
 
-    class ItineraryAdapter(val context: Context, val itemList: List<NiLocation>,
-                           val listener: OnRemoveClickListener)
+    class ItineraryAdapter(val context: Context, private val itemList: List<NiLocation>,
+                           private val listener: OnRemoveClickListener)
         : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
 
         interface OnRemoveClickListener {
@@ -318,13 +324,20 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 .into(holder.ivItineraryItem)
 
             holder.tvItineraryItem.text = item.name
-            holder.ibRemoveItem.setOnClickListener { listener.onRemoveClick(item, position)  }
+            holder.ibRemoveItem.setOnClickListener {
+                listener.onRemoveClick(item, itemList.indexOf(item))
+            }
         }
     }
 
-    class ItemTouchCallback(val itemList: List<NiLocation>)
+    class ItemTouchCallback(private val itemList: List<NiLocation>,
+                            private val itemMovedCallback: ItemMovedCallback)
         : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN
             or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
+
+        interface ItemMovedCallback {
+            fun itemMoved()
+        }
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder): Boolean {
@@ -332,9 +345,14 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             val toPosition = target.adapterPosition
             Collections.swap(itemList, fromPosition, toPosition)
             recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
-            return false
+            return true
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+        override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+            fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
+            itemMovedCallback.itemMoved()
+        }
     }
 }
