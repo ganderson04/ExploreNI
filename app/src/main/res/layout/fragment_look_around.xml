@@ -10,16 +10,43 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <SeekBar
-            android:id="@+id/skbArRange"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:min="1"
-            android:max="5"
-            android:progress="5"/>
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:orientation="horizontal"
+            android:weightSum="7">
+
+                <TextView
+                    android:id="@+id/tvCurrentArRange"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="1mi"
+                    android:textColor="#000000"
+                    android:textSize="15sp" />
+
+                <SeekBar
+                    android:id="@+id/skbArRange"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:min="1"
+                    android:max="30"
+                    android:progress="5"/>
+
+                <TextView
+                    android:id="@+id/tvMaxArRange"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="30mi"
+                    android:textColor="#000000"/>
+
+        </LinearLayout>
 
 </FrameLayout>

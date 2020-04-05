@@ -14,6 +14,7 @@ import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
+import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.viewmodels.NearbyViewModel
 import com.ganderson.exploreni.ui.components.LoadingDialog
@@ -62,9 +63,28 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
             .getDefaultSharedPreferences(this.context)
             .getBoolean("measurement_distance", false)
 
+        if(useMetric) {
+            tvCurrentRange.text = "${currentSeekRadius}km"
+            skbNearbyRange.max = Utils.MAX_SEEK_KM
+            tvMaxRange.text = "${Utils.MAX_SEEK_KM}km"
+        }
+        else {
+            tvCurrentRange.text = "${currentSeekRadius}mi"
+            skbNearbyRange.max = Utils.MAX_SEEK_MILES
+            tvMaxRange.text = "${Utils.MAX_SEEK_MILES}mi"
+        }
         skbNearbyRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
-                                           fromUser: Boolean) {}
+                                           fromUser: Boolean) {
+                seekBar?.let {
+                    if(useMetric) {
+                        tvCurrentRange.text = "${progress}km"
+                    }
+                    else {
+                        tvCurrentRange.text = "${progress}mi"
+                    }
+                }
+            }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
@@ -103,9 +123,16 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
     private fun getNearbyLocations() {
         val loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
         loadingDialog.show()
+        val miles: Int
+        if(useMetric) {
+            miles = Utils.distanceToImperial(currentSeekRadius.toDouble()).toInt()
+        }
+        else {
+            miles = currentSeekRadius
+        }
 
         viewModel
-            .getNearbyLocations(userLocation.latitude, userLocation.longitude, currentSeekRadius)
+            .getNearbyLocations(userLocation.latitude, userLocation.longitude, miles)
             .observe(viewLifecycleOwner) {
                 loadingDialog.dismiss()
                 if(it.isNotEmpty()) {
