@@ -65,9 +65,28 @@ class LookAroundFragment : Fragment() {
                 .getDefaultSharedPreferences(this.context)
                 .getBoolean("measurement_distance", false)
 
+            if(useMetric) {
+                tvCurrentArRange.text = "${currentSeekRadius}km"
+                skbArRange.max = Utils.MAX_SEEK_KM
+                tvMaxArRange.text = "${Utils.MAX_SEEK_KM}km"
+            }
+            else {
+                tvCurrentArRange.text = "${currentSeekRadius}mi"
+                skbArRange.max = Utils.MAX_SEEK_MILES
+                tvMaxArRange.text = "${Utils.MAX_SEEK_MILES}mi"
+            }
             skbArRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
-                    fromUser: Boolean) {}
+                    fromUser: Boolean) {
+                    seekBar?.let {
+                        if(useMetric) {
+                            tvCurrentArRange.text = "${progress}km"
+                        }
+                        else {
+                            tvCurrentArRange.text = "${progress}mi"
+                        }
+                    }
+                }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
@@ -116,9 +135,16 @@ class LookAroundFragment : Fragment() {
 
         val lat = locationScene!!.deviceLocation.currentBestLocation.latitude
         val lon = locationScene!!.deviceLocation.currentBestLocation.longitude
+        val miles: Int
+        if(useMetric) {
+            miles = Utils.distanceToImperial(currentSeekRadius.toDouble()).toInt()
+        }
+        else {
+            miles = currentSeekRadius
+        }
 
         viewModel
-            .getNearbyLocations(lat, lon, currentSeekRadius)
+            .getNearbyLocations(lat, lon, miles)
             .observe(viewLifecycleOwner) {
                 loadingDialog.dismiss()
 

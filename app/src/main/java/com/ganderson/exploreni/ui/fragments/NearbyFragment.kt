@@ -149,6 +149,11 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
     }
 
     private fun constructMap(it: List<NiLocation>) {
+        // Remove markers in the event that the range has been reduced and some or all of them
+        // should no longer be visible.
+        map.clear()
+
+        // Go through the list of in-range locations and (re-)add them to the map.
         it.forEach { location ->
             val latLng = LatLng(location.lat.toDouble(), location.long.toDouble())
             val markerOptions = MarkerOptions()
