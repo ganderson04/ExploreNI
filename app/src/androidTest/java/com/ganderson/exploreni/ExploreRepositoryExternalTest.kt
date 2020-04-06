@@ -2,14 +2,11 @@ package com.ganderson.exploreni
 
 import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
-import com.ganderson.exploreni.data.api.ApiAccessor
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.entities.api.Weather
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.jraska.livedata.test
 import org.junit.Before
@@ -44,7 +41,7 @@ class ExploreRepositoryExternalTest {
         val locationList = ArrayList<NiLocation>().apply {
             add(niLocation)
         }
-        itinerary = Itinerary("", "", locationList)
+        itinerary = Itinerary(dbId, name, locationList)
     }
 
     @Before
