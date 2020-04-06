@@ -63,8 +63,8 @@ dependencies {
     // Glide for downloading and displaying images
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.2.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     // Retrofit for API communication
@@ -74,7 +74,14 @@ dependencies {
     // Couchbase Lite
     implementation 'com.couchbase.lite:couchbase-lite-android:2.6.0'
 
+    // LiveData testing library
+    testImplementation 'com.jraska.livedata:testing-ktx:1.1.2'
+    androidTestImplementation 'com.jraska.livedata:testing-ktx:1.1.2'
+
     testImplementation 'junit:junit:4.13'
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
