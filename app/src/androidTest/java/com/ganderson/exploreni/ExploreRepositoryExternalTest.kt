@@ -38,9 +38,8 @@ class ExploreRepositoryExternalTest {
         val name = ""
         val niLocation = NiLocation("", "", 0f, "", "54.642748",
             "-5.942263", "", "", "", ArrayList())
-        val locationList = ArrayList<NiLocation>().apply {
-            add(niLocation)
-        }
+        val locationList = ArrayList<NiLocation>()
+        locationList.add(niLocation)
         itinerary = Itinerary(dbId, name, locationList)
     }
 
