@@ -13,7 +13,6 @@ import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.activities.SettingsActivity
@@ -21,7 +20,6 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
 
 @RunWith(AndroidJUnit4::class)
 class HomeFragmentTest {
@@ -47,6 +45,7 @@ class HomeFragmentTest {
         // The toolbar becomes inaccessible while the dialog is showing, even though it does
         // not take over the entire screen. Checking we can access the toolbar title shows that
         // the dialog has closed and focus has returned to the underlying fragment.
+        // CoreMatchers#allOf allows multiple Matchers to be combined.
         onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
             .check(matches(withText("Home")))
     }
@@ -83,7 +82,7 @@ class HomeFragmentTest {
         intended(hasComponent(SettingsActivity::class.java.name))
 
         // Espresso cannot seem to find the back button on the toolbar by its ID
-//         "android.R.id.home". It is instead found by its content description "Navigate up".
+        // "android.R.id.home". It is instead found by its content description "Navigate up".
         onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
             .perform(click())
 
@@ -99,12 +98,15 @@ class HomeFragmentTest {
         onView(withId(R.id.cvEvents))
             .perform(click())
 
-        // As the loading dialog is displayed over the Event fragment, the toolbar cannot
-        // be checked as easily. We now need to tell Espresso to check in the specified "root" view.
-        // In this case, we tell it to use the parent activity's DecorView which serves as the
-        // root of the view hierarchy and therefore enables us to access the toolbar.
-        onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
+        // The loading dialog is shown immediately after opening the Events screen. This means that
+        // other views "beneath" it, including the toolbar, are not directly accessible to Espresso.
+        // It is necessary to specify the "root" view in which it should look for the view with the
+        // specified ID (here "rvEvents" representing the RecyclerView holding the event items).
+        // The root here is the "DecorView" which contains the view hierarchy for the window.
+        // Using "not(isDialog())" tells Espresso explicitly that it should *not* look for the ID
+        // within a Dialog.
+        onView(withId(R.id.rvEvents))
             .inRoot(allOf(withDecorView(`is`(activityRule.activity.window.decorView)), not(isDialog())))
-            .check(matches(withText("Events")))
+            .check(matches(isDisplayed()))
     }
 }
