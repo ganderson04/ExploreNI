@@ -3,7 +3,6 @@ package com.ganderson.exploreni
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.DecimalFormat
-import java.util.concurrent.TimeUnit
 import kotlin.math.*
 
 /**
@@ -78,7 +77,7 @@ inline fun <reified T> Map<String, Any>.toDataClass() : T {
 }
 
 // Converting between data class and Map utilises Gson's ability to convert objects to and from
-// JSON.
+// JSON. The Gson library comes with Retrofit, although it does exist separately.
 inline fun <S, reified T> S.convert() : T {
     val gson = Gson()
     val json = gson.toJson(this)
