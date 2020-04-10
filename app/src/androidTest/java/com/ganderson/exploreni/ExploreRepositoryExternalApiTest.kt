@@ -15,7 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ExploreRepositoryExternalTest {
+class ExploreRepositoryExternalApiTest {
     private lateinit var location: Location
     private lateinit var itinerary: Itinerary
     private lateinit var openWeatherMapApiKey: String
