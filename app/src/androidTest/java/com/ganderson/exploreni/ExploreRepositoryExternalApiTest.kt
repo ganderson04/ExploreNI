@@ -21,8 +21,20 @@ class ExploreRepositoryExternalApiTest {
     private lateinit var openWeatherMapApiKey: String
     private lateinit var googleApiKey: String
 
-    // Used to execute background tasks synchronously.
+    // Used to execute background tasks synchronously. It is not necessary to call this in
+    // each test as Rules intercept the tests and act as @Before, @After etc. would.
+    // Ref: https://www.codeaffine.com/2012/09/24/junit-rules/
+    //
+    // When using JUnit Rules in Kotlin, it is necessary to mark them with the "@get" annotation
+    // as opposed to "@Rule" which would be used in Java. "@get" instructs the JVM to generate
+    // a getter for a specific property and is sometimes required for Java-Kotlin
+    // interoperability. Here "@get:Rule" is used to apply the "@Rule" annotation to the property
+    // so that JUnit can find it.
+    // Ref: https://kotlinlang.org/docs/reference/annotations.html#java-annotations
     @get:Rule val taskRule = InstantTaskExecutorRule()
+
+    // Used to obtain a Context reference with which to access the app's resources and retrieve
+    // the API keys.
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
     @Before
