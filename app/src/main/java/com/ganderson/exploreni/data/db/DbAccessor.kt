@@ -110,7 +110,7 @@ class DbAccessor {
             return resultSet.next() != null
         }
 
-        fun getItineraries(): LiveData<List<Itinerary>> {
+        fun getItineraries() : LiveData<List<Itinerary>> {
             val data = MutableLiveData<List<Itinerary>>()
             val query = QueryBuilder
                 .select(SelectResult.expression(Meta.id), SelectResult.all())
@@ -142,13 +142,14 @@ class DbAccessor {
             return data
         }
 
-        fun deleteItinerary(dbId: String) {
+        fun deleteItinerary(dbId: String): Boolean {
             val document = database.getDocument(dbId)
             database.delete(document)
+            return true
         }
 
-        fun setInterests(interests: List<String>) {
-            val document: MutableDocument?
+        fun setInterests(interests: List<String>) : Boolean {
+            val document: MutableDocument
             val query = QueryBuilder
                 .select(SelectResult.expression(Meta.id))
                 .from(DataSource.database(database))
@@ -168,9 +169,11 @@ class DbAccessor {
                 document = MutableDocument(interestMap)
             }
             database.save(document)
+            return true
         }
 
-        fun getInterests() : List<String>? {
+        fun getInterests() : List<String> {
+            val interests = ArrayList<String>()
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
@@ -180,7 +183,10 @@ class DbAccessor {
             val resultSet = query.execute()
             val result = resultSet.next()
             val interestMap: Map<String, Any>? = result?.getDictionary(database.name)?.toMap()
-            return interestMap?.get("interests") as List<String>?
+            interestMap?.let {
+                interests.addAll(interestMap["interests"] as List<String>)
+            }
+            return interests
         }
     }
 }

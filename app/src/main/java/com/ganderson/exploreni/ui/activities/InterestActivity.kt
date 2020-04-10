@@ -44,8 +44,8 @@ class InterestActivity : AppCompatActivity() {
 
     private fun getUserInterests() {
         val userInterests = viewModel.getInterests()
-        userInterests?.let { list ->
-            selectedInterests.addAll(list)
+        if(userInterests.isNotEmpty()) {
+            selectedInterests.addAll(userInterests)
             selectedInterests.forEach { interest ->
                 val itemIndex = interests.indexOf(interest)
                 if(itemIndex != -1) {

@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.ganderson.exploreni.data.ExploreRepository
 
 class InterestsViewModel : ViewModel() {
-    fun getInterests() : List<String>? {
+    fun getInterests() : List<String> {
         return ExploreRepository.getInterests()
     }
 
-    fun setInterests(interests: List<String>) {
-        ExploreRepository.setInterests(interests)
+    fun setInterests(interests: List<String>) : Boolean {
+        return ExploreRepository.setInterests(interests)
     }
 }

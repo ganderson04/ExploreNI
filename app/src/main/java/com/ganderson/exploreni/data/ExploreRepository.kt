@@ -74,16 +74,16 @@ class ExploreRepository {
             return DbAccessor.getItineraries()
         }
 
-        fun deleteItinerary(dbId: String) {
-            DbAccessor.deleteItinerary(dbId)
+        fun deleteItinerary(dbId: String) : Boolean {
+            return DbAccessor.deleteItinerary(dbId)
         }
 
-        fun getInterests() : List<String>? {
+        fun getInterests() : List<String> {
             return DbAccessor.getInterests()
         }
 
-        fun setInterests(interests: List<String>) {
-            DbAccessor.setInterests(interests)
+        fun setInterests(interests: List<String>) : Boolean {
+            return DbAccessor.setInterests(interests)
         }
     }
 }
