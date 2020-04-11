@@ -86,12 +86,11 @@ class AttractionDetailFragment(private val location: NiLocation,
                 else {
                     removeFromFavourites()
                 }
-                return true
             }
 
             R.id.tb_map -> {
-                Toast.makeText(requireContext(), "View on map", Toast.LENGTH_SHORT).show()
-                return true
+                val mainActivity = requireActivity() as MainActivity
+                mainActivity.displayFragment(AttractionMapFragment(location))
             }
         }
         return super.onOptionsItemSelected(item)
