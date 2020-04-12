@@ -1,5 +1,6 @@
 package com.ganderson.exploreni
 
+import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.DecimalFormat
@@ -82,4 +83,35 @@ inline fun <S, reified T> S.convert() : T {
     val gson = Gson()
     val json = gson.toJson(this)
     return gson.fromJson(json, object: TypeToken<T>(){}.type)
+}
+
+// The below object is a singleton which provides access to Espresso's CountingIdlingResource.
+// IdlingResources are used to instruct the Espresso test to wait for an asynchronous activity to
+// finish and then proceed with the test instructions. Otherwise, the test would fail as the UI
+// element(s) under consideration would not yet be ready.
+//
+// Kotlin allows singletons to be created by declaring them using the "object" keyword. The result
+// looks like a class declaration and accessing its methods looks like accessing a static method in
+// a class. For example, accessing the increment() method below would look like:
+// EspressoIdlingResource.increment()
+// Ref: https://kotlinlang.org/docs/reference/object-declarations.html#object-declarations
+object EspressoIdlingResource {
+    private const val RESOURCE = "GLOBAL"
+
+    // @JvmField means this property will be exposed as a field without getter/setter.
+    @JvmField val countingIdlingResource = CountingIdlingResource(RESOURCE)
+
+    // CountingIdlingResources work similar to semaphores. If their internal counter is not zero,
+    // the app is not idle which means there is some asynchronous activity going on. This means
+    // Espresso will wait.
+    fun increment() = countingIdlingResource.increment()
+
+    // If the CountingIdlingResource's counter is zero, it means the app is idle and Espresso can
+    // continue with testing.
+    fun decrement() {
+        // Do not decrement counter if the app is already idle.
+        if(!countingIdlingResource.isIdleNow) {
+            countingIdlingResource.decrement()
+        }
+    }
 }

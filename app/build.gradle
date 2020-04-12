@@ -73,6 +73,11 @@ dependencies {
     // Couchbase Lite
     implementation 'com.couchbase.lite:couchbase-lite-android:2.6.0'
 
+    // Espresso Idling Resource library added as "implementation" rather than
+    // "androidTestImplementation" as it is used in the main code body of the app as well as in
+    // the tests.
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+
     // LiveData testing library
     testImplementation 'com.jraska.livedata:testing-ktx:1.1.2'
     androidTestImplementation 'com.jraska.livedata:testing-ktx:1.1.2'
