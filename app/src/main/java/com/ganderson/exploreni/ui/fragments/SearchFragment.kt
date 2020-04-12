@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.api.NiLocation
@@ -43,11 +44,13 @@ class SearchFragment(private val query: String) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        EspressoIdlingResource.increment()
         val loadingDialog = LoadingDialog(requireContext(), "Searching...")
         loadingDialog.show()
         viewModel.performSearch(query)
             .observe(viewLifecycleOwner) { list ->
                 loadingDialog.dismiss()
+                EspressoIdlingResource.decrement()
                 if(list.isNotEmpty()) {
                     val adapterListener = object: LocationAdapter.OnLocationClickListener {
                         override fun onLocationClick(location: NiLocation) {
