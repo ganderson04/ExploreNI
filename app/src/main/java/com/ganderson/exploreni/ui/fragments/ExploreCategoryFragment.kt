@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
@@ -83,30 +84,36 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
         // If the list is empty it must be a new instantiation of this fragment, so show the
         // loading dialog and begin observing the ViewModel's LiveData.
         if(locationList.isEmpty()) {
+            EspressoIdlingResource.increment()
             val loadingDialog = LoadingDialog(requireContext(),
                 "Loading locations, please wait.")
             loadingDialog.show()
-            viewModel.locations.observe(viewLifecycleOwner) { list ->
-                loadingDialog.dismiss()
-                if (list.isNotEmpty()) {
-                    locationList.clear()
-                    locationList.addAll(list)
-                    displayLocations()
-                    createFilterDialog()
-                } else {
-                    val alert = AlertDialog.Builder(requireContext())
-                        .setCancelable(false)
-                        .setTitle("Error")
-                        .setMessage("No locations found for this type.")
-                        .setPositiveButton("OK") { dialog, _ ->
-                            run {
-                                dialog.dismiss()
-                                parentFragmentManager.popBackStack()
+
+            viewModel
+                .locations
+                .observe(viewLifecycleOwner) { list ->
+                    loadingDialog.dismiss()
+                    EspressoIdlingResource.decrement()
+
+                    if (list.isNotEmpty()) {
+                        locationList.clear()
+                        locationList.addAll(list)
+                        displayLocations()
+                        createFilterDialog()
+                    } else {
+                        val alert = AlertDialog.Builder(requireContext())
+                            .setCancelable(false)
+                            .setTitle("Error")
+                            .setMessage("No locations found for this type.")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                run {
+                                    dialog.dismiss()
+                                    parentFragmentManager.popBackStack()
+                                }
                             }
-                        }
-                    alert.show()
+                        alert.show()
+                    }
                 }
-            }
         }
         else {
             displayLocations()
