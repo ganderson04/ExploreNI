@@ -33,6 +33,7 @@ class ExploreCategoryFragmentTest {
 
     @Before
     fun registerIdlingResource() {
+        // IdlingResources for a test must be registered and unregistered each time.
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
     }
 
