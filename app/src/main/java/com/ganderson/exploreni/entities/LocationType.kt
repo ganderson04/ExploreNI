@@ -1,6 +1,6 @@
 package com.ganderson.exploreni.entities
 
-enum class LocationType() {
+enum class LocationType {
     SEE,
     DO,
     STAY,
