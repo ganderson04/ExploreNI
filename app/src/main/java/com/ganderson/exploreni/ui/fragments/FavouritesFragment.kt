@@ -4,20 +4,15 @@ package com.ganderson.exploreni.ui.fragments
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ganderson.exploreni.EspressoIdlingResource
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.ui.components.adapters.FavouriteAdapter
+import com.ganderson.exploreni.ui.components.adapters.FavouritesAdapter
 import com.ganderson.exploreni.ui.viewmodels.FavouritesViewModel
 import kotlinx.android.synthetic.main.fragment_favourites.*
 
@@ -48,9 +43,9 @@ class FavouritesFragment : Fragment() {
             .observe(viewLifecycleOwner) {
                 EspressoIdlingResource.decrement()
                 val linearLayoutManager = LinearLayoutManager(requireContext())
-                val favouritesAdapter = FavouriteAdapter(requireContext(),
+                val favouritesAdapter = FavouritesAdapter(requireContext(),
                     it,
-                    object: FavouriteAdapter.OnRemoveClickListener {
+                    object: FavouritesAdapter.OnRemoveClickListener {
                     override fun onRemoveClick(niLocation: NiLocation) {
                         removeFromFavourites(niLocation)
                     }

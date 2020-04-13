@@ -14,10 +14,10 @@ import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.AttractionDetailFragment
 
-class FavouriteAdapter(private val context: Context,
-                       private val locations: List<NiLocation>,
-                       private val removeClickListener: OnRemoveClickListener)
-    : RecyclerView.Adapter<FavouriteAdapter.FavouritesViewHolder>() {
+class FavouritesAdapter(private val context: Context,
+                        private val locations: List<NiLocation>,
+                        private val removeClickListener: OnRemoveClickListener)
+    : RecyclerView.Adapter<FavouritesAdapter.FavouritesViewHolder>() {
 
     interface OnRemoveClickListener {
         fun onRemoveClick(niLocation: NiLocation)
