@@ -7,6 +7,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.api.NiLocation
@@ -18,7 +19,9 @@ import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class FavouritesFragmentTest {
     private val niLocation = NiLocation("123", "FragTest", 0f, "",
         "54.642748", "-5.942263", "", "", "", ArrayList())
