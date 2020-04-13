@@ -12,6 +12,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.ganderson.exploreni.EspressoIdlingResource
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
@@ -23,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_favourites.*
 /**
  * A simple [Fragment] subclass.
  */
-class FavouriteFragment : Fragment() {
+class FavouritesFragment : Fragment() {
     private val viewModel = FavouritesViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -42,8 +43,10 @@ class FavouriteFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        EspressoIdlingResource.increment()
         viewModel.getFavouriteLocations()
             .observe(viewLifecycleOwner) {
+                EspressoIdlingResource.decrement()
                 val linearLayoutManager = LinearLayoutManager(requireContext())
                 val favouritesAdapter = FavouriteAdapter(requireContext(),
                     it,

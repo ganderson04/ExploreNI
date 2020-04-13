@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_explore -> selectedFragment = ExploreFragment()
                 R.id.nav_ar -> selectedFragment = LookAroundFragment()
                 R.id.nav_plan -> selectedFragment = PlanFragment()
-                R.id.nav_favourites -> selectedFragment = FavouriteFragment()
+                R.id.nav_favourites -> selectedFragment = FavouritesFragment()
             }
 
             if(selectedFragment != null) displayFragment(selectedFragment)
