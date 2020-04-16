@@ -110,6 +110,28 @@ class DbAccessor {
             return resultSet.next() != null
         }
 
+        /**
+         * Convenience method for testing with a single itinerary.
+         */
+        fun getItinerary(itineraryName: String) : Itinerary {
+            val query = QueryBuilder
+                .select(SelectResult.expression(Meta.id), SelectResult.all())
+                .from(DataSource.database(database))
+                .where(Expression.property("unique_name")
+                    .equalTo(Expression.string(itineraryName.toLowerCase(Locale.getDefault()))))
+            val resultSet = query.execute()
+            val result = resultSet.next()
+            val itineraryMap = result.getDictionary(database.name).toMap()
+            itineraryMap["dbId"] = result.getValue("id")
+
+            // type and unique_name are not part of the data class so they are removed from
+            // the map before conversion.
+            itineraryMap.remove("type")
+            itineraryMap.remove("unique_name")
+
+            return itineraryMap.toDataClass()
+        }
+
         fun getItineraries() : LiveData<List<Itinerary>> {
             val data = MutableLiveData<List<Itinerary>>()
             val query = QueryBuilder
@@ -144,7 +166,7 @@ class DbAccessor {
 
         fun deleteItinerary(dbId: String): Boolean {
             val document = database.getDocument(dbId)
-            database.delete(document)
+            if(document != null) database.delete(document)
             return true
         }
 

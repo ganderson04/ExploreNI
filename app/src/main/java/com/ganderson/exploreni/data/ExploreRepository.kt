@@ -70,7 +70,14 @@ class ExploreRepository {
             return DbAccessor.isDuplicateItineraryName(name)
         }
 
-        fun getItineraries(): LiveData<List<Itinerary>> {
+        /**
+         * Convenience method for testing with a single itinerary.
+         */
+        fun getItinerary(itineraryName: String) : Itinerary {
+            return DbAccessor.getItinerary(itineraryName)
+        }
+
+        fun getItineraries() : LiveData<List<Itinerary>> {
             return DbAccessor.getItineraries()
         }
 
