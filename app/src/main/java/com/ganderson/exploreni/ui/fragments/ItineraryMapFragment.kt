@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.Itinerary
@@ -55,7 +56,6 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val fcvMap = childFragmentManager.findFragmentById(R.id.fcvItineraryMap)
                 as SupportMapFragment
-
         fcvMap.getMapAsync {
             this.map = it
             map.isMyLocationEnabled = true
@@ -104,6 +104,8 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
     }
 
     private fun drawRoute() {
+        EspressoIdlingResource.increment()
+
         val loadingDialog = LoadingDialog(requireContext(), "Loading route, please wait.")
         loadingDialog.show()
         viewModel
@@ -116,6 +118,8 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
                 polyline.addAll(PolyUtil.decode(polyString))
                 map.addPolyline(polyline)
                 loadingDialog.dismiss()
+
+                EspressoIdlingResource.decrement()
             }
     }
 

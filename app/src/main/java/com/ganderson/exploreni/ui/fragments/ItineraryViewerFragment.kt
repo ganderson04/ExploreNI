@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
@@ -247,6 +248,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
         val userLocation = getUserLocation()
         if((itinerary.itemList.size == 1 && userLocation != null) ||
             itinerary.itemList.size > 1) {
+            EspressoIdlingResource.increment()
             val loadingDialog = LoadingDialog(
                 requireContext(),
                 "Calculating duration, please wait."
@@ -259,6 +261,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                     val duration = Utils.secondsToTimeString(seconds)
                     val durationText = "Travel time: $duration"
                     tvItineraryDuration.text = durationText
+                    EspressoIdlingResource.decrement()
                 }
         }
     }
