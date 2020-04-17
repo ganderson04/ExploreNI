@@ -7,11 +7,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.couchbase.lite.CouchbaseLite
@@ -20,7 +18,7 @@ import com.ganderson.exploreni.ui.viewmodels.InterestsViewModel
 
 import kotlinx.android.synthetic.main.activity_interest.*
 
-class InterestActivity : AppCompatActivity() {
+class InterestsActivity : AppCompatActivity() {
     private val viewModel = InterestsViewModel()
     private val interests = ArrayList<String>()
     private val selectedInterests = ArrayList<String>()
@@ -76,7 +74,7 @@ class InterestActivity : AppCompatActivity() {
     class InterestAdapter(private val context: Context, private val interests: Array<String>)
         : RecyclerView.Adapter<InterestAdapter.InterestViewHolder>() {
 
-        private val interestActivity = context as InterestActivity
+        private val interestActivity = context as InterestsActivity
         private val itemCheckStates = SparseBooleanArray()
 
         class InterestViewHolder(val view: View) : RecyclerView.ViewHolder(view){

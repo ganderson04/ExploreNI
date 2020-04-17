@@ -12,7 +12,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.ganderson.exploreni.ui.activities.InterestActivity
+import com.ganderson.exploreni.ui.activities.InterestsActivity
 import com.ganderson.exploreni.ui.activities.SettingsActivity
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +31,7 @@ class SettingsActivityTest {
                 hasDescendant(withText("Select interests")),
                 click()))
 
-        intended(hasComponent(InterestActivity::class.java.name))
+        intended(hasComponent(InterestsActivity::class.java.name))
         Intents.release()
     }
 
@@ -43,7 +43,7 @@ class SettingsActivityTest {
                 hasDescendant(withText("Select interests")),
                 click()))
 
-        intended(hasComponent(InterestActivity::class.java.name))
+        intended(hasComponent(InterestsActivity::class.java.name))
 
         // Espresso cannot seem to find the back button on the toolbar by its ID
         // "android.R.id.home". It is instead found by its content description "Navigate up".

@@ -3,11 +3,9 @@ package com.ganderson.exploreni.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import com.ganderson.exploreni.R
 
 class SettingsActivity : AppCompatActivity() {
@@ -37,7 +35,7 @@ class SettingsActivity : AppCompatActivity() {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
             val interestPreference = findPreference<Preference>("interests")
             interestPreference?.setOnPreferenceClickListener {
-                val intent = Intent(requireContext(), InterestActivity::class.java)
+                val intent = Intent(requireContext(), InterestsActivity::class.java)
                 requireActivity().startActivity(intent)
                 true
             }

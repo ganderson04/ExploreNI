@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activities.InterestActivity"
+            android:name=".ui.activities.InterestsActivity"
             android:label="@string/title_activity_interest"/>
         <activity
             android:name=".ui.activities.SettingsActivity"
