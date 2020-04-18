@@ -3,9 +3,7 @@ package com.ganderson.exploreni
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
@@ -15,6 +13,8 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.AttractionDetailFragment
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +45,7 @@ class AttractionDetailFragmentTest {
         onView(withId(R.id.tb_favourite))
             .perform(click())
 
-        assert(ExploreRepository.isFavouriteLocation(niLocation.id))
+        assertTrue(ExploreRepository.isFavouriteLocation(niLocation.id))
         ExploreRepository.removeFavouriteLocation(niLocation.id)
     }
 
@@ -56,7 +56,7 @@ class AttractionDetailFragmentTest {
         onView(withId(R.id.tb_favourite))
             .perform(click())
 
-        assert(!ExploreRepository.isFavouriteLocation(niLocation.id))
+        assertFalse(ExploreRepository.isFavouriteLocation(niLocation.id))
     }
 
     @Test

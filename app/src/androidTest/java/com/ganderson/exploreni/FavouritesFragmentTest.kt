@@ -16,6 +16,7 @@ import com.ganderson.exploreni.ui.components.adapters.FavouritesAdapter
 import com.ganderson.exploreni.ui.fragments.FavouritesFragment
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,7 +97,7 @@ class FavouritesFragmentTest {
         onView(withText("Yes"))
             .perform(click())
 
-        assert(!ExploreRepository.isFavouriteLocation(niLocation.id))
+        assertFalse(ExploreRepository.isFavouriteLocation(niLocation.id))
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 }

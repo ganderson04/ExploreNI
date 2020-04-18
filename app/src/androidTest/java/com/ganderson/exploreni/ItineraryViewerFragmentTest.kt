@@ -15,6 +15,7 @@ import com.ganderson.exploreni.ui.fragments.ItineraryViewerFragment
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -77,7 +78,7 @@ class ItineraryViewerFragmentTest {
         onView(withText("Yes"))
             .perform(click())
 
-        assert(!ExploreRepository.isDuplicateItineraryName(savedItinerary.name))
+        assertFalse(ExploreRepository.isDuplicateItineraryName(savedItinerary.name))
     }
 
     @Test

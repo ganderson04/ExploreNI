@@ -8,6 +8,8 @@ import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.jraska.livedata.test
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,53 +45,53 @@ class ExploreRepositoryDbTest {
 
     @Test
     fun addFavouriteLocationTest() {
-        assert(ExploreRepository.addFavouriteLocation(niLocation))
-        assert(ExploreRepository.isFavouriteLocation("123"))
+        assertTrue(ExploreRepository.addFavouriteLocation(niLocation))
+        assertTrue(ExploreRepository.isFavouriteLocation("123"))
         ExploreRepository.removeFavouriteLocation("123")
     }
 
     @Test
     fun removeFavouriteLocationTest() {
         ExploreRepository.addFavouriteLocation(niLocation)
-        assert(ExploreRepository.removeFavouriteLocation("123"))
-        assert(ExploreRepository.isFavouriteLocation("123"))
+        assertTrue(ExploreRepository.removeFavouriteLocation("123"))
+        assertFalse(ExploreRepository.isFavouriteLocation("123"))
     }
 
     @Test
     fun saveItineraryTest() {
-        assert(ExploreRepository.saveItinerary(itinerary))
+        assertTrue(ExploreRepository.saveItinerary(itinerary))
 
         val savedItinerary = ExploreRepository.getItineraries()
             .test()
             .awaitValue()
             .value()[0]
-        assert(savedItinerary.name == itineraryName)
+        assertTrue(savedItinerary.name == itineraryName)
         ExploreRepository.deleteItinerary(savedItinerary.dbId)
     }
 
     @Test
     fun deleteItineraryTest() {
-        assert(ExploreRepository.saveItinerary(itinerary))
+        assertTrue(ExploreRepository.saveItinerary(itinerary))
 
         val savedItinerary = ExploreRepository.getItineraries()
             .test()
             .awaitValue()
             .value()[0]
-        assert(savedItinerary.name == itineraryName)
-        assert(ExploreRepository.deleteItinerary(savedItinerary.dbId))
+        assertTrue(savedItinerary.name == itineraryName)
+        assertTrue(ExploreRepository.deleteItinerary(savedItinerary.dbId))
     }
 
     @Test
     fun setInterests() {
-        assert(ExploreRepository.setInterests(interests))
+        assertTrue(ExploreRepository.setInterests(interests))
         ExploreRepository.setInterests(ArrayList())
     }
 
     @Test
     fun getInterests() {
-        assert(ExploreRepository.setInterests(interests))
+        assertTrue(ExploreRepository.setInterests(interests))
         val savedInterests = ExploreRepository.getInterests()
-        assert(savedInterests[0] == interests[0] &&
+        assertTrue(savedInterests[0] == interests[0] &&
                 savedInterests[1] == interests[1])
         ExploreRepository.setInterests((ArrayList()))
     }

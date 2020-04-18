@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.ui.activities.InterestsActivity
 import com.ganderson.exploreni.ui.activities.SettingsActivity
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,7 +71,7 @@ class SettingsActivityTest {
         val preferenceAfter = PreferenceManager.getDefaultSharedPreferences(activityRule.activity)
             .getBoolean("measurement_distance", false)
 
-        assert(preferenceBefore == preferenceAfter)
+        assertTrue(preferenceBefore == preferenceAfter)
     }
 
     @Test
@@ -86,6 +87,6 @@ class SettingsActivityTest {
         val preferenceAfter = PreferenceManager.getDefaultSharedPreferences(activityRule.activity)
             .getBoolean("measurement_temperature", false)
 
-        assert(preferenceBefore == preferenceAfter)
+        assertTrue(preferenceBefore == preferenceAfter)
     }
 }
