@@ -3,7 +3,6 @@ package com.ganderson.exploreni
 import android.view.View
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
@@ -14,11 +13,12 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
+import com.ganderson.exploreni.ui.activities.InterestsActivity
 import com.ganderson.exploreni.ui.activities.SettingsActivity
-import org.hamcrest.CoreMatchers.anything
-import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.Matcher
 import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,30 +65,58 @@ class InterestsActivityTest {
 
     @Test
     fun selectInterestTest() {
-        onData(withId(R.id.rvInterests))
-            .atPosition(0)
-            .onChildView(withClassName(containsString("CheckBox")))
-            .perform(click())
+        onView(withId(R.id.rvInterests))
+            .perform(RecyclerViewActions.actionOnItemAtPosition
+            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
 
         onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
             .perform(click())
 
         val selectedInterests = ExploreRepository.getInterests()
-        assert(selectedInterests.contains(interestsArray[0]))
+        assertTrue(selectedInterests.contains(interestsArray[0]))
     }
 
-    private fun clickOnCheckbox() = object: ViewAction {
-        override fun getDescription(): String {
-            TODO("Not yet implemented")
-        }
+    @Test
+    fun selectAndDeselectInterestTest() {
+        onView(withId(R.id.rvInterests))
+            .perform(RecyclerViewActions.actionOnItemAtPosition
+            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
 
-        override fun getConstraints(): Matcher<View> {
-            TODO("Not yet implemented")
-        }
+        onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
+            .perform(click())
+
+        val firstSelectedInterests = ExploreRepository.getInterests()
+        assertTrue(firstSelectedInterests.contains(interestsArray[0]))
+
+        // Re-access InterestsActivity from SettingsActivity.
+        onView(withId(androidx.preference.R.id.recycler_view))
+            .perform(RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                hasDescendant(withText("Select interests")), click()))
+
+        onView(withId(R.id.rvInterests))
+            .perform(RecyclerViewActions.actionOnItemAtPosition
+            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
+
+        onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
+            .perform(click())
+
+        val secondSelectedInterests = ExploreRepository.getInterests()
+        assertFalse(secondSelectedInterests.contains(interestsArray[0]))
+    }
+
+    /**
+     * Returns a custom ViewAction to click the checkboxes within the individual rows of the
+     * interests list.
+     */
+    private fun clickOnCheckbox() = object: ViewAction {
+        override fun getDescription(): String = "Click on the CheckBox in an interest row"
+
+        override fun getConstraints(): Matcher<View>? = null
 
         override fun perform(uiController: UiController?, view: View?) {
-            if(uiController != null && view != null) {
-                click().perform(uiController, view.findViewById<CheckBox>(R.id.cbInterest))
+            if(view != null) {
+                val checkbox = view.findViewById<CheckBox>(R.id.cbInterest)
+                checkbox.performClick()
             }
         }
 
