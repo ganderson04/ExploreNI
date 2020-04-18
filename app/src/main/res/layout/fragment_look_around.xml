@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.LookAroundFragment">
+    tools:context=".ui.fragments.ArModeFragment">
 
         <com.google.ar.sceneform.ArSceneView
             android:id="@+id/asvLookAround"

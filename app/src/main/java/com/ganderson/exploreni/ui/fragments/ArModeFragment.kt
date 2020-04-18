@@ -19,7 +19,7 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.components.LoadingDialog
-import com.ganderson.exploreni.ui.viewmodels.LookAroundViewModel
+import com.ganderson.exploreni.ui.viewmodels.ArModeViewModel
 import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
@@ -32,8 +32,8 @@ import uk.co.appoly.arcorelocation.LocationScene
 import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
 
-class LookAroundFragment : Fragment() {
-    private val viewModel = LookAroundViewModel()
+class ArModeFragment : Fragment() {
+    private val viewModel = ArModeViewModel()
     private var locationScene: LocationScene? = null
     private var locationReady = false
     private var useMetric = false
@@ -306,7 +306,7 @@ class LookAroundFragment : Fragment() {
         asvLookAround.pause()
     }
 
-    class LocationTask(private val fragment: WeakReference<LookAroundFragment>)
+    class LocationTask(private val fragment: WeakReference<ArModeFragment>)
         : AsyncTask<LocationScene, Unit, Boolean>() {
 
         override fun doInBackground(vararg params: LocationScene?): Boolean {

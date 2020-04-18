@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             when(menuItem.itemId) {
                 R.id.nav_home -> selectedFragment = HomeFragment()
                 R.id.nav_explore -> selectedFragment = ExploreFragment()
-                R.id.nav_ar -> selectedFragment = LookAroundFragment()
+                R.id.nav_ar -> selectedFragment = ArModeFragment()
                 R.id.nav_plan -> selectedFragment = PlanFragment()
                 R.id.nav_favourites -> selectedFragment = FavouritesFragment()
             }
