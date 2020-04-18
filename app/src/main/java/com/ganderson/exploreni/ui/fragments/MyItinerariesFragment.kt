@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.Itinerary
@@ -45,10 +46,12 @@ class MyItinerariesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        EspressoIdlingResource.increment()
         viewModel.getItineraries()
-            .observe(viewLifecycleOwner) {
+            .observe(viewLifecycleOwner) { list ->
+                EspressoIdlingResource.decrement()
                 val linearLayoutManager = LinearLayoutManager(this.context)
-                val itinerariesAdapter = MyItinerariesAdapter(requireContext(), it)
+                val itinerariesAdapter = MyItinerariesAdapter(requireContext(), list)
 
                 rvMyItineraries.layoutManager = linearLayoutManager
                 rvMyItineraries.adapter = itinerariesAdapter
