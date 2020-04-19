@@ -83,11 +83,17 @@ class UtilsTest {
     }
 
     @Test
-    fun toHashMapTest() {
+    fun toHashMapKeysTest() {
         val utilsTestClass = UtilsTestClass("Hello", 1)
         val utilsTestClassHashMap = utilsTestClass.toHashMap()
         assertTrue(utilsTestClassHashMap.contains("testStr") &&
                 utilsTestClassHashMap.contains("testInt"))
+    }
+
+    @Test
+    fun toHashMapValuesTest() {
+        val utilsTestClass = UtilsTestClass("Hello", 1)
+        val utilsTestClassHashMap = utilsTestClass.toHashMap()
 
         // 1. Although considered a no-no in Java, "==" is interpreted as ".equals()" on reference
         // types in Kotlin. "===" is used to check if two references point to the same object in
