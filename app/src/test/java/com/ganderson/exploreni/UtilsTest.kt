@@ -1,7 +1,8 @@
 package com.ganderson.exploreni
 
 import com.google.gson.JsonParseException
-import org.jetbrains.annotations.NotNull
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -27,7 +28,7 @@ class UtilsTest {
 
         // The distance is turned into a BigDecimal object in order to set the rounding.
         val distanceAsBigDecimal = BigDecimal(distance).setScale(2, RoundingMode.HALF_UP)
-        assert(distanceAsBigDecimal.toDouble() == expectedDistance)
+        assertEquals(expectedDistance, distanceAsBigDecimal.toDouble(), 0.0)
     }
 
     @Test
@@ -37,7 +38,7 @@ class UtilsTest {
         val imperialDistance = Utils.distanceToImperial(metricDistance)
         val imperialDistanceAsBigDecimal = BigDecimal(imperialDistance)
             .setScale(2, RoundingMode.HALF_UP)
-        assert(imperialDistanceAsBigDecimal.toDouble() == expectedImperialDistance)
+        assertEquals(expectedImperialDistance, imperialDistanceAsBigDecimal.toDouble(), 0.0)
     }
 
     @Test
@@ -47,59 +48,65 @@ class UtilsTest {
         val metricDistance = Utils.distanceToMetric(imperialDistance)
         val metricDistanceAsBigDecimal = BigDecimal(metricDistance)
             .setScale(2, RoundingMode.HALF_UP)
-        assert(metricDistanceAsBigDecimal.toDouble() == expectedMetricDistance)
+        assertEquals(expectedMetricDistance, metricDistanceAsBigDecimal.toDouble(), 0.0)
     }
 
     @Test
     fun secondsToTimeStringTestMinutes() {
         val seconds = 60
         val expectedTimeString = "1 minute"
-        val timeString = Utils.secondsToTimeString(seconds)
-
-        // Although considered a no-no in Java, "==" is interpreted as ".equals()" on reference
-        // types in Kotlin. "===" is used to check if two references point to the same object in
-        // the same way Java uses "==" on reference types.
-        // Ref: https://kotlinlang.org/docs/reference/equality.html
-        assert(timeString == expectedTimeString)
+        val actualTimeString = Utils.secondsToTimeString(seconds)
+        assertEquals(expectedTimeString, actualTimeString)
     }
 
     @Test
     fun secondsToTimeStringHoursTest() {
         val seconds = 3600
         val expectedTimeString = "1 hour"
-        val timeString = Utils.secondsToTimeString(seconds)
-        assert(timeString == expectedTimeString)
+        val actualTimeString = Utils.secondsToTimeString(seconds)
+        assertEquals(expectedTimeString, actualTimeString)
     }
 
     @Test
     fun secondsToTimeStringHoursAndMinutesTest() {
         val seconds = 3660
         val expectedTimeString = "1 hour, 1 minute"
-        val timeString = Utils.secondsToTimeString(seconds)
-        assert(timeString == expectedTimeString)
+        val actualTimeString = Utils.secondsToTimeString(seconds)
+        assertEquals(expectedTimeString, actualTimeString)
     }
 
     @Test
     fun secondsToTimeStringEmptyTest() {
         val seconds = 59
         val timeString = Utils.secondsToTimeString(seconds)
-        assert(timeString.isEmpty())
+        assertTrue(timeString.isEmpty())
     }
 
     @Test
-    fun toHashMapTest() {
+    fun toHashMapKeysTest() {
         val utilsTestClass = UtilsTestClass("Hello", 1)
         val utilsTestClassHashMap = utilsTestClass.toHashMap()
-        assert(utilsTestClassHashMap.contains("testStr") &&
+        assertTrue(utilsTestClassHashMap.contains("testStr") &&
                 utilsTestClassHashMap.contains("testInt"))
+    }
 
-        // Gson's conversion of integers to doubles has been encountered by other users such as
+    @Test
+    fun toHashMapValuesTest() {
+        val utilsTestClass = UtilsTestClass("Hello", 1)
+        val utilsTestClassHashMap = utilsTestClass.toHashMap()
+
+        // 1. Although considered a no-no in Java, "==" is interpreted as ".equals()" on reference
+        // types in Kotlin. "===" is used to check if two references point to the same object in
+        // the same way Java uses "==" on reference types.
+        // Ref: https://kotlinlang.org/docs/reference/equality.html
+        //
+        // 2. Gson's conversion of integers to doubles has been encountered by other users such as
         // in this StackOverflow question:
         // https://stackoverflow.com/q/36508323/8100469
         // Whilst a solution was given in the question above, this behaviour cannot be controlled
         // here due to the generic nature of the Utils#convert method. It is necessary, then, to
         // compare the stored value to 1.0 instead of 1.
-        assert(utilsTestClassHashMap["testStr"] == "Hello" &&
+        assertTrue(utilsTestClassHashMap["testStr"] == "Hello" &&
                 utilsTestClassHashMap["testInt"] == 1.0)
     }
 
@@ -110,7 +117,7 @@ class UtilsTest {
             put("testInt", 1)
         }
         val dataClass: UtilsTestClass = hashMap.toDataClass()
-        assert(dataClass::class.isData) // KClass#isData uses reflection.
+        assertTrue(dataClass::class.isData) // KClass#isData uses reflection.
     }
 
     @Test
@@ -129,8 +136,7 @@ class UtilsTest {
         }
 
         assertFailsWith<JsonParseException> {
-            val data = hashMap.toDataClass<UtilsTestClass>()
-            println(data)
+            hashMap.toDataClass<UtilsTestClass>()
         }
     }
 
