@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -47,14 +49,27 @@ class MyItinerariesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         EspressoIdlingResource.increment()
+        val onRemoveClickListener = object: MyItinerariesAdapter.OnRemoveClickListener {
+            override fun onRemoveClick(itinerary: Itinerary) {
+                val dialog = AlertDialog.Builder(requireContext())
+                    .setTitle("Confirm removal")
+                    .setMessage("Remove \"${itinerary.name}\"?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes") { _, _ -> viewModel.deleteItinerary(itinerary.dbId) }
+                    .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+                dialog.show()
+            }
+        }
         viewModel.getItineraries()
             .observe(viewLifecycleOwner) { list ->
-                EspressoIdlingResource.decrement()
+                val sortedList = list.sortedBy { itinerary -> itinerary.name }
                 val linearLayoutManager = LinearLayoutManager(this.context)
-                val itinerariesAdapter = MyItinerariesAdapter(requireContext(), list)
+                val itinerariesAdapter = MyItinerariesAdapter(requireContext(), sortedList,
+                    onRemoveClickListener)
 
                 rvMyItineraries.layoutManager = linearLayoutManager
                 rvMyItineraries.adapter = itinerariesAdapter
+                EspressoIdlingResource.decrement()
             }
     }
 
@@ -68,13 +83,19 @@ class MyItinerariesFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    class MyItinerariesAdapter(val context: Context, val itineraryList: List<Itinerary>)
+    class MyItinerariesAdapter(val context: Context, private val itineraryList: List<Itinerary>,
+                               private val listener: OnRemoveClickListener)
         : RecyclerView.Adapter<MyItinerariesAdapter.ItineraryViewHolder>() {
+
+        interface OnRemoveClickListener {
+            fun onRemoveClick(itinerary: Itinerary)
+        }
 
         class ItineraryViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
             val cvMyItinerary = view.findViewById<CardView>(R.id.cvMyItinerary)
             val tvMyItineraryName = view.findViewById<TextView>(R.id.tvMyItineraryName)
             val tvMyItinerarySize = view.findViewById<TextView>(R.id.tvMyItinerarySize)
+            val ibRemoveItinerary = view.findViewById<ImageButton>(R.id.ibRemoveItinerary)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
@@ -100,6 +121,8 @@ class MyItinerariesFragment : Fragment() {
                 val mainActivity = context as MainActivity
                 mainActivity.displayFragment(ItineraryViewerFragment(false, itinerary))
             }
+
+            holder.ibRemoveItinerary.setOnClickListener { listener.onRemoveClick(itinerary) }
         }
 
     }

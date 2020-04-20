@@ -9,4 +9,8 @@ class MyItinerariesViewModel : ViewModel() {
     fun getItineraries() : LiveData<List<Itinerary>> {
         return ExploreRepository.getItineraries()
     }
+
+    fun deleteItinerary(itineraryId: String) : Boolean {
+        return ExploreRepository.deleteItinerary(itineraryId)
+    }
 }
