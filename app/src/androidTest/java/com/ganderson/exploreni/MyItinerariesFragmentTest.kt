@@ -13,10 +13,8 @@ import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.MyItinerariesFragment
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
+import org.junit.Assert.assertFalse
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -89,6 +87,19 @@ class MyItinerariesFragmentTest {
 
         onView(withId(R.id.rvMyItineraries))
             .check(matches(isDisplayed()))
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+    }
+
+    @Test
+    fun deleteItineraryTest() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        onView(withId(R.id.ibRemoveItinerary))
+            .perform(click())
+
+        onView(withText("Yes"))
+            .perform(click())
+
+        assertFalse(ExploreRepository.isDuplicateItineraryName(savedItinerary.name))
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 }
