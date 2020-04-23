@@ -78,7 +78,7 @@ class HomeFragment : Fragment() {
                     location.longitude,
                     resources.getString(R.string.google_api_key)
                 ).observe(viewLifecycleOwner) { name ->
-                    tvWeatherTown.text = name
+                    tvWeatherTown?.text = name
                 }
             }
             catch(e: Exception) {
@@ -89,10 +89,10 @@ class HomeFragment : Fragment() {
                     val addressList = geocoder
                         .getFromLocation(location!!.latitude, location.longitude, 1)
                     val address = addressList[0]
-                    tvWeatherTown.text = address.subAdminArea
+                    tvWeatherTown?.text = address.subAdminArea
                 }
                 else {
-                    tvWeatherTown.text = "Northern Ireland"
+                    tvWeatherTown?.text = "Northern Ireland"
                     Toast.makeText(context, "Cannot retrieve location",
                         Toast.LENGTH_SHORT).show()
                 }
