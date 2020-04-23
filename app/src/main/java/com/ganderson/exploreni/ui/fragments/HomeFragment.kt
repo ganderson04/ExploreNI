@@ -230,7 +230,7 @@ class HomeFragment : Fragment() {
                 cvNearby.setOnClickListener {
                     if (locationResult != null) {
                         val nearbyFragment = NearbyFragment(locationResult.lastLocation)
-                        val mainActivity = this@HomeFragment.requireActivity() as MainActivity
+                        val mainActivity = this@HomeFragment.activity as MainActivity
                         mainActivity.displayFragment(nearbyFragment)
                     }
                     else {
