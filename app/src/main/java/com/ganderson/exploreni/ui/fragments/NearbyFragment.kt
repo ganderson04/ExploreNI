@@ -102,6 +102,8 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
             this.map = it
             map.isMyLocationEnabled = true
             map.uiSettings.isMyLocationButtonEnabled = false
+
+            // InfoWindow is the text bubble that appears above the marker when tapped.
             map.setOnInfoWindowClickListener{ marker ->
                 val attractionDetailFragment =
                     AttractionDetailFragment(marker.tag as NiLocation, true)
@@ -109,6 +111,7 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
                 (this.activity as MainActivity).displayFragment(attractionDetailFragment)
             }
 
+            // Set the zoom level.
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 LatLng(userLocation.latitude, userLocation.longitude), 10f)
             map.animateCamera(cameraUpdate)
@@ -148,13 +151,13 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
             }
     }
 
-    private fun constructMap(it: List<NiLocation>) {
+    private fun constructMap(locationList: List<NiLocation>) {
         // Remove markers in the event that the range has been reduced and some or all of them
         // should no longer be visible.
         map.clear()
 
         // Go through the list of in-range locations and (re-)add them to the map.
-        it.forEach { location ->
+        locationList.forEach { location ->
             val latLng = LatLng(location.lat.toDouble(), location.long.toDouble())
             val markerOptions = MarkerOptions()
             markerOptions.position(latLng)
