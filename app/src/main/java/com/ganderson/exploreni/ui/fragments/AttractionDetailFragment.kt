@@ -52,7 +52,7 @@ class AttractionDetailFragment(private val location: NiLocation,
             .error(R.drawable.placeholder_no_image_available)
             .into(ivAttraction)
 
-        val attractionText = "${location.desc}\n${location.imgAttr}"
+        val attractionText = "${location.desc}\n\n${location.imgAttr}"
         tvAttraction.text = attractionText
     }
 
