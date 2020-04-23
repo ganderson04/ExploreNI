@@ -184,7 +184,7 @@ class HomeFragment : Fragment() {
                         FINE_LOCATION_PERMISSION
                     )
                 }
-                // Kotlin allows unusued lambda parameters to be named as "_".
+                // Kotlin allows unused lambda parameters to be named as "_".
                 .setNegativeButton("Cancel") { dialog, _ -> dialog?.dismiss() }
                 .create()
                 .show()
