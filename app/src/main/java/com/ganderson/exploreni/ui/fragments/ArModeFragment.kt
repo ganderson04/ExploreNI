@@ -2,6 +2,7 @@ package com.ganderson.exploreni.ui.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.*
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.bumptech.glide.Glide
 import com.ganderson.exploreni.ui.activities.CAMERA_PERMISSION
 import com.ganderson.exploreni.ui.activities.MainActivity
 
@@ -26,6 +29,7 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.rendering.ViewRenderable
 import kotlinx.android.synthetic.main.fragment_look_around.*
+import kotlinx.android.synthetic.main.layout_look_around_location.*
 import kotlinx.android.synthetic.main.layout_look_around_location.view.*
 import uk.co.appoly.arcorelocation.LocationMarker
 import uk.co.appoly.arcorelocation.LocationScene
@@ -178,6 +182,8 @@ class ArModeFragment : Fragment() {
                     if(exception != null) return@handle null
                     else {
                         val locNode = loadNode(location, vrFuture)
+                        loadImage(location, vrFuture.get())
+
                         val locationMarker = LocationMarker(
                             location.long.toDouble(),
                             location.lat.toDouble(),
@@ -226,6 +232,22 @@ class ArModeFragment : Fragment() {
         }
 
         return node
+    }
+
+    private fun loadImage(location: NiLocation, arRenderable: ViewRenderable) {
+        // Loading spinner to be displayed while Glide loads the attraction image.
+        val loadingSpinner = CircularProgressDrawable(requireContext())
+        loadingSpinner.strokeWidth = 5f
+        loadingSpinner.centerRadius = 30f
+        loadingSpinner.setTint(Color.WHITE)
+        loadingSpinner.start()
+
+        // Load image asynchronously with Glide.
+        Glide.with(this)
+            .load(location.imgUrl)
+            .error(R.drawable.placeholder_no_image_available)
+            .placeholder(loadingSpinner)
+            .into(arRenderable.view.ivArLocation)
     }
 
     private fun updateDistance(location: NiLocation, lookAroundRenderable: ViewRenderable) {
