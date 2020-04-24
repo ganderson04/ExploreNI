@@ -24,6 +24,7 @@ import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
+import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
@@ -61,29 +62,62 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tvItineraryName.setOnClickListener { showInputDialog() }
-        if(itinerary.itemList.isNotEmpty()) {
-            tvTapAdd.visibility = View.GONE
-            rvItinerary.visibility = View.VISIBLE
-            calculateDuration()
-        }
 
-        val itemMovedCallback = object: ItemTouchCallback.ItemMovedCallback {
-            override fun itemMoved() {
+        // It was possible, through use of the app's back button in the toolbar or the phone's
+        // back button, to return to a deleted itinerary in the itinerary viewer. This meant the
+        // app would crash if the user pressed the app's back button which would activate the
+        // saving procedure. Since the itinerary would already have a database ID, the app would
+        // attempt to update its record in the database which would no longer exist.
+        // The if-statement below checks if the itinerary has a database ID already but its name
+        // does not match any itinerary currently stored in the database. If an itinerary cannot
+        // be found by that name then it must have been deleted. The user is then taken back to
+        // the "Plan" screen.
+        if(itinerary.dbId.isNotEmpty() &&
+            !ExploreRepository.isDuplicateItineraryName(itinerary.name)){
+                alertDeletedItinerary()
+        }
+        else {
+            tvItineraryName.setOnClickListener { showInputDialog() }
+            if (itinerary.itemList.isNotEmpty()) {
+                tvTapAdd.visibility = View.GONE
+                rvItinerary.visibility = View.VISIBLE
                 calculateDuration()
             }
-        }
-        val itemTouchHelper = ItemTouchHelper(ItemTouchCallback(itinerary.itemList,
-            itemMovedCallback))
-        itemTouchHelper.attachToRecyclerView(rvItinerary)
 
-        val removeListener = object: ItineraryAdapter.OnRemoveClickListener {
-            override fun onRemoveClick(itemIndex: Int) {
-                confirmItemRemoval(itemIndex)
+            val itemMovedCallback = object : ItemTouchCallback.ItemMovedCallback {
+                override fun itemMoved() {
+                    calculateDuration()
+                }
             }
+            val itemTouchHelper = ItemTouchHelper(
+                ItemTouchCallback(
+                    itinerary.itemList,
+                    itemMovedCallback
+                )
+            )
+            itemTouchHelper.attachToRecyclerView(rvItinerary)
+
+            val removeListener = object : ItineraryAdapter.OnRemoveClickListener {
+                override fun onRemoveClick(itemIndex: Int) {
+                    confirmItemRemoval(itemIndex)
+                }
+            }
+            rvItinerary.layoutManager = LinearLayoutManager(requireContext())
+            rvItinerary.adapter =
+                ItineraryAdapter(requireContext(), itinerary.itemList, removeListener)
         }
-        rvItinerary.layoutManager = LinearLayoutManager(requireContext())
-        rvItinerary.adapter = ItineraryAdapter(requireContext(), itinerary.itemList, removeListener)
+    }
+
+    private fun alertDeletedItinerary() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Warning")
+            .setMessage("Itinerary has been deleted.")
+            .setPositiveButton("OK") {dialog, _ ->
+                dialog.dismiss()
+                val mainActivity = this.activity as MainActivity
+                mainActivity.displayFragment(PlanFragment())
+            }
+            .show()
     }
 
     private fun showInputDialog() {
@@ -128,7 +162,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun changeItineraryName(name: String) {
-        if(!name.equals(itinerary.name)) {
+        if(name != itinerary.name) {
             if (viewModel.isDuplicateItineraryName(name)) {
                 val dialog = AlertDialog.Builder(requireContext())
                     .setCancelable(true)
