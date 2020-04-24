@@ -107,16 +107,7 @@ interface ExploreService {
                 val imgAttr = eventResponse.get("imgAttr").asString
                 val website = eventResponse.get("website").asString
 
-                return Event(
-                    id,
-                    name,
-                    desc,
-                    startDate,
-                    endDate,
-                    imgUrl,
-                    imgAttr,
-                    website
-                )
+                return Event(id, name, desc, startDate, endDate, imgUrl, imgAttr, website)
             }
             return null
         }
