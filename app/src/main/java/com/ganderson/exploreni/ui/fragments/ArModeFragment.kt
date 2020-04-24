@@ -180,7 +180,11 @@ class ArModeFragment : Fragment() {
             // render. It is processed here.
             CompletableFuture.anyOf(vrFuture)
                 .handle<Any> { _, exception ->
-                    if(exception != null) return@handle null
+                    if(exception != null) {
+                        Toast.makeText(requireContext(),
+                            "Could not create marker for ${location.name}", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                     else {
                         val locNode = loadNode(location, vrFuture)
                         loadImage(location, vrFuture.get())
