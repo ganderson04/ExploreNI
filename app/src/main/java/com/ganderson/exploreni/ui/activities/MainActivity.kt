@@ -50,4 +50,23 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    override fun onBackPressed() {
+        // The Material Design guidelines for the BottomNavigationView's (BNV) behaviour once stated
+        // that the phone's back button does not navigate between navigation bar views. This has
+        // been removed but not replaced with a new guideline. Indeed, Google's own apps featuring
+        // BNVs behave differently to one another. Some developers have gone with the behaviour that
+        // a back press returns to the home screen and a further back press closes the app.
+        // Ref: https://www.reddit.com/r/androiddev/comments/814utk/back_button_behavior_in_bottom_navigation/
+        //
+        // Below, if the BNV's current ID does not equal the "Home" ID, return to the "Home" screen,
+        // otherwise close the app.
+        if(bnvNavigation.selectedItemId != R.id.nav_home) {
+            displayFragment(HomeFragment())
+            bnvNavigation.selectedItemId = R.id.nav_home
+        }
+        else {
+            this.finish()
+        }
+    }
 }
