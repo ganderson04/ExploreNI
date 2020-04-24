@@ -10,15 +10,6 @@
         android:layout_height="50dp"
         android:scaleType="centerCrop"/>
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/locContainer"-->
-<!--        android:layout_width="150dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical"-->
-<!--        android:visibility="visible"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:background="@color/colorPrimaryDark">-->
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/name"
             android:gravity="center_vertical"
