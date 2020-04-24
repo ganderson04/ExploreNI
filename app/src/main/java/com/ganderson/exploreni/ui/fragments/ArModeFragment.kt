@@ -123,9 +123,10 @@ class ArModeFragment : Fragment() {
             }
         })
 
-        locationScene = LocationScene(this.activity, asvLookAround)
-        locationScene!!.setMinimalRefreshing(true)
-        locationScene!!.setOffsetOverlapping(true)
+        locationScene = LocationScene(this.activity, asvLookAround).apply {
+            setMinimalRefreshing(true)
+            setOffsetOverlapping(true)
+        }
 
         val locationTask = LocationTask(WeakReference(this))
         locationTask.execute(locationScene)
@@ -192,7 +193,8 @@ class ArModeFragment : Fragment() {
                         locationScene?.mLocationMarkers?.add(locationMarker)
                         locationMarker.anchorNode?.isEnabled = true
                         locationMarker.scalingMode = LocationMarker.ScalingMode.FIXED_SIZE_ON_SCREEN
-                        locationMarker.scaleModifier = 0.75f // Size reduced.
+                        locationMarker.scaleModifier = 0.65f // Size reduced.
+                        locationMarker.height = generateRandomHeightBasedOnDistance(location)
 
                         // Distance calculated in the marker's render event. Previously it was
                         // calculated in "loadNode" but this caused instances where the marker
@@ -273,6 +275,23 @@ class ArModeFragment : Fragment() {
         }
 
         lookAroundRenderable.view.distance.text = formattedDistance
+    }
+
+    private fun generateRandomHeightBasedOnDistance(location: NiLocation): Float {
+        val locationDistance = Utils.getHaversineGCD(
+            locationScene!!.deviceLocation!!.currentBestLocation!!.latitude,
+            locationScene!!.deviceLocation!!.currentBestLocation!!.longitude,
+            location.lat.toDouble(),
+            location.long.toDouble()
+        )
+
+        return when (locationDistance.toInt()) {
+            in 0..1000 -> (1..3).random().toFloat()
+            in 1001..1500 -> (4..6).random().toFloat()
+            in 1501..2000 -> (7..9).random().toFloat()
+            in 2001..3000 -> (10..12).random().toFloat()
+            else -> (12..13).random().toFloat()
+        }
     }
 
     private fun requestCameraPermission() {
