@@ -65,46 +65,6 @@ class ArModeFragment : Fragment() {
         }
         else {
             startAr()
-            useMetric = PreferenceManager
-                .getDefaultSharedPreferences(this.context)
-                .getBoolean("measurement_distance", false)
-
-            if(useMetric) {
-                tvCurrentArRange.text = "${currentSeekRadius}km"
-                skbArRange.max = Utils.MAX_SEEK_KM
-                tvMaxArRange.text = "${Utils.MAX_SEEK_KM}km"
-            }
-            else {
-                tvCurrentArRange.text = "${currentSeekRadius}mi"
-                skbArRange.max = Utils.MAX_SEEK_MILES
-                tvMaxArRange.text = "${Utils.MAX_SEEK_MILES}mi"
-            }
-            skbArRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
-                    fromUser: Boolean) {
-                    seekBar?.let {
-                        if(useMetric) {
-                            tvCurrentArRange.text = "${progress}km"
-                        }
-                        else {
-                            tvCurrentArRange.text = "${progress}mi"
-                        }
-                    }
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    if(locationReady) {
-                        seekBar?.let {
-                            if (it.progress != currentSeekRadius) {
-                                currentSeekRadius = it.progress
-                                getNearbyLocations()
-                            }
-                        }
-                    }
-                }
-            })
         }
     }
 
@@ -120,6 +80,49 @@ class ArModeFragment : Fragment() {
             arSession.configure(config)
             asvLookAround.setupSession(arSession)
         }
+
+        // Set up seekbar here.
+        useMetric = PreferenceManager
+            .getDefaultSharedPreferences(this.context)
+            .getBoolean("measurement_distance", false)
+
+        if(useMetric) {
+            tvCurrentArRange.text = "${currentSeekRadius}km"
+            skbArRange.max = Utils.MAX_SEEK_KM
+            tvMaxArRange.text = "${Utils.MAX_SEEK_KM}km"
+        }
+        else {
+            tvCurrentArRange.text = "${currentSeekRadius}mi"
+            skbArRange.max = Utils.MAX_SEEK_MILES
+            tvMaxArRange.text = "${Utils.MAX_SEEK_MILES}mi"
+        }
+        skbArRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
+                                           fromUser: Boolean) {
+                seekBar?.let {
+                    if(useMetric) {
+                        tvCurrentArRange.text = "${progress}km"
+                    }
+                    else {
+                        tvCurrentArRange.text = "${progress}mi"
+                    }
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                if(locationReady) {
+                    seekBar?.let {
+                        if (it.progress != currentSeekRadius) {
+                            currentSeekRadius = it.progress
+                            getNearbyLocations()
+                        }
+                    }
+                }
+            }
+        })
+
         locationScene = LocationScene(this.activity, asvLookAround)
         locationScene!!.setMinimalRefreshing(true)
         locationScene!!.setOffsetOverlapping(true)
@@ -149,17 +152,14 @@ class ArModeFragment : Fragment() {
 
         viewModel
             .getNearbyLocations(lat, lon, miles)
-            .observe(viewLifecycleOwner) {
+            .observe(viewLifecycleOwner) { list ->
                 loadingDialog.dismiss()
-
-                if(it.isNotEmpty()) {
-                    setupMarkers(it)
+                locationScene!!.clearMarkers()
+                if(list.isNotEmpty()) {
+                    setupMarkers(list)
                 }
                 else {
-                    locationScene!!.clearMarkers()
-
-                    Toast
-                        .makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
+                    Toast.makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -303,7 +303,10 @@ class ArModeFragment : Fragment() {
                 .setTitle("Caution")
                 .setMessage("Camera is required for this function.")
                 .setCancelable(false)
-                .setPositiveButton("OK") { dialog, _ -> dialog?.dismiss() }
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog?.dismiss()
+                    parentFragmentManager.popBackStack()
+                }
                 .show()
         }
         else {
