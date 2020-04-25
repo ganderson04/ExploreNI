@@ -2,6 +2,7 @@ package com.ganderson.exploreni
 
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -107,16 +108,18 @@ class ItineraryViewerFragmentTest {
 
     @Test
     fun openItineraryMapTest() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         onView(withId(R.id.tb_itinerary_map))
             .perform(click())
 
-        onView(allOf(isDescendantOfA(withResourceName("android:id/action_bar_container")),
-            withText("Itinerary Map")))
-            .check(matches(isDisplayed()))
+        onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
+            .check(matches(withText("Itinerary Map")))
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 
     @Test
     fun openAndCloseItineraryMapTest() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         onView(withId(R.id.tb_itinerary_map))
             .perform(click())
 
@@ -128,5 +131,6 @@ class ItineraryViewerFragmentTest {
 
         onView(withId(R.id.tvItineraryName))
             .check(matches(isDisplayed()))
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 }
