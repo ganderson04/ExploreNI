@@ -32,14 +32,13 @@ import java.util.stream.Collectors
 class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
     private val viewModel = ExploreViewModel(locationType)
     private val sortOptions = arrayOf("A-Z", "Distance")
+    private val locationList = ArrayList<NiLocation>()
+    private val currentFilterList = ArrayList<String>()
 
-    private var locationManager: LocationManager? = null
     private var location: Location? = null
     private lateinit var sortDialog: Dialog
     private lateinit var filterDialog: Dialog
     private lateinit var adapterListener: LocationAdapter.OnLocationClickListener
-    private val locationList = ArrayList<NiLocation>()
-    private val currentFilterList = ArrayList<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -64,18 +63,19 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
 
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
-                    as LocationManager
-
-            locationManager?.let {
-                // "it" refers to locationManager. "let" blocks are similar to lambdas.
-                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                }
-                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                }
-            }
+            location = (activity as MainActivity).getLastLocation()
+//            locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
+//                    as LocationManager
+//
+//            locationManager?.let {
+//                // "it" refers to locationManager. "let" blocks are similar to lambdas.
+//                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+//                }
+//                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+//                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+//                }
+//            }
 
             // Create new Dialog only if this is a new instantiation. See the comment below.
             if(locationList.isEmpty()) createSortDialog()
@@ -216,20 +216,12 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
         rvLocations.adapter?.notifyDataSetChanged()
     }
 
-    private fun recommend() {
-
-    }
-
     private fun filterList() {
         val filteredLocations = locationList.filter { location ->
-            run {
-                location.locTags.forEach { tag ->
-                    run {
-                        if (currentFilterList.contains(tag)) return@filter true
-                    }
-                }
-                return@filter false
+            location.locTags.forEach { tag ->
+                if (currentFilterList.contains(tag)) return@filter true
             }
+            return@filter false
         }
         rvLocations.adapter = LocationAdapter(requireContext(), filteredLocations, adapterListener)
     }

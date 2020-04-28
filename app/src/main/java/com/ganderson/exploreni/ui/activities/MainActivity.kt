@@ -1,22 +1,30 @@
 package com.ganderson.exploreni.ui.activities
 
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import com.couchbase.lite.CouchbaseLite
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.ui.fragments.*
+import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val FINE_LOCATION_PERMISSION = 1
 const val CAMERA_PERMISSION = 2
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var fusedLocationProvider: FusedLocationProviderClient
+    private var locationRequest: LocationRequest? = null
+    private var lastLocationCallback: LocationCallback? = null
+    private var location: Location? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        setupLocationService()
 
         bnvNavigation.setOnNavigationItemSelectedListener { menuItem ->
             var selectedFragment: Fragment? = null
@@ -49,6 +57,50 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.flFragment, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun setupLocationService() {
+        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
+
+        locationRequest = LocationRequest.create().apply {
+            // Request location in 1 minute intervals.
+            interval = 60000
+
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+
+        lastLocationCallback = object: LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                super.onLocationResult(locationResult)
+                location = locationResult?.lastLocation
+            }
+        }
+
+        fusedLocationProvider.requestLocationUpdates(locationRequest, lastLocationCallback,
+            Looper.getMainLooper())
+    }
+
+    fun registerLocationCallback(callback: LocationCallback) {
+        fusedLocationProvider
+            .requestLocationUpdates(locationRequest, callback, Looper.getMainLooper())
+    }
+
+    fun deregisterLocationCallback(callback: LocationCallback) {
+        fusedLocationProvider.removeLocationUpdates(callback)
+    }
+
+    fun getLastLocation(): Location? {
+        return location
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lastLocationCallback?.let { deregisterLocationCallback(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lastLocationCallback?.let { registerLocationCallback(it) }
     }
 
     override fun onBackPressed() {

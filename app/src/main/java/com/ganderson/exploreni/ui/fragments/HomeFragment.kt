@@ -31,8 +31,8 @@ import java.util.*
 class HomeFragment : Fragment() {
     private val viewModel = HomeViewModel()
 
-    private lateinit var fusedLocationProvider: FusedLocationProviderClient
-    private var locationRequest: LocationRequest? = null
+//    private lateinit var fusedLocationProvider: FusedLocationProviderClient
+//    private var locationRequest: LocationRequest? = null
     private var locationCallback: LocationCallback? = null
     private var useFahrenheit = false
 
@@ -58,7 +58,8 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            setupLocationService()
+//            setupLocationService()
+            registerLocationCallback()
         }
         else requestLocationPermission()
 
@@ -221,20 +222,45 @@ class HomeFragment : Fragment() {
                 .show()
         }
         else {
-            setupLocationService()
+            registerLocationCallback()
         }
     }
 
     private fun setupLocationService() {
-        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireContext())
-        locationRequest = LocationRequest.create().apply {
-            // Request location in 1 minute intervals.
-            interval = 60000
+//        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireContext())
+//        locationRequest = LocationRequest.create().apply {
+//            // Request location in 1 minute intervals.
+//            interval = 60000
+//
+//            // No need for high accuracy on this screen as we only wish to get the
+//            // town name and weather.
+//            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+//        }
+//        locationCallback = object: LocationCallback() {
+//            override fun onLocationResult(locationResult: LocationResult?) {
+//                super.onLocationResult(locationResult)
+//                setLocationName(locationResult)
+//                getWeather(locationResult)
+//
+//                cvNearby.setOnClickListener {
+//                    if (locationResult != null) {
+//                        val nearbyFragment = NearbyFragment(locationResult.lastLocation)
+//                        val mainActivity = this@HomeFragment.activity as MainActivity
+//                        mainActivity.displayFragment(nearbyFragment)
+//                    }
+//                    else {
+//                        Toast.makeText(requireContext(), "Not available with location disabled.",
+//                            Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        }
+//        (activity as MainActivity).registerLocationCallback(locationCallback)
+//        fusedLocationProvider.requestLocationUpdates(locationRequest, locationCallback,
+//            Looper.getMainLooper())
+    }
 
-            // No need for high accuracy on this screen as we only wish to get the
-            // town name and weather.
-            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-        }
+    private fun registerLocationCallback() {
         locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 super.onLocationResult(locationResult)
@@ -254,19 +280,18 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-        fusedLocationProvider.requestLocationUpdates(locationRequest, locationCallback,
-            Looper.getMainLooper())
+        locationCallback?.let { (activity as MainActivity).registerLocationCallback(it) }
     }
 
     override fun onPause() {
         super.onPause()
         // Remove request for location updates as the fragment is being hidden or destroyed.
-        locationCallback?.let {
-            fusedLocationProvider.removeLocationUpdates(it)
-        }
+        locationCallback?.let { (activity as MainActivity).deregisterLocationCallback(it) }
     }
 
     override fun onResume() {
+        super.onResume()
+
         // Check for settings change for temperature units
         if (PreferenceManager.getDefaultSharedPreferences(this.context)
             .getBoolean("measurement_temperature", false) != useFahrenheit) {
@@ -274,11 +299,7 @@ class HomeFragment : Fragment() {
 
             // Reinstate request for location updates as the fragment is being shown again or
             // (re)created.
-            locationRequest?.let {
-                setupLocationService()
-            }
+            locationCallback?.let { (activity as MainActivity).registerLocationCallback(it) }
         }
-
-        super.onResume()
     }
 }

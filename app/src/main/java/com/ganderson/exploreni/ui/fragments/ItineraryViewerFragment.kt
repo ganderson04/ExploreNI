@@ -276,7 +276,7 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun calculateDuration() {
-        val userLocation = getUserLocation()
+        val userLocation = (activity as MainActivity).getLastLocation()
         if((itinerary.itemList.size == 1 && userLocation != null) ||
             itinerary.itemList.size > 1) {
             EspressoIdlingResource.increment()
@@ -306,29 +306,6 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     private fun deleteItinerary() {
         viewModel.deleteItinerary(itinerary.dbId)
         goBack(true)
-    }
-
-    private fun getUserLocation() : Location? {
-        var location: Location? = null
-        if(ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            val locationManager: LocationManager? = (activity as MainActivity)
-                .getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-            // If the LocationManager has been instantiated, check for providers. Kotlin "?"
-            // performs a null check and ".let" runs the code inside the block if the object
-            // under consideration is not null.
-            locationManager?.let {
-                // "it" refers to locationManager. "let" blocks are similar to lambdas.
-                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                }
-                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                }
-            }
-        }
-        return location
     }
 
     class ItineraryAdapter(val context: Context, private val itemList: List<NiLocation>,
