@@ -10,7 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.api.Event
+import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.EventDetailFragment
 import java.time.format.DateTimeFormatter

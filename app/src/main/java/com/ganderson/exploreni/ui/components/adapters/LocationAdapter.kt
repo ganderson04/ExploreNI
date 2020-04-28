@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.data.ExploreRepository
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 
 class LocationAdapter(private val context: Context, private val locations: List<NiLocation>,
                       val listener: OnLocationClickListener)

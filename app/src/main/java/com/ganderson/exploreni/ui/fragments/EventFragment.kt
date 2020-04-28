@@ -48,25 +48,39 @@ class EventFragment : Fragment() {
         val loadingDialog = LoadingDialog(requireContext(), "Loading events, please wait.")
         loadingDialog.show()
         viewModel.getEvents()
-            .observe(viewLifecycleOwner) {
+            .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
-                if(it.isNotEmpty()) {
-                    val linearLayoutManager = LinearLayoutManager(this.context)
-                    val eventAdapter = EventAdapter(requireContext(), it)
+                if(listResult.data != null) {
+                    val list = listResult.data
+                    if (list.isNotEmpty()) {
+                        val linearLayoutManager = LinearLayoutManager(requireContext())
+                        val eventAdapter = EventAdapter(requireContext(), list)
 
-                    rvEvents.layoutManager = linearLayoutManager
-                    rvEvents.adapter = eventAdapter
+                        rvEvents.layoutManager = linearLayoutManager
+                        rvEvents.adapter = eventAdapter
+                    }
+                    else {
+                        val alert = AlertDialog.Builder(requireContext())
+                            .setCancelable(false)
+                            .setTitle("Error")
+                            .setMessage("No events found.")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                run {
+                                    dialog.dismiss()
+                                    parentFragmentManager.popBackStack()
+                                }
+                            }
+                        alert.show()
+                    }
                 }
                 else {
                     val alert = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle("Error")
-                        .setMessage("No events found.")
+                        .setMessage("Unable to load events.")
                         .setPositiveButton("OK") { dialog, _ ->
-                            run {
-                                dialog.dismiss()
-                                parentFragmentManager.popBackStack()
-                            }
+                            dialog.dismiss()
+                            parentFragmentManager.popBackStack()
                         }
                     alert.show()
                 }

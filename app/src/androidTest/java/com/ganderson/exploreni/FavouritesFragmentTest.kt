@@ -10,7 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.adapters.FavouritesAdapter
 import com.ganderson.exploreni.ui.fragments.FavouritesFragment

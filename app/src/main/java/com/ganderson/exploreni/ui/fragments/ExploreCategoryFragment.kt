@@ -18,7 +18,7 @@ import com.ganderson.exploreni.EspressoIdlingResource
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.entities.LocationType
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
@@ -91,25 +91,38 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
 
             viewModel
                 .locations
-                .observe(viewLifecycleOwner) { list ->
+                .observe(viewLifecycleOwner) { listResult ->
                     loadingDialog.dismiss()
                     EspressoIdlingResource.decrement()
 
-                    if (list.isNotEmpty()) {
-                        locationList.clear()
-                        locationList.addAll(list)
-                        displayLocations()
-                        createFilterDialog()
-                    } else {
-                        val alert = AlertDialog.Builder(requireContext())
-                            .setCancelable(false)
-                            .setTitle("Error")
-                            .setMessage("No locations found for this type.")
-                            .setPositiveButton("OK") { dialog, _ ->
-                                run {
+                    if(listResult.data != null) {
+                        val list = listResult.data
+                        if (list.isNotEmpty()) {
+                            locationList.clear()
+                            locationList.addAll(list)
+                            displayLocations()
+                            createFilterDialog()
+                        }
+                        else {
+                            val alert = AlertDialog.Builder(requireContext())
+                                .setCancelable(false)
+                                .setTitle("Error")
+                                .setMessage("No locations found for this type.")
+                                .setPositiveButton("OK") { dialog, _ ->
                                     dialog.dismiss()
                                     parentFragmentManager.popBackStack()
                                 }
+                            alert.show()
+                        }
+                    }
+                    else {
+                        val alert = AlertDialog.Builder(requireContext())
+                            .setCancelable(false)
+                            .setTitle("Error")
+                            .setMessage("Unable to load locations.")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                dialog.dismiss()
+                                parentFragmentManager.popBackStack()
                             }
                         alert.show()
                     }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
@@ -48,34 +48,52 @@ class SearchFragment(private val query: String) : Fragment() {
         val loadingDialog = LoadingDialog(requireContext(), "Searching...")
         loadingDialog.show()
         viewModel.performSearch(query)
-            .observe(viewLifecycleOwner) { list ->
+            .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
                 EspressoIdlingResource.decrement()
-                if(list.isNotEmpty()) {
-                    val adapterListener = object: LocationAdapter.OnLocationClickListener {
-                        override fun onLocationClick(location: NiLocation) {
-                            val mainActivity = activity as MainActivity
-                            if(targetFragment != null) {
-                                (targetFragment as ItineraryViewerFragment).addItem(location)
-                                mainActivity.displayFragment(targetFragment!!)
-                            }
-                            else {
-                                val attractionDetailFragment = AttractionDetailFragment(location,
-                                    false)
-                                mainActivity.displayFragment(attractionDetailFragment)
+                if(listResult.data != null) {
+                    val list = listResult.data
+                    if (list.isNotEmpty()) {
+                        val adapterListener = object : LocationAdapter.OnLocationClickListener {
+                            override fun onLocationClick(location: NiLocation) {
+                                val mainActivity = activity as MainActivity
+                                if (targetFragment != null) {
+                                    (targetFragment as ItineraryViewerFragment).addItem(location)
+                                    mainActivity.displayFragment(targetFragment!!)
+                                } else {
+                                    val attractionDetailFragment = AttractionDetailFragment(
+                                        location,
+                                        false
+                                    )
+                                    mainActivity.displayFragment(attractionDetailFragment)
+                                }
                             }
                         }
-                    }
 
-                    rvSearchResults.layoutManager = LinearLayoutManager(this.context)
-                    rvSearchResults.adapter = LocationAdapter(requireContext(), list,
-                        adapterListener)
+                        rvSearchResults.layoutManager = LinearLayoutManager(this.context)
+                        rvSearchResults.adapter = LocationAdapter(
+                            requireContext(), list,
+                            adapterListener
+                        )
+                    } else {
+                        val alert = AlertDialog.Builder(requireContext())
+                            .setCancelable(false)
+                            .setTitle("No results")
+                            .setMessage("Please try another search term.")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                run {
+                                    dialog.dismiss()
+                                    parentFragmentManager.popBackStack()
+                                }
+                            }
+                        alert.show()
+                    }
                 }
                 else {
                     val alert = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
-                        .setTitle("No results")
-                        .setMessage("Please try another search term.")
+                        .setTitle("Error")
+                        .setMessage("Unable to load search results.")
                         .setPositiveButton("OK") { dialog, _ ->
                             run {
                                 dialog.dismiss()

@@ -1,4 +1,4 @@
-package com.ganderson.exploreni.entities.api
+package com.ganderson.exploreni.entities.data.api
 
 /**
  * Represents an attraction in Northern Ireland.

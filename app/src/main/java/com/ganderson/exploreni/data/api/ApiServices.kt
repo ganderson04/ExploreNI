@@ -3,10 +3,9 @@ package com.ganderson.exploreni.data.api
 import com.ganderson.exploreni.data.api.services.ExploreService
 import com.ganderson.exploreni.data.api.services.GoogleService
 import com.ganderson.exploreni.data.api.services.WeatherService
-import com.ganderson.exploreni.entities.api.Event
-import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.entities.api.Weather
-import com.google.gson.Gson
+import com.ganderson.exploreni.entities.data.api.Event
+import com.ganderson.exploreni.entities.data.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.Weather
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

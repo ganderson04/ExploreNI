@@ -1,7 +1,7 @@
 package com.ganderson.exploreni.data.api.services
 
-import com.ganderson.exploreni.entities.api.Event
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.Event
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.google.gson.Gson
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

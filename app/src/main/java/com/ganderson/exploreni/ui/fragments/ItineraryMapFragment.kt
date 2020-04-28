@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.ganderson.exploreni.EspressoIdlingResource
 
@@ -111,14 +112,20 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
         viewModel
             .getItineraryPolyline(itinerary, getUserLocation(),
                 resources.getString(R.string.google_api_key))
-            .observe(viewLifecycleOwner) { polyString ->
-                val polyline = PolylineOptions()
-                    .clickable(false)
-                polyline.color(resources.getColor(R.color.colorPrimaryDark, null))
-                polyline.addAll(PolyUtil.decode(polyString))
-                map.addPolyline(polyline)
+            .observe(viewLifecycleOwner) { polyStringResult ->
+                if(polyStringResult.data != null) {
+                    val polyString = polyStringResult.data
+                    val polyline = PolylineOptions()
+                        .clickable(false)
+                    polyline.color(resources.getColor(R.color.colorPrimaryDark, null))
+                    polyline.addAll(PolyUtil.decode(polyString))
+                    map.addPolyline(polyline)
+                }
+                else {
+                    Toast.makeText(requireContext(), "Unable to load route.",
+                        Toast.LENGTH_SHORT).show()
+                }
                 loadingDialog.dismiss()
-
                 EspressoIdlingResource.decrement()
             }
     }

@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.jraska.livedata.test
 import org.junit.Assert.assertFalse

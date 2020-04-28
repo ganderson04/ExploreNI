@@ -5,44 +5,46 @@ import androidx.lifecycle.LiveData
 import com.ganderson.exploreni.data.api.ApiAccessor
 import com.ganderson.exploreni.data.db.DbAccessor
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.Event
-import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.entities.api.Weather
+import com.ganderson.exploreni.entities.data.DataResult
+import com.ganderson.exploreni.entities.data.api.Event
+import com.ganderson.exploreni.entities.data.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.Weather
 
 class ExploreRepository {
     companion object {
-        fun getNearbyLocations(lat: Double, lon: Double, radius: Int) : LiveData<List<NiLocation>> {
+        fun getNearbyLocations(lat: Double, lon: Double, radius: Int) :
+                LiveData<DataResult<List<NiLocation>>> {
             return ApiAccessor.getNearbyLocations(lat, lon, radius)
         }
 
-        fun getLocationsByType(type: String) : LiveData<List<NiLocation>> {
+        fun getLocationsByType(type: String) : LiveData<DataResult<List<NiLocation>>> {
             return ApiAccessor.getLocationsByType(type)
         }
 
-        fun getLocationName(lat: Double, lon: Double, apiKey: String) : LiveData<String> {
+        fun getLocationName(lat: Double, lon: Double, apiKey: String) : LiveData<DataResult<String>> {
             return ApiAccessor.getLocationName(lat, lon, apiKey)
         }
 
-        fun getEvents() : LiveData<List<Event>> {
+        fun getEvents() : LiveData<DataResult<List<Event>>> {
             return ApiAccessor.getEvents()
         }
 
-        fun performSearch(query: String) : LiveData<List<NiLocation>> {
+        fun performSearch(query: String) : LiveData<DataResult<List<NiLocation>>> {
             return ApiAccessor.performSearch(query)
         }
 
         fun getWeather(lat: Double, lon: Double, useFahrenheit: Boolean, apiKey: String)
-                : LiveData<Weather> {
+                : LiveData<DataResult<Weather>> {
             return ApiAccessor.getWeather(lat, lon, useFahrenheit, apiKey)
         }
 
         fun calculateDuration(itinerary: Itinerary, userLocation: Location?,
-                              apiKey: String): LiveData<Int> {
+                              apiKey: String): LiveData<DataResult<Int>> {
             return ApiAccessor.calculateDuration(itinerary, userLocation, apiKey)
         }
 
         fun getItineraryPolyline(itinerary: Itinerary, userLocation: Location?,
-                                 apiKey: String): LiveData<String> {
+                                 apiKey: String): LiveData<DataResult<String>> {
             return ApiAccessor.getItineraryPolyline(itinerary, userLocation, apiKey)
         }
 

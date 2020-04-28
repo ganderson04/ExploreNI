@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

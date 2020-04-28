@@ -15,7 +15,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.viewmodels.NearbyViewModel
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -136,17 +136,21 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
 
         viewModel
             .getNearbyLocations(userLocation.latitude, userLocation.longitude, miles)
-            .observe(viewLifecycleOwner) {
+            .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
-                if(it.isNotEmpty()) {
-                    constructMap(it)
+                if(listResult.data != null) {
+                    val list = listResult.data
+                    if (list.isNotEmpty()) {
+                        constructMap(list)
+                    } else {
+                        map.clear()
+                        Toast.makeText(requireContext(), "No locations found.",
+                            Toast.LENGTH_SHORT).show()
+                    }
                 }
                 else {
-                    map.clear()
-
-                    Toast
-                        .makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(requireContext(), "Unable to load locations.",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
     }

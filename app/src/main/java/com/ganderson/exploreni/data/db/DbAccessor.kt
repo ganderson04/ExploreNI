@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.couchbase.lite.*
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.toDataClass
 import com.ganderson.exploreni.toHashMap
 import java.util.*

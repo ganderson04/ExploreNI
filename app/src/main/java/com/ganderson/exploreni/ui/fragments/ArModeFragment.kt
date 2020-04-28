@@ -20,7 +20,7 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.viewmodels.ArModeViewModel
 import com.google.ar.core.Config
@@ -29,7 +29,6 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.rendering.ViewRenderable
 import kotlinx.android.synthetic.main.fragment_look_around.*
-import kotlinx.android.synthetic.main.layout_look_around_location.*
 import kotlinx.android.synthetic.main.layout_look_around_location.view.*
 import uk.co.appoly.arcorelocation.LocationMarker
 import uk.co.appoly.arcorelocation.LocationScene
@@ -153,14 +152,20 @@ class ArModeFragment : Fragment() {
 
         viewModel
             .getNearbyLocations(lat, lon, miles)
-            .observe(viewLifecycleOwner) { list ->
+            .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
-                locationScene!!.clearMarkers()
-                if(list.isNotEmpty()) {
-                    setupMarkers(list)
+                if(listResult.data != null) {
+                    val list = listResult.data
+                    locationScene!!.clearMarkers()
+                    if (list.isNotEmpty()) {
+                        setupMarkers(list)
+                    } else {
+                        Toast.makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
                 else {
-                    Toast.makeText(this.context, "No locations found.", Toast.LENGTH_SHORT)
+                    Toast.makeText(this.context, "Unable to load locations.", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

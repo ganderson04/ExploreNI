@@ -11,7 +11,7 @@ import com.ganderson.exploreni.EspressoIdlingResource
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.components.adapters.FavouritesAdapter
 import com.ganderson.exploreni.ui.viewmodels.FavouritesViewModel
 import kotlinx.android.synthetic.main.fragment_favourites.*

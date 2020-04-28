@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,14 +25,12 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.Utils
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
-import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * A simple [Fragment] subclass.
@@ -290,12 +287,18 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             loadingDialog.show()
             viewModel
                 .calculateDuration(itinerary, userLocation, resources.getString(R.string.google_api_key))
-                .observe(viewLifecycleOwner) { seconds ->
+                .observe(viewLifecycleOwner) { secondsResult ->
                     loadingDialog.dismiss()
-                    val duration = Utils.secondsToTimeString(seconds)
-                    val durationText = "Travel time: $duration"
-                    tvItineraryDuration.text = durationText
                     EspressoIdlingResource.decrement()
+                    if(secondsResult.data != null) {
+                        val duration = Utils.secondsToTimeString(secondsResult.data)
+                        val durationText = "Travel time: $duration"
+                        tvItineraryDuration.text = durationText
+                    }
+                    else {
+                        Toast.makeText(requireContext(), "Unable to calculate duration.",
+                            Toast.LENGTH_SHORT).show()
+                    }
                 }
         }
     }

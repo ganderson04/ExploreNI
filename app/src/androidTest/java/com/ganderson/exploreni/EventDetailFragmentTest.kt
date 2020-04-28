@@ -14,7 +14,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.ganderson.exploreni.entities.api.Event
+import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.EventDetailFragment
 import org.hamcrest.CoreMatchers.allOf

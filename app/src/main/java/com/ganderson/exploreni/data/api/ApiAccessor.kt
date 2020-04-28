@@ -6,9 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ganderson.exploreni.data.api.services.GoogleService
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.api.Event
-import com.ganderson.exploreni.entities.api.NiLocation
-import com.ganderson.exploreni.entities.api.Weather
+import com.ganderson.exploreni.entities.data.DataResult
+import com.ganderson.exploreni.entities.data.api.Event
+import com.ganderson.exploreni.entities.data.api.NiLocation
+import com.ganderson.exploreni.entities.data.api.Weather
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,22 +19,22 @@ class ApiAccessor {
         private const val API_ERROR_CODE = 404
 
         fun getNearbyLocations(lat: Double, lon: Double, radius:Int)
-                : LiveData<List<NiLocation>> {
-            val data = MutableLiveData<List<NiLocation>>()
+                : LiveData<DataResult<List<NiLocation>>> {
+            val data = MutableLiveData<DataResult<List<NiLocation>>>()
 
             val call = ApiServices.exploreLocationService.getNearbyLocations(lat, lon, radius)
             call.enqueue(object: Callback<List<NiLocation>> {
                 override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<List<NiLocation>>,
                                         response: Response<List<NiLocation>>) {
                     if(response.code() != API_ERROR_CODE) {
-                        data.value = response.body()
+                        data.value = DataResult(response.body(), null)
                     }
                     else {
-                        data.value = emptyList()
+                        data.value = DataResult(emptyList(), null)
                     }
                 }
             })
@@ -41,22 +42,22 @@ class ApiAccessor {
             return data
         }
 
-        fun getLocationsByType(type: String) : LiveData<List<NiLocation>> {
-            val data = MutableLiveData<List<NiLocation>>()
+        fun getLocationsByType(type: String) : LiveData<DataResult<List<NiLocation>>> {
+            val data = MutableLiveData<DataResult<List<NiLocation>>>()
 
             val call = ApiServices.exploreLocationService.getLocationsByType(type)
             call.enqueue(object: Callback<List<NiLocation>> {
                 override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<List<NiLocation>>,
                                         response: Response<List<NiLocation>>) {
                     if(response.code() != API_ERROR_CODE) {
-                        data.value = response.body()
+                        data.value = DataResult(response.body(), null)
                     }
                     else {
-                        data.value = emptyList()
+                        data.value = DataResult(emptyList(), null)
                     }
                 }
             })
@@ -64,45 +65,44 @@ class ApiAccessor {
             return data
         }
 
-        fun getEvents() : LiveData<List<Event>> {
-            val data = MutableLiveData<List<Event>>()
+        fun getEvents() : LiveData<DataResult<List<Event>>> {
+            val data = MutableLiveData<DataResult<List<Event>>>()
 
             val call = ApiServices.exploreEventService.getEvents()
             call.enqueue(object: Callback<List<Event>> {
                 override fun onFailure(call: Call<List<Event>>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
                     if(response.code() != API_ERROR_CODE) {
-                        data.value = response.body()
+                        data.value = DataResult(response.body(), null)
                     }
                     else {
-                        data.value = emptyList()
+                        data.value = DataResult(emptyList(), null)
                     }
                 }
-
             })
 
             return data
         }
 
-        fun performSearch(query: String) : LiveData<List<NiLocation>> {
-            val data = MutableLiveData<List<NiLocation>>()
+        fun performSearch(query: String) : LiveData<DataResult<List<NiLocation>>> {
+            val data = MutableLiveData<DataResult<List<NiLocation>>>()
 
             val call = ApiServices.exploreLocationService.performSearch(query)
             call.enqueue(object: Callback<List<NiLocation>> {
                 override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<List<NiLocation>>,
                                         response: Response<List<NiLocation>>) {
                     if(response.code() != API_ERROR_CODE) {
-                        data.value = response.body()
+                        data.value = DataResult(response.body(), null)
                     }
                     else {
-                        data.value = emptyList()
+                        data.value = DataResult(emptyList(), null)
                     }
                 }
             })
@@ -110,8 +110,9 @@ class ApiAccessor {
             return data
         }
 
-        fun getLocationName(lat: Double, lon: Double, apiKey: String) : LiveData<String> {
-            val data = MutableLiveData<String>()
+        fun getLocationName(lat: Double, lon: Double, apiKey: String) :
+                LiveData<DataResult<String>> {
+            val data = MutableLiveData<DataResult<String>>()
 
             val geocodingData = HashMap<String, String>()
             geocodingData["latlng"] = "$lat,$lon"
@@ -121,11 +122,11 @@ class ApiAccessor {
             val geocodingCall = ApiServices.geocodingService.reverseGeocode(geocodingData)
             geocodingCall.enqueue(object : Callback<String> {
                 override fun onFailure(call: Call<String>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<String>, response: Response<String>) {
-                    data.value = response.body()
+                    data.value = DataResult(response.body(), null)
                 }
             })
 
@@ -133,8 +134,8 @@ class ApiAccessor {
         }
 
         fun getWeather(lat: Double, lon: Double, useFahrenheit: Boolean, apiKey: String)
-                : LiveData<Weather> {
-            val data = MutableLiveData<Weather>()
+                : LiveData<DataResult<Weather>> {
+            val data = MutableLiveData<DataResult<Weather>>()
 
             var units = "metric"
             if(useFahrenheit) {
@@ -152,12 +153,12 @@ class ApiAccessor {
             val weatherCall = ApiServices.weatherService.getCurrentWeather(weatherData)
             weatherCall.enqueue(object : Callback<Weather> {
                 override fun onFailure(call: Call<Weather>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<Weather>,
                                         response: Response<Weather>) {
-                    data.value = response.body()
+                    data.value = DataResult(response.body(), null)
                 }
             })
 
@@ -165,9 +166,9 @@ class ApiAccessor {
         }
 
         fun calculateDuration(itinerary: Itinerary, userLocation: Location?,
-                              apiKey: String): LiveData<Int> {
+                              apiKey: String): LiveData<DataResult<Int>> {
             val itemList = itinerary.itemList
-            val data = MutableLiveData<Int>()
+            val data = MutableLiveData<DataResult<Int>>()
 
             var beginIndex = 0
             var origins: String
@@ -196,11 +197,11 @@ class ApiAccessor {
             val durationCall = ApiServices.durationService.getItineraryDuration(params)
             durationCall.enqueue(object: Callback<Int> {
                 override fun onFailure(call: Call<Int>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<Int>, response: Response<Int>) {
-                    data.value = response.body()
+                    data.value = DataResult(response.body(), null)
                 }
             })
 
@@ -208,9 +209,9 @@ class ApiAccessor {
         }
 
         fun getItineraryPolyline(itinerary: Itinerary, userLocation: Location?,
-                                 apiKey: String) : LiveData<String> {
+                                 apiKey: String) : LiveData<DataResult<String>> {
             val itemList = itinerary.itemList
-            val data = MutableLiveData<String>()
+            val data = MutableLiveData<DataResult<String>>()
 
             var beginIndex = 1
             val origin: String
@@ -237,15 +238,15 @@ class ApiAccessor {
             if(waypoints.isNotBlank()) {
                 params["waypoints"] = waypoints
             }
+
             val polylineCall = ApiServices.polylineService.getPolyline(params)
-            Log.d("PLURL", polylineCall.request().url().toString())
             polylineCall.enqueue(object: Callback<String> {
                 override fun onFailure(call: Call<String>, t: Throwable) {
-                    throw t
+                    data.value = DataResult(null, t)
                 }
 
                 override fun onResponse(call: Call<String>, response: Response<String>) {
-                    data.value = response.body()
+                    data.value = DataResult(response.body(), null)
                 }
             })
 
