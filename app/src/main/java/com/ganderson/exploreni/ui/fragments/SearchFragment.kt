@@ -99,16 +99,9 @@ class SearchFragment(private val query: String) : Fragment() {
         val adapterListener = object : LocationAdapter.OnLocationClickListener {
             override fun onLocationClick(location: NiLocation) {
                 val mainActivity = activity as MainActivity
-                if (targetFragment != null) {
-                    (targetFragment as ItineraryViewerFragment).addItem(location)
-                    mainActivity.displayFragment(targetFragment!!)
-                } else {
-                    val attractionDetailFragment = AttractionDetailFragment(
-                        location,
-                        false
-                    )
-                    mainActivity.displayFragment(attractionDetailFragment)
-                }
+                val attractionDetailFragment = AttractionDetailFragment(location,
+                    false)
+                mainActivity.displayFragment(attractionDetailFragment)
             }
         }
 
