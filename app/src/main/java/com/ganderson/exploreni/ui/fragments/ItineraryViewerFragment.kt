@@ -38,9 +38,10 @@ import java.util.*
  * A simple [Fragment] subclass.
  */
 const val ADD_ITEM_CODE = 1
-class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : Fragment() {
+class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itinerary?) : Fragment() {
     private val viewModel = ItineraryViewerViewModel()
     private val itinerary = savedItinerary ?: Itinerary()
+    private var newNameChanged = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -104,6 +105,10 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
             rvItinerary.layoutManager = LinearLayoutManager(requireContext())
             rvItinerary.adapter =
                 ItineraryAdapter(requireContext(), itinerary.itemList, removeListener)
+
+            if(isNew && !newNameChanged) {
+                showInputDialog()
+            }
         }
     }
 
@@ -161,18 +166,22 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     }
 
     private fun changeItineraryName(name: String) {
-        if(name != itinerary.name) {
+        if((isNew && !newNameChanged) || name != itinerary.name) {
             if (viewModel.isDuplicateItineraryName(name)) {
                 val dialog = AlertDialog.Builder(requireContext())
                     .setCancelable(true)
                     .setTitle("Error")
                     .setMessage("That itinerary name already exists.")
-                    .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                    .setPositiveButton("OK") { dialog, _ ->
+                        dialog.dismiss()
+                        showInputDialog()
+                    }
                     .create()
                 dialog.show()
             } else {
                 itinerary.name = name
                 tvItineraryName.text = name
+                newNameChanged = true
             }
         }
     }
