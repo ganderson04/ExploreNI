@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.fragment_search.*
  */
 class SearchFragment(private val query: String) : Fragment() {
     private val viewModel = SearchViewModel()
+    private val locationList = ArrayList<NiLocation>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -44,42 +45,39 @@ class SearchFragment(private val query: String) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        EspressoIdlingResource.increment()
-        val loadingDialog = LoadingDialog(requireContext(), "Searching...")
-        loadingDialog.show()
-        viewModel.performSearch(query)
-            .observe(viewLifecycleOwner) { listResult ->
-                loadingDialog.dismiss()
-                EspressoIdlingResource.decrement()
-                if(listResult.data != null) {
-                    val list = listResult.data
-                    if (list.isNotEmpty()) {
-                        val adapterListener = object : LocationAdapter.OnLocationClickListener {
-                            override fun onLocationClick(location: NiLocation) {
-                                val mainActivity = activity as MainActivity
-                                if (targetFragment != null) {
-                                    (targetFragment as ItineraryViewerFragment).addItem(location)
-                                    mainActivity.displayFragment(targetFragment!!)
-                                } else {
-                                    val attractionDetailFragment = AttractionDetailFragment(
-                                        location,
-                                        false
-                                    )
-                                    mainActivity.displayFragment(attractionDetailFragment)
-                                }
-                            }
-                        }
 
-                        rvSearchResults.layoutManager = LinearLayoutManager(this.context)
-                        rvSearchResults.adapter = LocationAdapter(
-                            requireContext(), list,
-                            adapterListener
-                        )
-                    } else {
+        if(locationList.isEmpty()) {
+            EspressoIdlingResource.increment()
+            val loadingDialog = LoadingDialog(requireContext(), "Searching...")
+            loadingDialog.show()
+            viewModel.performSearch(query)
+                .observe(viewLifecycleOwner) { listResult ->
+                    loadingDialog.dismiss()
+                    EspressoIdlingResource.decrement()
+                    if (listResult.data != null) {
+                        locationList.addAll(listResult.data)
+                        if (locationList.isNotEmpty()) {
+                            displayLocations()
+                        }
+                        else {
+                            val alert = AlertDialog.Builder(requireContext())
+                                .setCancelable(false)
+                                .setTitle("No results")
+                                .setMessage("Please try another search term.")
+                                .setPositiveButton("OK") { dialog, _ ->
+                                    run {
+                                        dialog.dismiss()
+                                        parentFragmentManager.popBackStack()
+                                    }
+                                }
+                            alert.show()
+                        }
+                    }
+                    else {
                         val alert = AlertDialog.Builder(requireContext())
                             .setCancelable(false)
-                            .setTitle("No results")
-                            .setMessage("Please try another search term.")
+                            .setTitle("Error")
+                            .setMessage("Unable to load search results.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 run {
                                     dialog.dismiss()
@@ -89,20 +87,36 @@ class SearchFragment(private val query: String) : Fragment() {
                         alert.show()
                     }
                 }
-                else {
-                    val alert = AlertDialog.Builder(requireContext())
-                        .setCancelable(false)
-                        .setTitle("Error")
-                        .setMessage("Unable to load search results.")
-                        .setPositiveButton("OK") { dialog, _ ->
-                            run {
-                                dialog.dismiss()
-                                parentFragmentManager.popBackStack()
-                            }
-                        }
-                    alert.show()
+        }
+        else {
+            displayLocations()
+        }
+    }
+
+    private fun displayLocations() {
+        locationList.sortBy { it.name }
+
+        val adapterListener = object : LocationAdapter.OnLocationClickListener {
+            override fun onLocationClick(location: NiLocation) {
+                val mainActivity = activity as MainActivity
+                if (targetFragment != null) {
+                    (targetFragment as ItineraryViewerFragment).addItem(location)
+                    mainActivity.displayFragment(targetFragment!!)
+                } else {
+                    val attractionDetailFragment = AttractionDetailFragment(
+                        location,
+                        false
+                    )
+                    mainActivity.displayFragment(attractionDetailFragment)
                 }
             }
+        }
+
+        rvSearchResults.layoutManager = LinearLayoutManager(this.context)
+        rvSearchResults.adapter = LocationAdapter(
+            requireContext(), locationList,
+            adapterListener
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
