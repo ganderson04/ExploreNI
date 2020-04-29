@@ -18,7 +18,7 @@ class Utils {
         private const val DISTANCE_SCALE = 1.609 // Conversion between miles and kilometres
         const val MAX_SEEK_MILES = 30
         const val MAX_SEEK_KM = 50
-        val DISTANCE_FORMATTER = DecimalFormat("0.00")
+        val distanceFormatter = DecimalFormat("0.00")
 
         /**
          * Calculates the Great Circle distance between locations using the Haversine

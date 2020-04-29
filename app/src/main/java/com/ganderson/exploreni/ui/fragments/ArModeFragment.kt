@@ -274,10 +274,10 @@ class ArModeFragment : Fragment() {
         // The Haversine formula returns the distance in kilometres. If the user has elected to use
         // kilometres, do no conversion. Otherwise, convert to miles.
         if(useMetric) {
-            formattedDistance = Utils.DISTANCE_FORMATTER.format(locationDistance) + " km"
+            formattedDistance = Utils.distanceFormatter.format(locationDistance) + " km"
         }
         else {
-            formattedDistance = Utils.DISTANCE_FORMATTER
+            formattedDistance = Utils.distanceFormatter
                 .format(
                     Utils.distanceToImperial(locationDistance)
                 ) + " miles"
