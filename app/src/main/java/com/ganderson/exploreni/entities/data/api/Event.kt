@@ -1,12 +1,12 @@
 package com.ganderson.exploreni.entities.data.api
 
-import java.time.LocalDate
+import java.util.*
 
 data class Event(val id: String,
                  val name: String,
                  val desc: String,
-                 val startDate: LocalDate,
-                 val endDate: LocalDate,
+                 val startDate: Date,
+                 val endDate: Date,
                  val imgUrl: String,
                  val imgAttr: String,
                  val website: String)

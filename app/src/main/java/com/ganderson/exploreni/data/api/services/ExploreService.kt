@@ -13,8 +13,10 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import java.lang.reflect.Type
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * Represents the endpoints used to obtain information stored in the Explore NI database accessible
@@ -23,7 +25,7 @@ import java.time.format.DateTimeFormatter
 interface ExploreService {
     companion object {
         const val BASE_URL = "https://explore-ni-api.herokuapp.com/api/"
-        val eventDateFormat = DateTimeFormatter.ofPattern("E, d MMM yyyy H:m:s z")
+        val eventDateFormat = SimpleDateFormat("E, d MMM yyyy H:m:s z", Locale.UK)
     }
 
     @POST("locations/nearby")
@@ -97,12 +99,8 @@ interface ExploreService {
                 val id = eventResponse.get("_id").asString
                 val name = eventResponse.get("name").asString
                 val desc = eventResponse.get("desc").asString
-                val startDate = LocalDate
-                    .parse(eventResponse.get("startDate").asString,
-                        eventDateFormat)
-                val endDate = LocalDate
-                    .parse(eventResponse.get("endDate").asString,
-                        eventDateFormat)
+                val startDate = eventDateFormat.parse(eventResponse.get("startDate").asString)
+                val endDate = eventDateFormat.parse(eventResponse.get("endDate").asString)
                 val imgUrl = eventResponse.get("imgUrl").asString
                 val imgAttr = eventResponse.get("imgAttr").asString
                 val website = eventResponse.get("website").asString

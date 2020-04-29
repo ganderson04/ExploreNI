@@ -13,11 +13,13 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.EventDetailFragment
+import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 class EventAdapter(private val context: Context, private val events: List<Event>)
     : RecyclerView.Adapter<EventAdapter.EventViewHolder>() {
-    private val eventDateFormatter = DateTimeFormatter.ofPattern("E d MMM")
+    private val eventDateFormatter = SimpleDateFormat("E d MMM yyyy", Locale.UK)
 
     class EventViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val cvEvent = view.findViewById<CardView>(R.id.cvEvent)
@@ -41,7 +43,8 @@ class EventAdapter(private val context: Context, private val events: List<Event>
             .error(R.drawable.placeholder_no_image_available)
             .into(holder.ivEvent)
 
-        val dateString = "${event.startDate.format(eventDateFormatter)} - ${event.endDate.format(eventDateFormatter)}"
+        val dateString = "${eventDateFormatter.format(event.startDate)} - " +
+                eventDateFormatter.format(event.endDate)
 
         holder.tvEventName.text = event.name
         holder.tvEventDates.text = dateString
