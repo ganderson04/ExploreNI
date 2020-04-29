@@ -226,40 +226,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupLocationService() {
-//        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireContext())
-//        locationRequest = LocationRequest.create().apply {
-//            // Request location in 1 minute intervals.
-//            interval = 60000
-//
-//            // No need for high accuracy on this screen as we only wish to get the
-//            // town name and weather.
-//            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-//        }
-//        locationCallback = object: LocationCallback() {
-//            override fun onLocationResult(locationResult: LocationResult?) {
-//                super.onLocationResult(locationResult)
-//                setLocationName(locationResult)
-//                getWeather(locationResult)
-//
-//                cvNearby.setOnClickListener {
-//                    if (locationResult != null) {
-//                        val nearbyFragment = NearbyFragment(locationResult.lastLocation)
-//                        val mainActivity = this@HomeFragment.activity as MainActivity
-//                        mainActivity.displayFragment(nearbyFragment)
-//                    }
-//                    else {
-//                        Toast.makeText(requireContext(), "Not available with location disabled.",
-//                            Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        }
-//        (activity as MainActivity).registerLocationCallback(locationCallback)
-//        fusedLocationProvider.requestLocationUpdates(locationRequest, locationCallback,
-//            Looper.getMainLooper())
-    }
-
     private fun registerLocationCallback() {
         locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
