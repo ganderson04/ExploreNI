@@ -73,6 +73,11 @@ fun <T> T.toHashMap() : HashMap<String, Any> {
     return convert()
 }
 
+// Reified types can be accessed within the function body without needing to pass Class<T> (by, for
+// example, T::class.java). Reified types can only be used in "inline" functions, however.
+// "Inline" injects the code of a function at the call-site and avoids allocating an object for the
+// function. Useful on functions taking a lambda as a parameter, but necessary here.
+// Ref: https://kotlinlang.org/docs/reference/inline-functions.html
 inline fun <reified T> Map<String, Any>.toDataClass() : T {
     return convert()
 }
