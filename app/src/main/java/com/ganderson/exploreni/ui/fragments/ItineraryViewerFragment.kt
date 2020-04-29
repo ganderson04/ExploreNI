@@ -27,7 +27,9 @@ import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.ItineraryItemTouchCallback
 import com.ganderson.exploreni.ui.components.LoadingDialog
+import com.ganderson.exploreni.ui.components.adapters.ItineraryAdapter
 import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
 import java.util.*
@@ -81,13 +83,13 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
                 calculateDuration()
             }
 
-            val itemMovedCallback = object : ItemTouchCallback.ItemMovedCallback {
+            val itemMovedCallback = object : ItineraryItemTouchCallback.ItemMovedCallback {
                 override fun itemMoved() {
                     calculateDuration()
                 }
             }
             val itemTouchHelper = ItemTouchHelper(
-                ItemTouchCallback(
+                ItineraryItemTouchCallback(
                     itinerary.itemList,
                     itemMovedCallback
                 )
@@ -306,71 +308,5 @@ class ItineraryViewerFragment(val isNew: Boolean, savedItinerary: Itinerary?) : 
     private fun deleteItinerary() {
         viewModel.deleteItinerary(itinerary.dbId)
         goBack(true)
-    }
-
-    class ItineraryAdapter(val context: Context, private val itemList: List<NiLocation>,
-                           private val removeListener: OnRemoveClickListener)
-        : RecyclerView.Adapter<ItineraryAdapter.ItemViewHolder>() {
-
-        interface OnRemoveClickListener {
-            fun onRemoveClick(itemIndex: Int)
-        }
-
-        class ItemViewHolder(val view: View, val removeListener: OnRemoveClickListener)
-            : RecyclerView.ViewHolder(view) {
-            val tvItineraryItem = view.findViewById<TextView>(R.id.tvItineraryItem)
-            val ivItineraryItem = view.findViewById<ImageView>(R.id.ivItineraryLocation)
-            val ibRemoveItem = view.findViewById<ImageButton>(R.id.ibRemoveItem)
-
-            init {
-                ibRemoveItem.setOnClickListener { removeListener.onRemoveClick(adapterPosition) }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-            val view = LayoutInflater.from(context).inflate(R.layout.layout_itinerary_item,
-                parent, false)
-            return ItemViewHolder(view, removeListener)
-        }
-
-        override fun getItemCount() = itemList.size
-
-        override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-            val item = itemList[position]
-
-            Glide.with(context)
-                .load(item.imgUrl)
-                .centerCrop()
-                .error(R.drawable.placeholder_no_image_available)
-                .into(holder.ivItineraryItem)
-
-            holder.tvItineraryItem.text = item.name
-        }
-    }
-
-    class ItemTouchCallback(private val itemList: List<NiLocation>,
-                            private val itemMovedCallback: ItemMovedCallback)
-        : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN
-            or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
-
-        interface ItemMovedCallback {
-            fun itemMoved()
-        }
-
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder): Boolean {
-            val fromPosition = viewHolder.adapterPosition
-            val toPosition = target.adapterPosition
-            Collections.swap(itemList, fromPosition, toPosition)
-            recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-        override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-            fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
-            itemMovedCallback.itemMoved()
-        }
     }
 }
