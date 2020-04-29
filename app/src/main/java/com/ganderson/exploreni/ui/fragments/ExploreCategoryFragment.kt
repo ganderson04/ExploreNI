@@ -9,6 +9,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
@@ -35,7 +36,6 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
     private val locationList = ArrayList<NiLocation>()
     private val currentFilterList = ArrayList<String>()
 
-    private var location: Location? = null
     private lateinit var sortDialog: Dialog
     private lateinit var filterDialog: Dialog
     private lateinit var adapterListener: LocationAdapter.OnLocationClickListener
@@ -63,19 +63,6 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
 
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            location = (activity as MainActivity).getLastLocation()
-//            locationManager = (activity as MainActivity).getSystemService(Context.LOCATION_SERVICE)
-//                    as LocationManager
-//
-//            locationManager?.let {
-//                // "it" refers to locationManager. "let" blocks are similar to lambdas.
-//                if(it.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//                    location = it.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-//                }
-//                else if(it.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-//                    location = it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-//                }
-//            }
 
             // Create new Dialog only if this is a new instantiation. See the comment below.
             if(locationList.isEmpty()) createSortDialog()
@@ -207,12 +194,23 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
 
     private fun sortList(option: Int) {
         if(option == 0) locationList.sortBy { it.name }
-        else locationList.sortWith(
-            compareBy {
-                Utils.getHaversineGCD(location!!.latitude, location!!.longitude,
-                    it.lat.toDouble(), it.long.toDouble())
+        else {
+            val lastLocation = (activity as MainActivity).getLastLocation()
+            if(lastLocation != null) {
+                locationList.sortWith(
+                    compareBy { niLocation ->
+                        Utils.getHaversineGCD(
+                            lastLocation.latitude, lastLocation.longitude,
+                            niLocation.lat.toDouble(), niLocation.long.toDouble()
+                        )
+                    }
+                )
             }
-        )
+            else {
+                Toast.makeText(requireContext(), "Location currently unavailable. Sorting A-Z.",
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
         rvLocations.adapter?.notifyDataSetChanged()
     }
 
