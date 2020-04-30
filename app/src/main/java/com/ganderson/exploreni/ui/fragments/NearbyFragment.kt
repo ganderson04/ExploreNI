@@ -1,5 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.app.AlertDialog
 import android.location.Location
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -30,10 +31,12 @@ import kotlinx.android.synthetic.main.fragment_nearby.*
 /**
  * A simple [Fragment] subclass.
  */
-class NearbyFragment(private val userLocation: Location) : Fragment() {
+class NearbyFragment : Fragment() {
     private val viewModel: NearbyViewModel by viewModels()
     private var useMetric = false
     private var currentSeekRadius = 5
+
+    private var userLocation: Location? = null
     private lateinit var map: GoogleMap
     private lateinit var loadingDialog: LoadingDialog
 
@@ -57,92 +60,112 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
+        userLocation = (activity as MainActivity).getLastLocation()
+        if(userLocation != null) {
+            loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
 
-        val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
-                as SupportMapFragment
+            val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
+                    as SupportMapFragment
 
-        useMetric = PreferenceManager
-            .getDefaultSharedPreferences(this.context)
-            .getBoolean("measurement_distance", false)
+            useMetric = PreferenceManager
+                .getDefaultSharedPreferences(this.context)
+                .getBoolean("measurement_distance", false)
 
-        if(useMetric) {
-            tvCurrentRange.text = "${currentSeekRadius}km"
-            skbNearbyRange.max = Utils.MAX_SEEK_KM
-            tvMaxRange.text = "${Utils.MAX_SEEK_KM}km"
+            if (useMetric) {
+                tvCurrentRange.text = "${currentSeekRadius}km"
+                skbNearbyRange.max = Utils.MAX_SEEK_KM
+                tvMaxRange.text = "${Utils.MAX_SEEK_KM}km"
+            } else {
+                tvCurrentRange.text = "${currentSeekRadius}mi"
+                skbNearbyRange.max = Utils.MAX_SEEK_MILES
+                tvMaxRange.text = "${Utils.MAX_SEEK_MILES}mi"
+            }
+            skbNearbyRange.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?, progress: Int,
+                    fromUser: Boolean
+                ) {
+                    seekBar?.let {
+                        if (useMetric) {
+                            tvCurrentRange.text = "${progress}km"
+                        } else {
+                            tvCurrentRange.text = "${progress}mi"
+                        }
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    seekBar?.let {
+                        if (it.progress != currentSeekRadius) {
+                            currentSeekRadius = it.progress
+                            getNearbyLocations()
+                        }
+                    }
+                }
+            })
+
+            viewModel
+                .nearbyLocations
+                .observe(viewLifecycleOwner) { listResult ->
+                    loadingDialog.dismiss()
+                    if (listResult.data != null) {
+                        val list = listResult.data
+                        if (list.isNotEmpty()) {
+                            constructMap(list)
+                        } else {
+                            map.clear()
+                            Toast.makeText(
+                                requireContext(), "No locations found.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(
+                            requireContext(), "Unable to load locations.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+            frgMap.getMapAsync {
+                this.map = it
+                map.isMyLocationEnabled = true
+                map.uiSettings.isMyLocationButtonEnabled = false
+
+                // InfoWindow is the text bubble that appears above the marker when tapped.
+                map.setOnInfoWindowClickListener { marker ->
+                    val attractionDetailFragment =
+                        AttractionDetailFragment(marker.tag as NiLocation, true)
+
+                    (this.activity as MainActivity).displayFragment(attractionDetailFragment)
+                }
+
+                // Set the zoom level.
+                val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                    LatLng(userLocation!!.latitude, userLocation!!.longitude), 10f
+                )
+                map.animateCamera(cameraUpdate)
+
+                map.setMapStyle(
+                    MapStyleOptions
+                        .loadRawResourceStyle(this@NearbyFragment.context, R.raw.map_style)
+                )
+
+                getNearbyLocations()
+            }
         }
         else {
-            tvCurrentRange.text = "${currentSeekRadius}mi"
-            skbNearbyRange.max = Utils.MAX_SEEK_MILES
-            tvMaxRange.text = "${Utils.MAX_SEEK_MILES}mi"
-        }
-        skbNearbyRange.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int,
-                                           fromUser: Boolean) {
-                seekBar?.let {
-                    if(useMetric) {
-                        tvCurrentRange.text = "${progress}km"
-                    }
-                    else {
-                        tvCurrentRange.text = "${progress}mi"
-                    }
+            AlertDialog.Builder(requireContext())
+                .setCancelable(false)
+                .setTitle("Error")
+                .setMessage("Location not available.")
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    parentFragmentManager.popBackStack()
                 }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                seekBar?.let {
-                    if (it.progress != currentSeekRadius) {
-                        currentSeekRadius = it.progress
-                        getNearbyLocations()
-                    }
-                }
-            }
-        })
-
-        viewModel
-            .nearbyLocations
-            .observe(viewLifecycleOwner) { listResult ->
-                loadingDialog.dismiss()
-                if(listResult.data != null) {
-                    val list = listResult.data
-                    if (list.isNotEmpty()) {
-                        constructMap(list)
-                    } else {
-                        map.clear()
-                        Toast.makeText(requireContext(), "No locations found.",
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
-                else {
-                    Toast.makeText(requireContext(), "Unable to load locations.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-
-        frgMap.getMapAsync {
-            this.map = it
-            map.isMyLocationEnabled = true
-            map.uiSettings.isMyLocationButtonEnabled = false
-
-            // InfoWindow is the text bubble that appears above the marker when tapped.
-            map.setOnInfoWindowClickListener{ marker ->
-                val attractionDetailFragment =
-                    AttractionDetailFragment(marker.tag as NiLocation, true)
-
-                (this.activity as MainActivity).displayFragment(attractionDetailFragment)
-            }
-
-            // Set the zoom level.
-            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                LatLng(userLocation.latitude, userLocation.longitude), 10f)
-            map.animateCamera(cameraUpdate)
-
-            map.setMapStyle(MapStyleOptions
-                .loadRawResourceStyle(this@NearbyFragment.context, R.raw.map_style))
-
-            getNearbyLocations()
+                .show()
         }
     }
 
@@ -155,7 +178,7 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
         else {
             miles = currentSeekRadius
         }
-        viewModel.setNearbyParams(userLocation.latitude, userLocation.longitude, miles)
+        viewModel.setNearbyParams(userLocation!!.latitude, userLocation!!.longitude, miles)
     }
 
     private fun constructMap(locationList: List<NiLocation>) {

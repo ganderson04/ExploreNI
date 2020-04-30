@@ -241,27 +241,9 @@ class HomeFragment : Fragment() {
             override fun onLocationAvailability(availability: LocationAvailability?) {
                 super.onLocationAvailability(availability)
                 availability?.let {
-                    if (it.isLocationAvailable) {
-                        val location = (activity as MainActivity).getLastLocation()
-                        location?.let { userLocation ->
-                            cvNearby.setOnClickListener {
-                                val nearbyFragment = NearbyFragment(userLocation)
-                                val mainActivity = this@HomeFragment.activity as MainActivity
-                                mainActivity.displayFragment(nearbyFragment)
-                            }
-                        }
-                    }
-                    else {
-                        tvWeatherTown?.text = "Northern Ireland"
-                        tvWeatherDescription.text = "Unable to load weather."
-                        tvWeatherTemp.text = ""
-
-                        cvNearby.setOnClickListener {
-                            Toast.makeText(requireContext(),
-                                "Location not available.",
-                                Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    tvWeatherTown?.text = "Northern Ireland"
+                    tvWeatherDescription.text = "Unable to load weather."
+                    tvWeatherTemp.text = ""
                 }
             }
         }
