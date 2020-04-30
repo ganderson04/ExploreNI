@@ -60,12 +60,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         super.onViewCreated(view, savedInstanceState)
         rvLocations.layoutManager = LinearLayoutManager(requireContext())
 
-        if(ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            // Create new Dialog only if this is a new instantiation. See the comment below.
-            if(locationList.isEmpty()) createSortDialog()
-        }
+        if(locationList.isEmpty()) createSortDialog()
 
         // If the list is empty it must be a new instantiation of this fragment, so show the
         // loading dialog and begin observing the ViewModel's LiveData.

@@ -229,6 +229,10 @@ class HomeFragment : Fragment() {
                 .setCancelable(false)
                 .setPositiveButton("OK") { dialog, _ -> dialog?.dismiss() }
                 .show()
+
+            tvWeatherTown?.text = "Northern Ireland"
+            tvWeatherDescription.text = "Unable to load weather."
+            tvWeatherTemp.text = ""
         }
         else {
             registerLocationCallback()
