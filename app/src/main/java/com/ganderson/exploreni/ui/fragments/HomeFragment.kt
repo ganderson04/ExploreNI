@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
-import android.os.Looper
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -60,6 +59,12 @@ class HomeFragment : Fragment() {
             registerLocationCallback()
         }
         else requestLocationPermission()
+
+        cvNearby.setOnClickListener {
+            val nearbyFragment = NearbyFragment()
+            val mainActivity = this.activity as MainActivity
+            mainActivity.displayFragment(nearbyFragment)
+        }
 
         cvEvents.setOnClickListener {
             val eventFragment = EventFragment()
