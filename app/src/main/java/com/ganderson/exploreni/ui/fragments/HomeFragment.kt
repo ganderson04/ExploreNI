@@ -246,9 +246,11 @@ class HomeFragment : Fragment() {
             override fun onLocationAvailability(availability: LocationAvailability?) {
                 super.onLocationAvailability(availability)
                 availability?.let {
-                    tvWeatherTown?.text = "Northern Ireland"
-                    tvWeatherDescription.text = "Unable to load weather."
-                    tvWeatherTemp.text = ""
+                    if(!it.isLocationAvailable) {
+                        tvWeatherTown?.text = "Northern Ireland"
+                        tvWeatherDescription.text = "Unable to load weather."
+                        tvWeatherTemp.text = ""
+                    }
                 }
             }
         }
