@@ -36,7 +36,6 @@ class NearbyFragment : Fragment() {
     private var useMetric = false
     private var currentSeekRadius = 5
 
-    private var userLocation: Location? = null
     private lateinit var map: GoogleMap
     private lateinit var loadingDialog: LoadingDialog
 
@@ -54,14 +53,15 @@ class NearbyFragment : Fragment() {
         // Declares that this fragment will set its own menu.
         setHasOptionsMenu(true)
 
+        viewModel.userLocation = (activity as MainActivity).getLastLocation()
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nearby, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userLocation = (activity as MainActivity).getLastLocation()
-        if(userLocation != null) {
+        if(viewModel.userLocation != null) {
             loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
 
             val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
@@ -144,7 +144,8 @@ class NearbyFragment : Fragment() {
 
                 // Set the zoom level.
                 val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                    LatLng(userLocation!!.latitude, userLocation!!.longitude), 10f
+                    LatLng(viewModel.userLocation!!.latitude,
+                        viewModel.userLocation!!.longitude), 10f
                 )
                 map.animateCamera(cameraUpdate)
 
@@ -178,7 +179,8 @@ class NearbyFragment : Fragment() {
         else {
             miles = currentSeekRadius
         }
-        viewModel.setNearbyParams(userLocation!!.latitude, userLocation!!.longitude, miles)
+        viewModel.setNearbyParams(viewModel.userLocation!!.latitude,
+            viewModel.userLocation!!.longitude, miles)
     }
 
     private fun constructMap(locationList: List<NiLocation>) {
