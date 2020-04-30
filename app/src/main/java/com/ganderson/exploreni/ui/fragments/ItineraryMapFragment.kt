@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
@@ -35,7 +36,7 @@ import com.google.maps.android.PolyUtil
  * A simple [Fragment] subclass.
  */
 class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
-    private val viewModel = ItineraryMapViewModel()
+    private val viewModel: ItineraryMapViewModel by viewModels()
     private lateinit var map: GoogleMap
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -109,9 +110,10 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
 
         val loadingDialog = LoadingDialog(requireContext(), "Loading route, please wait.")
         loadingDialog.show()
-        viewModel
-            .getItineraryPolyline(itinerary, getUserLocation(),
+        viewModel.setPolylineParams(itinerary, getUserLocation(),
                 resources.getString(R.string.google_api_key))
+        viewModel
+            .polyline
             .observe(viewLifecycleOwner) { polyStringResult ->
                 if(polyStringResult.data != null) {
                     val polyString = polyStringResult.data

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +21,7 @@ import com.ganderson.exploreni.ui.viewmodels.InterestsViewModel
 import kotlinx.android.synthetic.main.activity_interest.*
 
 class InterestsActivity : AppCompatActivity() {
-    private val viewModel = InterestsViewModel()
+    private val viewModel: InterestsViewModel by viewModels()
     private val interests = ArrayList<String>()
     private val selectedInterests = ArrayList<String>()
     private lateinit var adapter: InterestsAdapter
@@ -42,7 +43,7 @@ class InterestsActivity : AppCompatActivity() {
     }
 
     private fun getUserInterests() {
-        val userInterests = viewModel.getInterests()
+        val userInterests = viewModel.interests
         if(userInterests.isNotEmpty()) {
             selectedInterests.addAll(userInterests)
             selectedInterests.forEach { interest ->

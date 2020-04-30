@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.MainActivity
@@ -30,11 +31,11 @@ import kotlinx.android.synthetic.main.fragment_nearby.*
  * A simple [Fragment] subclass.
  */
 class NearbyFragment(private val userLocation: Location) : Fragment() {
-    private val viewModel: NearbyViewModel =
-        NearbyViewModel()
+    private val viewModel: NearbyViewModel by viewModels()
     private var useMetric = false
     private var currentSeekRadius = 5
     private lateinit var map: GoogleMap
+    private lateinit var loadingDialog: LoadingDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -56,6 +57,8 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
+
         val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
                 as SupportMapFragment
 
@@ -98,6 +101,26 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
             }
         })
 
+        viewModel
+            .nearbyLocations
+            .observe(viewLifecycleOwner) { listResult ->
+                loadingDialog.dismiss()
+                if(listResult.data != null) {
+                    val list = listResult.data
+                    if (list.isNotEmpty()) {
+                        constructMap(list)
+                    } else {
+                        map.clear()
+                        Toast.makeText(requireContext(), "No locations found.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+                else {
+                    Toast.makeText(requireContext(), "Unable to load locations.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+
         frgMap.getMapAsync {
             this.map = it
             map.isMyLocationEnabled = true
@@ -124,7 +147,6 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
     }
 
     private fun getNearbyLocations() {
-        val loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
         loadingDialog.show()
         val miles: Int
         if(useMetric) {
@@ -133,26 +155,7 @@ class NearbyFragment(private val userLocation: Location) : Fragment() {
         else {
             miles = currentSeekRadius
         }
-
-        viewModel
-            .getNearbyLocations(userLocation.latitude, userLocation.longitude, miles)
-            .observe(viewLifecycleOwner) { listResult ->
-                loadingDialog.dismiss()
-                if(listResult.data != null) {
-                    val list = listResult.data
-                    if (list.isNotEmpty()) {
-                        constructMap(list)
-                    } else {
-                        map.clear()
-                        Toast.makeText(requireContext(), "No locations found.",
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
-                else {
-                    Toast.makeText(requireContext(), "Unable to load locations.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
+        viewModel.setNearbyParams(userLocation.latitude, userLocation.longitude, miles)
     }
 
     private fun constructMap(locationList: List<NiLocation>) {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ganderson.exploreni.EspressoIdlingResource
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_my_itineraries.*
  * A simple [Fragment] subclass.
  */
 class MyItinerariesFragment : Fragment() {
-    private val viewModel = MyItinerariesViewModel()
+    private val viewModel: MyItinerariesViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -43,7 +44,6 @@ class MyItinerariesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        EspressoIdlingResource.increment()
         val onRemoveClickListener = object: MyItinerariesAdapter.OnRemoveClickListener {
             override fun onRemoveClick(itinerary: Itinerary) {
                 val dialog = AlertDialog.Builder(requireContext())
@@ -55,7 +55,10 @@ class MyItinerariesFragment : Fragment() {
                 dialog.show()
             }
         }
-        viewModel.getItineraries()
+
+        EspressoIdlingResource.increment()
+        viewModel
+            .itineraries
             .observe(viewLifecycleOwner) { list ->
                 val sortedList = list.sortedBy { itinerary -> itinerary.name }
                 val linearLayoutManager = LinearLayoutManager(this.context)

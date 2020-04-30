@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ganderson.exploreni.EspressoIdlingResource
@@ -23,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_search.*
  * A simple [Fragment] subclass.
  */
 class SearchFragment(private val query: String) : Fragment() {
-    private val viewModel = SearchViewModel()
+    private val viewModel: SearchViewModel by viewModels()
     private val locationList = ArrayList<NiLocation>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -51,9 +52,12 @@ class SearchFragment(private val query: String) : Fragment() {
             val loadingDialog = LoadingDialog(requireContext(), "Searching...")
             loadingDialog.show()
             viewModel.performSearch(query)
+            viewModel
+                .searchResults
                 .observe(viewLifecycleOwner) { listResult ->
                     loadingDialog.dismiss()
                     EspressoIdlingResource.decrement()
+
                     if (listResult.data != null) {
                         locationList.addAll(listResult.data)
                         if (locationList.isNotEmpty()) {

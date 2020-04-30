@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_event.*
  * A simple [Fragment] subclass.
  */
 class EventFragment : Fragment() {
-    private val viewModel = EventViewModel()
+    private val viewModel: EventViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,7 +48,8 @@ class EventFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val loadingDialog = LoadingDialog(requireContext(), "Loading events, please wait.")
         loadingDialog.show()
-        viewModel.getEvents()
+        viewModel
+            .events
             .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
                 if(listResult.data != null) {

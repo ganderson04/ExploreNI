@@ -1,15 +1,23 @@
 package com.ganderson.exploreni.ui.viewmodels
 
 import android.location.Location
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.data.DataResult
 
 class ItineraryMapViewModel : ViewModel() {
-    fun getItineraryPolyline(itinerary: Itinerary, userLocation: Location?,
-                             apiKey: String) : LiveData<DataResult<String>> {
-        return ExploreRepository.getItineraryPolyline(itinerary, userLocation, apiKey)
+    private val polylineLiveData = MutableLiveData<Triple<Itinerary, Location?, String>>()
+    val polyline = polylineLiveData.switchMap { params ->
+        ExploreRepository.getItineraryPolyline(
+            params.first,
+            params.second,
+            params.third
+        )
+    }
+
+    fun setPolylineParams(itinerary: Itinerary, userLocation: Location?, apiKey: String) {
+        polylineLiveData.value = Triple(itinerary, userLocation, apiKey)
     }
 }

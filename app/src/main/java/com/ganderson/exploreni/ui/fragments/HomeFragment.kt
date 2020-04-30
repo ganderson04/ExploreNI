@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.ganderson.exploreni.ui.activities.FINE_LOCATION_PERMISSION
@@ -29,10 +30,8 @@ import java.util.*
  * A simple [Fragment] subclass.
  */
 class HomeFragment : Fragment() {
-    private val viewModel = HomeViewModel()
+    private val viewModel: HomeViewModel by viewModels()
 
-//    private lateinit var fusedLocationProvider: FusedLocationProviderClient
-//    private var locationRequest: LocationRequest? = null
     private var locationCallback: LocationCallback? = null
     private var useFahrenheit = false
 
@@ -58,7 +57,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if(ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            setupLocationService()
             registerLocationCallback()
         }
         else requestLocationPermission()
@@ -73,39 +71,42 @@ class HomeFragment : Fragment() {
     private fun setLocationName(locationResult: LocationResult?) {
         if(locationResult != null) {
             val location = locationResult.lastLocation
-                viewModel.getLocationName(
+                viewModel.updateLocationParams(
                     location.latitude,
                     location.longitude,
                     resources.getString(R.string.google_api_key)
-                ).observe(viewLifecycleOwner) { nameResult ->
-                    if (nameResult.data != null) {
-                        tvWeatherTown?.text = nameResult.data
-                    }
-                    else {
-                        // Attempt to use Geocoder. It may sometimes return null. A try-catch has
-                        // been used as Geocoder was still causing the app to crash any time it was
-                        // used as the fallback. The null check within is purely to avoid having to
-                        // check the Geocoder and then the address list separately using Kotlin's
-                        // "?" null-check operator.
-                        try {
-                            val geocoder: Geocoder? = Geocoder(activity, Locale.getDefault())
+                )
+                viewModel
+                    .locationName
+                    .observe(viewLifecycleOwner) { nameResult ->
+                        if (nameResult.data != null) {
+                            tvWeatherTown?.text = nameResult.data
+                        }
+                        else {
+                            // Attempt to use Geocoder. It may sometimes return null. A try-catch has
+                            // been used as Geocoder was still causing the app to crash any time it was
+                            // used as the fallback. The null check within is purely to avoid having to
+                            // check the Geocoder and then the address list separately using Kotlin's
+                            // "?" null-check operator.
+                            try {
+                                val geocoder: Geocoder? = Geocoder(activity, Locale.getDefault())
 
-                            if (geocoder != null) {
-                                val addressList = geocoder
-                                    .getFromLocation(location.latitude, location.longitude, 1)
-                                val address = addressList[0]
-                                tvWeatherTown?.text = address.subAdminArea
+                                if (geocoder != null) {
+                                    val addressList = geocoder
+                                        .getFromLocation(location.latitude, location.longitude, 1)
+                                    val address = addressList[0]
+                                    tvWeatherTown?.text = address.subAdminArea
+                                }
+                            }
+                            catch(e: Exception) {
+                                tvWeatherTown?.text = "Northern Ireland"
+                                Toast.makeText(
+                                    requireContext(), "Cannot retrieve location",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
-                        catch(e: Exception) {
-                            tvWeatherTown?.text = "Northern Ireland"
-                            Toast.makeText(
-                                requireContext(), "Cannot retrieve location",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
                     }
-                }
         }
         else {
             tvWeatherTown?.text = "Northern Ireland"
@@ -117,26 +118,29 @@ class HomeFragment : Fragment() {
     private fun getWeather(locationResult: LocationResult?) {
         if(locationResult != null) {
             val location = locationResult.lastLocation
-            viewModel.getWeather(location.latitude,
+            viewModel.updateWeatherParams(location.latitude,
                 location.longitude,
                 useFahrenheit,
                 resources.getString(R.string.openweathermap_api_key)
-            ).observe(viewLifecycleOwner) { weatherResult ->
-                if(weatherResult.data != null) {
-                    val weather = weatherResult.data
-                    var symbol = "°C"
-                    if (useFahrenheit) symbol = "°F"
+            )
+            viewModel
+                .weather
+                .observe(viewLifecycleOwner) { weatherResult ->
+                    if(weatherResult.data != null) {
+                        val weather = weatherResult.data
+                        var symbol = "°C"
+                        if (useFahrenheit) symbol = "°F"
 
-                    tvWeatherDescription.text = weather.desc
+                        tvWeatherDescription.text = weather.desc
 
-                    // Decimal portion of temperature truncated with toInt().
-                    val tempText = "${weather.temp.toInt()}$symbol"
-                    tvWeatherTemp.text = tempText
-                }
-                else {
-                    tvWeatherDescription.text = "Unable to load weather."
-                    tvWeatherTemp.text = ""
-                }
+                        // Decimal portion of temperature truncated with toInt().
+                        val tempText = "${weather.temp.toInt()}$symbol"
+                        tvWeatherTemp.text = tempText
+                    }
+                    else {
+                        tvWeatherDescription.text = "Unable to load weather."
+                        tvWeatherTemp.text = ""
+                    }
             }
         }
         else {

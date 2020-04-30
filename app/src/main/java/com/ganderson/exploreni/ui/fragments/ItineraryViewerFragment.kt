@@ -1,11 +1,7 @@
 package com.ganderson.exploreni.ui.fragments
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.text.InputType
 import android.view.*
@@ -13,12 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.ganderson.exploreni.EspressoIdlingResource
 
 import com.ganderson.exploreni.R
@@ -32,15 +26,16 @@ import com.ganderson.exploreni.ui.components.LoadingDialog
 import com.ganderson.exploreni.ui.components.adapters.ItineraryAdapter
 import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
-import java.util.*
 
 /**
  * A simple [Fragment] subclass.
  */
 const val ADD_ITEM_CODE = 1
 class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itinerary?) : Fragment() {
-    private val viewModel = ItineraryViewerViewModel()
+    private val viewModel: ItineraryViewerViewModel by viewModels()
     private val itinerary = savedItinerary ?: Itinerary()
+
+    private lateinit var durationLoadingDialog: LoadingDialog
     private var newNameChanged = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -62,6 +57,8 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        durationLoadingDialog = LoadingDialog(requireContext(),
+            "Calculating duration, please wait.")
 
         // It was possible, through use of the app's back button in the toolbar or the phone's
         // back button, to return to a deleted itinerary in the itinerary viewer. This meant the
@@ -110,6 +107,22 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
                 showInputDialog()
             }
         }
+
+        viewModel
+            .duration
+            .observe(viewLifecycleOwner) { secondsResult ->
+                durationLoadingDialog.dismiss()
+                EspressoIdlingResource.decrement()
+                if(secondsResult.data != null) {
+                    val duration = Utils.secondsToTimeString(secondsResult.data)
+                    val durationText = "Travel time: $duration"
+                    tvItineraryDuration.text = durationText
+                }
+                else {
+                    Toast.makeText(requireContext(), "Unable to calculate duration.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun alertDeletedItinerary() {
@@ -291,26 +304,9 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
         if((itinerary.itemList.size == 1 && userLocation != null) ||
             itinerary.itemList.size > 1) {
             EspressoIdlingResource.increment()
-            val loadingDialog = LoadingDialog(
-                requireContext(),
-                "Calculating duration, please wait."
-            )
-            loadingDialog.show()
-            viewModel
-                .calculateDuration(itinerary, userLocation, resources.getString(R.string.google_api_key))
-                .observe(viewLifecycleOwner) { secondsResult ->
-                    loadingDialog.dismiss()
-                    EspressoIdlingResource.decrement()
-                    if(secondsResult.data != null) {
-                        val duration = Utils.secondsToTimeString(secondsResult.data)
-                        val durationText = "Travel time: $duration"
-                        tvItineraryDuration.text = durationText
-                    }
-                    else {
-                        Toast.makeText(requireContext(), "Unable to calculate duration.",
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
+            durationLoadingDialog.show()
+            viewModel.setDurationParams(itinerary, userLocation,
+                resources.getString(R.string.google_api_key))
         }
     }
 

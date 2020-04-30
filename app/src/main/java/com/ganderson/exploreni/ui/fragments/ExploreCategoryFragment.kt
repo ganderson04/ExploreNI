@@ -3,15 +3,13 @@ package com.ganderson.exploreni.ui.fragments
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ganderson.exploreni.EspressoIdlingResource
@@ -30,8 +28,9 @@ import java.util.stream.Collectors
 /**
  * A simple [Fragment] subclass.
  */
-class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
-    private val viewModel = ExploreViewModel(locationType)
+class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
+    private val viewModel: ExploreViewModel by viewModels()
+
     private val sortOptions = arrayOf("A-Z", "Distance")
     private val locationList = ArrayList<NiLocation>()
     private val currentFilterList = ArrayList<String>()
@@ -76,6 +75,7 @@ class ExploreCategoryFragment(locationType: LocationType) : Fragment() {
                 "Loading locations, please wait.")
             loadingDialog.show()
 
+            viewModel.setLocationType(locationType)
             viewModel
                 .locations
                 .observe(viewLifecycleOwner) { listResult ->

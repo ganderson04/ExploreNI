@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -36,7 +37,8 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
 
 class ArModeFragment : Fragment() {
-    private val viewModel = ArModeViewModel()
+    private val viewModel: ArModeViewModel by viewModels()
+
     private var locationScene: LocationScene? = null
     private var locationReady = false
     private var useMetric = false
@@ -150,8 +152,9 @@ class ArModeFragment : Fragment() {
             miles = currentSeekRadius
         }
 
+        viewModel.updateParameters(lat, lon, miles)
         viewModel
-            .getNearbyLocations(lat, lon, miles)
+            .nearbyLocations
             .observe(viewLifecycleOwner) { listResult ->
                 loadingDialog.dismiss()
                 if(listResult.data != null) {

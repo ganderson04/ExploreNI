@@ -7,7 +7,5 @@ import com.ganderson.exploreni.entities.data.DataResult
 import com.ganderson.exploreni.entities.data.api.Event
 
 class EventViewModel : ViewModel() {
-    fun getEvents() : LiveData<DataResult<List<Event>>> {
-        return ExploreRepository.getEvents()
-    }
+    val events: LiveData<DataResult<List<Event>>> = ExploreRepository.getEvents()
 }
