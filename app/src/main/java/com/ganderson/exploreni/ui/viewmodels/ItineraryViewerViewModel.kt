@@ -1,13 +1,11 @@
 package com.ganderson.exploreni.ui.viewmodels
 
 import android.location.Location
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
-import com.ganderson.exploreni.entities.data.DataResult
 
 class ItineraryViewerViewModel : ViewModel() {
     private val durationLiveData = MutableLiveData<Triple<Itinerary, Location?, String>>()
