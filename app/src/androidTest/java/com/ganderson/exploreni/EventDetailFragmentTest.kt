@@ -23,12 +23,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
+import java.time.Instant
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class EventDetailFragmentTest {
-    private val event = Event("", "Test Event", "", LocalDate.now(),
-        LocalDate.now(), "", "", "https://www.google.co.uk")
+    private val event = Event("", "Test Event", "", Date.from(Instant.now()),
+        Date.from(Instant.now()), "", "", "https://www.google.co.uk")
 
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
