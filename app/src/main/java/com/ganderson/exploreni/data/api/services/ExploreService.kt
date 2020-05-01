@@ -59,6 +59,7 @@ interface ExploreService {
                     val desc = locationResponse.get("desc").asString
                     val imgUrl = locationResponse.get("imgUrl").asString
                     val imgAttr = locationResponse.get("imgAttr").asString
+                    val website = locationResponse.get("website").asString
                     val locTags = Gson().fromJson<List<String>>(locationResponse["locTags"],
                         object: TypeToken<List<String>>(){}.type)
 
@@ -82,6 +83,7 @@ interface ExploreService {
                         desc,
                         imgUrl,
                         imgAttr,
+                        website,
                         locTags
                     )
                 }
