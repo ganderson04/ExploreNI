@@ -13,8 +13,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.ganderson.exploreni.data.ExploreRepository
-import com.ganderson.exploreni.ui.activities.InterestsActivity
 import com.ganderson.exploreni.ui.activities.SettingsActivity
+import com.ganderson.exploreni.ui.components.adapters.InterestsAdapter
 import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -67,7 +67,7 @@ class InterestsActivityTest {
     fun selectInterestTest() {
         onView(withId(R.id.rvInterests))
             .perform(RecyclerViewActions.actionOnItemAtPosition
-            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
+            <InterestsAdapter.InterestsViewHolder>(0, clickOnCheckbox()))
 
         onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
             .perform(click())
@@ -80,7 +80,7 @@ class InterestsActivityTest {
     fun selectAndDeselectInterestTest() {
         onView(withId(R.id.rvInterests))
             .perform(RecyclerViewActions.actionOnItemAtPosition
-            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
+            <InterestsAdapter.InterestsViewHolder>(0, clickOnCheckbox()))
 
         onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
             .perform(click())
@@ -95,7 +95,7 @@ class InterestsActivityTest {
 
         onView(withId(R.id.rvInterests))
             .perform(RecyclerViewActions.actionOnItemAtPosition
-            <InterestsActivity.InterestAdapter.InterestViewHolder>(0, clickOnCheckbox()))
+            <InterestsAdapter.InterestsViewHolder>(0, clickOnCheckbox()))
 
         onView(withContentDescription(R.string.nav_app_bar_navigate_up_description))
             .perform(click())
