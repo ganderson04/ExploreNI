@@ -39,6 +39,7 @@ import java.util.concurrent.CompletableFuture
 class ArModeFragment : Fragment() {
     private val viewModel: ArModeViewModel by viewModels()
 
+    private lateinit var loadingDialog: LoadingDialog
     private var locationScene: LocationScene? = null
     private var locationReady = false
     private var useMetric = false
@@ -124,35 +125,11 @@ class ArModeFragment : Fragment() {
             }
         })
 
-        locationScene = LocationScene(this.activity, asvLookAround).apply {
-            setMinimalRefreshing(true)
-            setOffsetOverlapping(true)
-        }
+        loadingDialog = LoadingDialog(this.requireContext(), "Loading locations, please wait.")
 
-        val locationTask = LocationTask(WeakReference(this))
-        locationTask.execute(locationScene)
-    }
-
-    private fun locationIsReady(ready: Boolean) {
-        locationReady = ready
-        getNearbyLocations()
-    }
-
-    private fun getNearbyLocations() {
-        val loadingDialog = LoadingDialog(this.requireContext(), "Loading locations, please wait.")
-        loadingDialog.show()
-
-        val lat = locationScene!!.deviceLocation.currentBestLocation.latitude
-        val lon = locationScene!!.deviceLocation.currentBestLocation.longitude
-        val miles: Int
-        if(useMetric) {
-            miles = Utils.distanceToImperial(currentSeekRadius.toDouble()).toInt()
-        }
-        else {
-            miles = currentSeekRadius
-        }
-
-        viewModel.updateParameters(lat, lon, miles)
+        // Begin observing changes to in-range locations. The observer lambda will run after the
+        // parameters are updated in getNearbyLocations() and the associated LiveData has been
+        // updated.
         viewModel
             .nearbyLocations
             .observe(viewLifecycleOwner) { listResult ->
@@ -172,6 +149,35 @@ class ArModeFragment : Fragment() {
                         .show()
                 }
             }
+
+        locationScene = LocationScene(this.activity, asvLookAround).apply {
+            setMinimalRefreshing(true)
+            setOffsetOverlapping(true)
+        }
+
+        val locationTask = LocationTask(WeakReference(this))
+        locationTask.execute(locationScene)
+    }
+
+    private fun locationIsReady(ready: Boolean) {
+        locationReady = ready
+        getNearbyLocations()
+    }
+
+    private fun getNearbyLocations() {
+        loadingDialog.show()
+
+        val lat = locationScene!!.deviceLocation.currentBestLocation.latitude
+        val lon = locationScene!!.deviceLocation.currentBestLocation.longitude
+        val miles: Int
+        if(useMetric) {
+            miles = Utils.distanceToImperial(currentSeekRadius.toDouble()).toInt()
+        }
+        else {
+            miles = currentSeekRadius
+        }
+
+        viewModel.updateParameters(lat, lon, miles)
     }
 
     /**
