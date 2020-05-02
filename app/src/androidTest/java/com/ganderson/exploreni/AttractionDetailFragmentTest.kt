@@ -1,9 +1,13 @@
 package com.ganderson.exploreni
 
+import android.app.Instrumentation
+import android.content.Intent
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
@@ -23,7 +27,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AttractionDetailFragmentTest {
     private val niLocation = NiLocation("123", "FragTest", 0f, "",
-        "54.642748", "-5.942263", "", "", "", ArrayList())
+        "54.642748", "-5.942263", "", "", "", "https://google.co.uk",
+        ArrayList())
 
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
@@ -79,5 +84,26 @@ class AttractionDetailFragmentTest {
         onView(allOf(instanceOf(TextView::class.java),
             withParent(withId(R.id.toolbar))))
             .check(matches(withText(niLocation.name)))
+    }
+
+    @Test
+    fun openWebsiteTest() {
+        // Espresso testing would stop when the app hands over to the device's default web browser.
+        // The Intent which loads the specified URL in the browser is intercepted here instead and
+        // its contents examined to prove it contains the expected information.
+        // Solution adapted from: https://stackoverflow.com/a/35067831/8100469
+        Intents.init()
+
+        val expectedIntent = allOf(
+            IntentMatchers.hasAction(Intent.ACTION_VIEW),
+            IntentMatchers.hasData(niLocation.website)
+        )
+        Intents.intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
+
+        onView(withId(R.id.btnWebsite))
+            .perform(click())
+
+        Intents.intended(expectedIntent)
+        Intents.release()
     }
 }

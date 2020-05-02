@@ -12,6 +12,7 @@ import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.Itinerary
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.activities.MainActivity
+import com.ganderson.exploreni.ui.components.adapters.MyItinerariesAdapter
 import com.ganderson.exploreni.ui.fragments.MyItinerariesFragment
 import org.junit.*
 import org.junit.Assert.assertFalse
@@ -35,7 +36,8 @@ class MyItinerariesFragmentTest {
     private fun insertItinerary() {
         val dbId = ""
         val niLocation = NiLocation("123", "DbTest", 0f, "",
-            "54.642748", "-5.942263", "", "", "", ArrayList())
+            "54.642748", "-5.942263", "", "", "", "",
+            ArrayList())
         val locationList = ArrayList<NiLocation>()
         locationList.add(niLocation)
         ExploreRepository.saveItinerary(Itinerary(dbId, itineraryName, locationList))
@@ -65,7 +67,7 @@ class MyItinerariesFragmentTest {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         onView(withId(R.id.rvMyItineraries))
             .perform(RecyclerViewActions.actionOnItemAtPosition
-            <MyItinerariesFragment.MyItinerariesAdapter.ItineraryViewHolder>(0, click()))
+            <MyItinerariesAdapter.ItineraryViewHolder>(0, click()))
 
         onView(withId(R.id.rvItinerary))
             .check(matches(isDisplayed()))
@@ -77,7 +79,7 @@ class MyItinerariesFragmentTest {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         onView(withId(R.id.rvMyItineraries))
             .perform(RecyclerViewActions.actionOnItemAtPosition
-            <MyItinerariesFragment.MyItinerariesAdapter.ItineraryViewHolder>(0, click()))
+            <MyItinerariesAdapter.ItineraryViewHolder>(0, click()))
 
         onView(withId(R.id.rvItinerary))
             .check(matches(isDisplayed()))

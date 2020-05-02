@@ -40,7 +40,8 @@ class ItineraryViewerFragmentTest {
     private fun insertItinerary() {
         val dbId = ""
         val niLocation = NiLocation("123", "DbTest", 0f, "",
-            "54.642748", "-5.942263", "", "", "", ArrayList())
+            "54.642748", "-5.942263", "", "", "", "",
+            ArrayList())
         val locationList = ArrayList<NiLocation>()
         locationList.add(niLocation)
         ExploreRepository.saveItinerary(Itinerary(dbId, itineraryName, locationList))

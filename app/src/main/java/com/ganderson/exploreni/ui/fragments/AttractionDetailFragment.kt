@@ -1,5 +1,7 @@
 package com.ganderson.exploreni.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -54,6 +56,8 @@ class AttractionDetailFragment(private val location: NiLocation,
 
         val attractionText = "${location.desc}\n\n${location.imgAttr}"
         tvAttraction.text = attractionText
+
+        btnWebsite.setOnClickListener { openWebsite() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -94,6 +98,11 @@ class AttractionDetailFragment(private val location: NiLocation,
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openWebsite() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(location.website))
+        startActivity(intent)
     }
 
     private fun addToFavourites() {

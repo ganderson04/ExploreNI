@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FavouritesFragmentTest {
     private val niLocation = NiLocation("123", "FragTest", 0f, "",
-        "54.642748", "-5.942263", "", "", "", ArrayList())
+        "54.642748", "-5.942263", "", "", "", "", ArrayList())
 
     @get:Rule
     val activityRule = ActivityTestRule(MainActivity::class.java)

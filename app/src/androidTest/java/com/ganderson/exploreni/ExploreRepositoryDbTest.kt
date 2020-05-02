@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ExploreRepositoryDbTest {
     private val niLocation = NiLocation("123", "DbTest", 0f, "", "54.642748",
-        "-5.942263", "", "", "", ArrayList())
+        "-5.942263", "", "", "", "", ArrayList())
     private val itineraryName = "DbItineraryName"
     private lateinit var itinerary: Itinerary
     private val interests = ArrayList<String>().apply {
@@ -37,7 +37,7 @@ class ExploreRepositoryDbTest {
     fun constructItinerary() {
         val dbId = ""
         val niLocation = NiLocation("", "", 0f, "", "54.642748",
-            "-5.942263", "", "", "", ArrayList())
+            "-5.942263", "", "", "", "", ArrayList())
         val locationList = ArrayList<NiLocation>()
         locationList.add(niLocation)
         itinerary = Itinerary(dbId, itineraryName, locationList)
