@@ -1,7 +1,6 @@
 package com.ganderson.exploreni.data.api
 
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ganderson.exploreni.data.api.services.GoogleService
@@ -20,8 +19,11 @@ class ApiAccessor {
 
         fun getNearbyLocations(lat: Double, lon: Double, radius:Int)
                 : LiveData<DataResult<List<NiLocation>>> {
+            // LiveData is used to publish the result of the asynchronous API calls to attached
+            // observers.
             val data = MutableLiveData<DataResult<List<NiLocation>>>()
 
+            // Make, enqueue and process the call.
             val call = ApiServices.exploreLocationService.getNearbyLocations(lat, lon, radius)
             call.enqueue(object: Callback<List<NiLocation>> {
                 override fun onFailure(call: Call<List<NiLocation>>, t: Throwable) {
@@ -114,6 +116,7 @@ class ApiAccessor {
                 LiveData<DataResult<String>> {
             val data = MutableLiveData<DataResult<String>>()
 
+            // Assemble the required parameters.
             val geocodingData = HashMap<String, String>()
             geocodingData["latlng"] = "$lat,$lon"
             geocodingData["result_type"] = GoogleService.GEOCODING_RESULT_TYPE
@@ -142,14 +145,12 @@ class ApiAccessor {
                 units = "imperial"
             }
 
-            // Assemble parameters for OpenWeatherMap API call.
             val weatherData = HashMap<String, String>()
             weatherData["lat"] = lat.toString()
             weatherData["lon"] = lon.toString()
             weatherData["units"] = units
             weatherData["APPID"] = apiKey
 
-            // Make, enqueue and process the call.
             val weatherCall = ApiServices.weatherService.getCurrentWeather(weatherData)
             weatherCall.enqueue(object : Callback<Weather> {
                 override fun onFailure(call: Call<Weather>, t: Throwable) {
@@ -170,6 +171,10 @@ class ApiAccessor {
             val itemList = itinerary.itemList
             val data = MutableLiveData<DataResult<Int>>()
 
+            // "beginIndex" represents the index from which to start adding locations to the
+            // "origins" parameter in the API call. If the user's location is available, begin at
+            // index 0 in the itinerary's location list as it has not been accessed yet, otherwise
+            // begin at index 1 as the first location has been used for the first origin.
             var beginIndex = 0
             var origins: String
             if(userLocation != null) {
@@ -185,6 +190,7 @@ class ApiAccessor {
                 origins += "|" + "${itemList[i].lat},${itemList[i].long}"
             }
 
+            // The first "origin" is not included in the destinations list.
             for(i in beginIndex+1 until itemList.size) {
                 destinations += "|" + "${itemList[i].lat},${itemList[i].long}"
             }
@@ -213,6 +219,7 @@ class ApiAccessor {
             val itemList = itinerary.itemList
             val data = MutableLiveData<DataResult<String>>()
 
+            // The same principle is used here as above with regards to "beginIndex".
             var beginIndex = 1
             val origin: String
             if(userLocation != null) {

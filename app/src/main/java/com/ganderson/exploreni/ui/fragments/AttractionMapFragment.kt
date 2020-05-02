@@ -17,9 +17,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 
-/**
- * A simple [Fragment] subclass.
- */
 class AttractionMapFragment(private val location: NiLocation) : Fragment() {
     private lateinit var map: GoogleMap
 
@@ -46,6 +43,7 @@ class AttractionMapFragment(private val location: NiLocation) : Fragment() {
         val fcvMap = childFragmentManager.findFragmentById(R.id.fcvAttractionMap)
                 as SupportMapFragment
 
+        // Load the map. This action is asynchronous.
         fcvMap.getMapAsync {
             this.map = it
             map.isMyLocationEnabled = true

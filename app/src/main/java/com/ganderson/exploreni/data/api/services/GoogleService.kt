@@ -8,6 +8,9 @@ import retrofit2.http.GET
 import retrofit2.http.QueryMap
 import java.lang.reflect.Type
 
+/**
+ * Represents the Google Maps API endpoints used in the application.
+ */
 interface GoogleService {
 
     companion object {
@@ -27,19 +30,22 @@ interface GoogleService {
     class GeocodingDeserialiser : JsonDeserializer<String> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
             context: JsonDeserializationContext?): String? {
-            val geocodingResponse = json?.asJsonObject
+            json?.let {
+                val geocodingResponse = json.asJsonObject
 
-            val resultsObject = geocodingResponse
-                ?.getAsJsonArray("results")
-                ?.get(0)
-                ?.asJsonObject
+                val resultsObject = geocodingResponse
+                    .getAsJsonArray("results")
+                    .get(0)
+                    .asJsonObject
 
-            val postalTown = resultsObject
-                ?.getAsJsonArray("address_components")
-                ?.get(0)
-                ?.asJsonObject
+                val postalTown = resultsObject
+                    .getAsJsonArray("address_components")
+                    .get(0)
+                    .asJsonObject
 
-            return postalTown?.get("long_name")?.asString
+                return postalTown.get("long_name")?.asString
+            }
+            return null
         }
     }
 

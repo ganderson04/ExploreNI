@@ -20,9 +20,6 @@ import com.ganderson.exploreni.ui.components.adapters.LocationAdapter
 import com.ganderson.exploreni.ui.viewmodels.SearchViewModel
 import kotlinx.android.synthetic.main.fragment_search.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class SearchFragment(private val query: String) : Fragment() {
     private val viewModel: SearchViewModel by viewModels()
     private val locationList = ArrayList<NiLocation>()
@@ -47,6 +44,7 @@ class SearchFragment(private val query: String) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // If the list is empty, we must have come from the "Explore" screen and it's a new search.
         if(locationList.isEmpty()) {
             EspressoIdlingResource.increment()
             val loadingDialog = LoadingDialog(requireContext(), "Searching...")

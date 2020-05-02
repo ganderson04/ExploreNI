@@ -111,6 +111,7 @@ class ArModeFragment : Fragment() {
                 }
             }
 
+            // Required to override all three methods here, even if some may not be implemented.
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
@@ -150,6 +151,8 @@ class ArModeFragment : Fragment() {
                 }
             }
 
+        // Set up LocationScene. "apply" is a handy Kotlin extension function to call multiple of
+        // an object's methods without needing to refer to the object each time.
         locationScene = LocationScene(this.activity, asvLookAround).apply {
             setMinimalRefreshing(true)
             setOffsetOverlapping(true)
@@ -232,9 +235,7 @@ class ArModeFragment : Fragment() {
         }
     }
 
-    /**
-     * Load the Node which will contain the graphic and details for the marker.
-     */
+    // Load the Node which will contain the graphic and details for the marker.
     private fun loadNode(location: NiLocation,
                          lookAroundLayoutFuture: CompletableFuture<ViewRenderable>): Node {
         val node = Node()
@@ -368,6 +369,10 @@ class ArModeFragment : Fragment() {
         asvLookAround.pause()
     }
 
+    // The ARCore-Location library handles location retrieval itself, as it sets a large number
+    // of parameters to obtain the most precise location possible. As such, loading the AR markers
+    // cannot proceed until it has finished. This AsyncTask is an admittedly-hacky way of waiting
+    // for it to be ready.
     class LocationTask(private val fragment: WeakReference<ArModeFragment>)
         : AsyncTask<LocationScene, Unit, Boolean>() {
 

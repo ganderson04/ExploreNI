@@ -7,6 +7,8 @@ import com.jraska.livedata.test
 import org.junit.Rule
 import org.junit.Test
 
+// Heroku tests are not instrumented as they do not require access to API keys via the app's
+// resources.
 class ExploreRepositoryHerokuTest {
     private val latitude = 54.597181
     private val longitude = -5.930148

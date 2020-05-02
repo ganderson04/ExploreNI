@@ -15,9 +15,6 @@ import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class AttractionDetailFragment(private val location: NiLocation,
                                private val cameFromMap: Boolean) : Fragment() {
     private lateinit var menu: Menu

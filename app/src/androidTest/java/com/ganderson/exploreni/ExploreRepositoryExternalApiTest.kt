@@ -33,8 +33,8 @@ class ExploreRepositoryExternalApiTest {
     // Ref: https://kotlinlang.org/docs/reference/annotations.html#java-annotations
     @get:Rule val taskRule = InstantTaskExecutorRule()
 
-    // Used to obtain a Context reference with which to access the app's resources and retrieve
-    // the API keys.
+    // A reference to the MainActivity is used in the tests in this class to access the app's
+    // resources and retrieve the necessary API keys.
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
     @Before

@@ -1,7 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
 import android.app.AlertDialog
-import android.location.Location
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -28,9 +27,6 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_nearby.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class NearbyFragment : Fragment() {
     private val viewModel: NearbyViewModel by viewModels()
     private var useMetric = false
@@ -67,6 +63,7 @@ class NearbyFragment : Fragment() {
             val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
                     as SupportMapFragment
 
+            // Set up the seekbar.
             useMetric = PreferenceManager
                 .getDefaultSharedPreferences(this.context)
                 .getBoolean("measurement_distance", false)
@@ -106,6 +103,7 @@ class NearbyFragment : Fragment() {
                 }
             })
 
+            // Begin observing LiveData changes caused by the user updating the seek radius.
             viewModel
                 .nearbyLocations
                 .observe(viewLifecycleOwner) { listResult ->

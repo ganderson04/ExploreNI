@@ -10,7 +10,12 @@ import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.entities.data.api.Weather
 
+/**
+ * Provides access to APIs and the local DB for the ViewModels.
+ */
 class ExploreRepository {
+    // Kotlin does not support classes of static methods, or "library classes", in the same way
+    // Java does. "Companion objects" can be used to provide this functionality.
     companion object {
         fun getNearbyLocations(lat: Double, lon: Double, radius: Int) :
                 LiveData<DataResult<List<NiLocation>>> {

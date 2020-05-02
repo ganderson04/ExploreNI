@@ -47,7 +47,7 @@ class LocationAdapter(private val context: Context, private val locations: List<
 
         holder.tvLocationName.text = location.name
         holder.cvLocation.setOnClickListener { listener.onLocationClick(location) }
-        interests?.forEach { interest ->
+        interests.forEach { interest ->
             if(location.locTags.contains(interest)) {
                 holder.llRecommended.visibility = View.VISIBLE
                 return@forEach // "break" for the "forEach" extension method

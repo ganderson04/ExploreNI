@@ -14,13 +14,15 @@ import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.ui.fragments.EventDetailFragment
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class EventAdapter(private val context: Context, private val events: List<Event>)
     : RecyclerView.Adapter<EventAdapter.EventViewHolder>() {
     private val eventDateFormatter = SimpleDateFormat("E d MMM yyyy", Locale.UK)
 
+    // A ViewHolder is created for each item in the adapter and contains views that must be updated
+    // with data for each item in the adapter's list. It does not need to contain every view if
+    // some are not dynamic.
     class EventViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val cvEvent = view.findViewById<CardView>(R.id.cvEvent)
         val ivEvent = view.findViewById<ImageView>(R.id.ivEvent)
@@ -37,6 +39,7 @@ class EventAdapter(private val context: Context, private val events: List<Event>
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event = events[position]
 
+        // Load image asynchronously with Glide.
         Glide.with(context)
             .load(event.imgUrl)
             .centerCrop()

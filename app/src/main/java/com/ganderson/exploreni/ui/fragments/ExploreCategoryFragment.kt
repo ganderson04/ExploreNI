@@ -25,9 +25,6 @@ import com.ganderson.exploreni.ui.viewmodels.ExploreViewModel
 import kotlinx.android.synthetic.main.fragment_explore_category.*
 import java.util.stream.Collectors
 
-/**
- * A simple [Fragment] subclass.
- */
 class ExploreCategoryFragment(private val locationType: LocationType) : Fragment() {
     private val viewModel: ExploreViewModel by viewModels()
 
@@ -142,6 +139,8 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         val allTags = ArrayList<String>()
         val distinctTagList = ArrayList<String>()
         locationList.forEach { location -> allTags.addAll(location.locTags) }
+
+        // Utilises Java 8 Streams.
         distinctTagList.addAll(allTags.stream().distinct().collect(Collectors.toList()))
         return distinctTagList
     }

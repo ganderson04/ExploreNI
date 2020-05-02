@@ -18,9 +18,6 @@ import com.ganderson.exploreni.ui.components.adapters.EventAdapter
 import com.ganderson.exploreni.ui.viewmodels.EventViewModel
 import kotlinx.android.synthetic.main.fragment_event.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class EventFragment : Fragment() {
     private val viewModel: EventViewModel by viewModels()
 

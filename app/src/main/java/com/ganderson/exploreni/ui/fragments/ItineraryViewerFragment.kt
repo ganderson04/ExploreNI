@@ -27,10 +27,8 @@ import com.ganderson.exploreni.ui.components.adapters.ItineraryAdapter
 import com.ganderson.exploreni.ui.viewmodels.ItineraryViewerViewModel
 import kotlinx.android.synthetic.main.fragment_itinerary_viewer.*
 
-/**
- * A simple [Fragment] subclass.
- */
-const val ADD_ITEM_CODE = 1
+const val ADD_ITEM_CODE = 1 // Used when accessing the "Explore" feature to choose a location.
+
 class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itinerary?) : Fragment() {
     private val viewModel: ItineraryViewerViewModel by viewModels()
     private val itinerary = savedItinerary ?: Itinerary()
@@ -222,6 +220,8 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
     }
 
     private fun goBack(wasDeleted: Boolean) {
+        // Save on close only if it's a new, non-empty itinerary or if the user chose to keep the
+        // itinerary after removing all of its items.
         if((isNew && itinerary.itemList.isNotEmpty()) || (!isNew && !wasDeleted)) {
             if (viewModel.saveItinerary(itinerary)) {
                 Toast.makeText(requireContext(), "Itinerary saved.", Toast.LENGTH_SHORT).show()

@@ -5,6 +5,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import java.util.*
 
+/**
+ * Defines the behaviour when a user drags an itinerary item.
+ */
+// "or" performs a bitwise OR operation and is used to define the directions the views can be
+// dragged. The second parameter defines directions the views can be swiped. As swiping is not
+// allowed, it is set to 0.
 class ItineraryItemTouchCallback(private val itemList: List<NiLocation>,
                                  private val itemMovedCallback: ItemMovedCallback)
     : ItemTouchHelper.SimpleCallback(

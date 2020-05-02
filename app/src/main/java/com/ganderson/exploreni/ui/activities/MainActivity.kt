@@ -15,6 +15,8 @@ const val FINE_LOCATION_PERMISSION = 1
 const val CAMERA_PERMISSION = 2
 
 class MainActivity : AppCompatActivity() {
+    // The FusedLocationProviderClient was used to better monitor change in location
+    // availability.
     private lateinit var fusedLocationProvider: FusedLocationProviderClient
     private var locationRequest: LocationRequest? = null
     private var lastLocationCallback: LocationCallback? = null
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         // Start with the home screen.
         displayFragment(HomeFragment())
 
+        // Couchbase Lite must be initialised in each Activity that uses it.
         CouchbaseLite.init(this)
     }
 

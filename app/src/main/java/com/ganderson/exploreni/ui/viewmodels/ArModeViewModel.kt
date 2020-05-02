@@ -6,12 +6,19 @@ import androidx.lifecycle.switchMap
 import com.ganderson.exploreni.data.ExploreRepository
 
 class ArModeViewModel : ViewModel() {
+    // A private LiveData object is kept in the ViewModels to monitor changes to the parameters
+    // required for the API calls.
     private val nearbyParamsLiveData = MutableLiveData<Triple<Double, Double, Int>>()
+
+    // The public LiveData object accessible by the relevant UI class is provided with data by way
+    // of the LiveData "switchMap" extension function which is fired when the private LiveData
+    // above is updated.
     val nearbyLocations = nearbyParamsLiveData.switchMap { params ->
         ExploreRepository.getNearbyLocations(params.first, params.second, params.third)
     }
 
     fun updateParameters(lat: Double, lon: Double, radius: Int) {
+        // The private LiveData object is updated, causing "switchMap" to fire.
         nearbyParamsLiveData.value = Triple(lat, lon, radius)
     }
 }

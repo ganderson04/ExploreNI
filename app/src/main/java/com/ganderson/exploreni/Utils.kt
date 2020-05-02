@@ -10,9 +10,6 @@ import kotlin.math.*
  * Contains utility methods for use throughout the application.
  */
 class Utils {
-
-    // Kotlin does not support classes of static methods, or "library classes", in the same way
-    // Java does. "Companion objects" can be used to provide this functionality.
     companion object {
         private const val EARTH_RADIUS = 6371.0 // Earth's radius in kilometres
         private const val DISTANCE_SCALE = 1.609 // Conversion between miles and kilometres

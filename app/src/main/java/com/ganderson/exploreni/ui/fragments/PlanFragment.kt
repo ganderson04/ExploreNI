@@ -8,9 +8,6 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import kotlinx.android.synthetic.main.fragment_plan.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class PlanFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

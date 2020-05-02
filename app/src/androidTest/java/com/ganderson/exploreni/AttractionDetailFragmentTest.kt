@@ -30,6 +30,8 @@ class AttractionDetailFragmentTest {
         "54.642748", "-5.942263", "", "", "", "https://google.co.uk",
         ArrayList())
 
+    // Used to obtain a reference to the Activity onto which the Fragment under consideration will
+    // be placed.
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
     @Before

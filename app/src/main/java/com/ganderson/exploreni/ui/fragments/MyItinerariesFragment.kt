@@ -19,9 +19,6 @@ import com.ganderson.exploreni.ui.components.adapters.MyItinerariesAdapter
 import com.ganderson.exploreni.ui.viewmodels.MyItinerariesViewModel
 import kotlinx.android.synthetic.main.fragment_my_itineraries.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class MyItinerariesFragment : Fragment() {
     private val viewModel: MyItinerariesViewModel by viewModels()
 

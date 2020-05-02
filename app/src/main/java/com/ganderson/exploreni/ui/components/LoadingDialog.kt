@@ -6,16 +6,18 @@ import android.view.LayoutInflater
 import android.widget.TextView
 import com.ganderson.exploreni.R
 
-class LoadingDialog(cxt: Context, message: String) : AlertDialog(cxt) {
+/**
+ * Convenience class to create an AlertDialog with a loading message and spinner.
+ */
+class LoadingDialog(context: Context, message: String) : AlertDialog(context) {
 
     init {
-        val inflater = cxt.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val loadingLayout = inflater.inflate(R.layout.dialog_loading, null)
         val loadingMessage = loadingLayout.findViewById<TextView>(R.id.tvLoadingMessage)
         loadingMessage.text = message
 
         setView(loadingLayout)
         setCancelable(false)
-
     }
 }

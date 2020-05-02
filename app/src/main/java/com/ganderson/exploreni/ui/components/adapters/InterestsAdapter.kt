@@ -14,6 +14,10 @@ import com.ganderson.exploreni.ui.activities.InterestsActivity
 class InterestsAdapter(private val context: Context, private val interests: Array<String>)
     : RecyclerView.Adapter<InterestsAdapter.InterestsViewHolder>() {
     private val interestsActivity = context as InterestsActivity
+
+    // A SparseBooleanArray is used to monitor the checkbox state of each interest item.
+    // A sparse array's indices can contain gaps and so, default values must be given when accessing
+    // its items.
     private val itemCheckStates = SparseBooleanArray()
 
     class InterestsViewHolder(val view: View) : RecyclerView.ViewHolder(view){

@@ -22,6 +22,8 @@ class DbAccessor {
                 .where(Expression.property("type")
                     .equalTo(Expression.string("location")))
 
+            // A listener is attached to update the LiveData each time a change is made to the
+            // database that affects the query's result set, such as deletion.
             query.addChangeListener {
                 val results = it.results
                 val locationList = ArrayList<NiLocation>()
@@ -57,6 +59,7 @@ class DbAccessor {
         }
 
         fun removeFavouriteLocation(locationId: String): Boolean {
+            // Meta.id retrieves the unique Couchbase Lite DB ID assigned to the document.
             val query = QueryBuilder
                 .select(SelectResult.expression(Meta.id))
                 .from(DataSource.database(database))
@@ -70,6 +73,8 @@ class DbAccessor {
         }
 
         fun isFavouriteLocation(locationId: String): Boolean {
+            // "id" here is not the same as "Meta.id", rather it is the "id" field of the
+            // NiLocation object which represents the assigned MongoDB document ID.
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
@@ -179,6 +184,8 @@ class DbAccessor {
                     .equalTo(Expression.string("interests")))
             val resultSet = query.execute()
             val result = resultSet.next()
+
+            // Update interests if the document already exists, otherwise create it.
             if(result != null) {
                 document = database.getDocument(result.getString("id")).toMutable()
                 document.keys
@@ -204,6 +211,9 @@ class DbAccessor {
 
             val resultSet = query.execute()
             val result = resultSet.next()
+
+            // If there is a result, convert it to a Map, then add the interests to the above
+            // list.
             val interestMap: Map<String, Any>? = result?.getDictionary(database.name)?.toMap()
             interestMap?.let {
                 interests.addAll(interestMap["interests"] as List<String>)

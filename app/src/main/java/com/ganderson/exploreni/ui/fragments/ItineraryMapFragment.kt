@@ -1,10 +1,6 @@
 package com.ganderson.exploreni.ui.fragments
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
@@ -13,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.ganderson.exploreni.EspressoIdlingResource
 
@@ -32,9 +27,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.PolyUtil
 
-/**
- * A simple [Fragment] subclass.
- */
 class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
     private val viewModel: ItineraryMapViewModel by viewModels()
     private lateinit var map: GoogleMap

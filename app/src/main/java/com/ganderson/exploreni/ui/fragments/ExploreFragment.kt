@@ -11,9 +11,6 @@ import com.ganderson.exploreni.R
 import com.ganderson.exploreni.entities.LocationType
 import kotlinx.android.synthetic.main.fragment_explore.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class ExploreFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

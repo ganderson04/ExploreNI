@@ -1,6 +1,5 @@
 package com.ganderson.exploreni.ui.fragments
 
-
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
@@ -17,9 +16,6 @@ import com.ganderson.exploreni.ui.components.adapters.FavouritesAdapter
 import com.ganderson.exploreni.ui.viewmodels.FavouritesViewModel
 import kotlinx.android.synthetic.main.fragment_favourites.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class FavouritesFragment : Fragment() {
     private val viewModel: FavouritesViewModel by viewModels()
 

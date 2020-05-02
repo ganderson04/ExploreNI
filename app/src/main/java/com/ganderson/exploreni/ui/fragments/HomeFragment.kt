@@ -25,9 +25,6 @@ import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import java.util.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
 
@@ -239,6 +236,8 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // A LocationCallback is registered with the FusedLocationProviderClient in MainActivity
+    // to update the weather display should the user's location change or become unavailable.
     private fun registerLocationCallback() {
         locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {

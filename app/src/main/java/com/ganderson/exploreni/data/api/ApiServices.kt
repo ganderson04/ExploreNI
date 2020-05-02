@@ -10,8 +10,13 @@ import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Provides implementations of the defined API services combined with the appropriate deserialisers.
+ * As some services have multiple deserialisers, they appear here multiple times.
+ */
 class ApiServices {
     companion object {
+        // "by lazy" creates the object when it is first needed by the application during runtime.
         val exploreLocationService by lazy { constructExploreLocationService() }
         val exploreEventService by lazy { constructExploreEventService() }
         val geocodingService by lazy { constructGeocodingService() }
@@ -20,10 +25,14 @@ class ApiServices {
         val weatherService by lazy { constructWeatherService() }
 
         private fun constructExploreLocationService() : ExploreService {
+            // Construct the appropriate deserialiser for this iteration of the service.
             val locationDeserialiser = GsonBuilder()
                 .registerTypeAdapter(NiLocation::class.java, ExploreService.LocationDeserialiser())
                 .create()
 
+            // Create an implementation of the service with the deserialiser.
+            // Classes in Kotlin are implementations of "KClass". "class.java" returns the
+            // equivalent Java "Class".
             return Retrofit.Builder()
                 .baseUrl(ExploreService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(locationDeserialiser))

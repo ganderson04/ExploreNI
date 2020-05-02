@@ -30,8 +30,14 @@ class InterestsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_interest)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        // Set the title.
         supportActionBar?.title = "Interests"
+
+        // Show the back button in the toolbar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Couchbase Lite must be initialised in each Activity that uses it.
         CouchbaseLite.init(this)
 
         interests.addAll(resources.getStringArray(R.array.interests))

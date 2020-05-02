@@ -13,9 +13,6 @@ import com.ganderson.exploreni.entities.data.api.Event
 import com.ganderson.exploreni.ui.activities.MainActivity
 import kotlinx.android.synthetic.main.fragment_event_detail.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class EventDetailFragment(private val event: Event) : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +63,8 @@ class EventDetailFragment(private val event: Event) : Fragment() {
     }
 
     private fun openWebsite() {
+        // Intents are used to start Activities and can pass data along. In this case, the URL
+        // of the event's website.
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.website))
         startActivity(intent)
     }
