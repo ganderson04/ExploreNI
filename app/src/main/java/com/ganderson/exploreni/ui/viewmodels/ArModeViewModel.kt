@@ -7,7 +7,8 @@ import com.ganderson.exploreni.data.ExploreRepository
 
 class ArModeViewModel : ViewModel() {
     // A private LiveData object is kept in the ViewModels to monitor changes to the parameters
-    // required for the API calls.
+    // required for the API calls. "Triple" is an inbuilt Kotlin class (along with "Pair") designed
+    // to hold three values of any type.
     private val nearbyParamsLiveData = MutableLiveData<Triple<Double, Double, Int>>()
 
     // The public LiveData object accessible by the relevant UI class is provided with data by way
