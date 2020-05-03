@@ -174,7 +174,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.home_toolbar, menu)
+        inflater.inflate(R.menu.toolbar_home, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

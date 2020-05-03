@@ -1,13 +1,10 @@
 package com.ganderson.exploreni.ui.fragments
 
-import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -219,7 +216,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.explore_category_toolbar, menu)
+        inflater.inflate(R.menu.toolbar_explore_category, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

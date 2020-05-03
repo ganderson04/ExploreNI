@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.ganderson.exploreni.ui.activities.MainActivity
 
 import com.ganderson.exploreni.R
-import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.ui.viewmodels.AttractionDetailViewModel
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
@@ -61,7 +60,7 @@ class AttractionDetailFragment(private val location: NiLocation,
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.attraction_toolbar, menu)
+        inflater.inflate(R.menu.toolbar_attraction, menu)
         this.menu = menu
         super.onCreateOptionsMenu(menu, inflater)
     }

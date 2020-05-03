@@ -30,8 +30,8 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.rendering.ViewRenderable
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_look_around.*
-import kotlinx.android.synthetic.main.layout_look_around_location.view.*
+import kotlinx.android.synthetic.main.fragment_ar_mode.*
+import kotlinx.android.synthetic.main.layout_ar_mode_location.view.*
 import uk.co.appoly.arcorelocation.LocationMarker
 import uk.co.appoly.arcorelocation.LocationScene
 import java.lang.ref.WeakReference
@@ -60,7 +60,7 @@ class ArModeFragment : Fragment() {
         actionBar?.setDisplayShowHomeEnabled(false)
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_look_around, container, false)
+        return inflater.inflate(R.layout.fragment_ar_mode, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -198,7 +198,7 @@ class ArModeFragment : Fragment() {
         locationList.forEach { location ->
             // Marker graphics must be created as ARCore ViewRenderables.
             val vrFuture = ViewRenderable.builder()
-                .setView(this.activity, R.layout.layout_look_around_location)
+                .setView(this.activity, R.layout.layout_ar_mode_location)
                 .build()
 
             // ViewRenderable.Builder#build returns a CompleteableFuture containing the view to

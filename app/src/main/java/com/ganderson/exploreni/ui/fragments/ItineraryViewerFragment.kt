@@ -198,7 +198,7 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.itinerary_viewer_toolbar, menu)
+        inflater.inflate(R.menu.toolbar_itinerary_viewer, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

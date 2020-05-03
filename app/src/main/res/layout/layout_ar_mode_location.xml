@@ -37,5 +37,4 @@
             android:textColor="#FFFF"
             android:paddingBottom="5dp"
             android:textSize="12sp"/>
-<!--    </LinearLayout>-->
 </RelativeLayout>
