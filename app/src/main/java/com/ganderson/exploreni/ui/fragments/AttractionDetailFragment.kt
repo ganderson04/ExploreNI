@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.ganderson.exploreni.ui.activities.MainActivity
@@ -13,10 +14,12 @@ import com.ganderson.exploreni.ui.activities.MainActivity
 import com.ganderson.exploreni.R
 import com.ganderson.exploreni.data.ExploreRepository
 import com.ganderson.exploreni.entities.data.api.NiLocation
+import com.ganderson.exploreni.ui.viewmodels.AttractionDetailViewModel
 import kotlinx.android.synthetic.main.fragment_attraction_detail.*
 
 class AttractionDetailFragment(private val location: NiLocation,
                                private val cameFromMap: Boolean) : Fragment() {
+    private val viewModel: AttractionDetailViewModel by viewModels()
     private lateinit var menu: Menu
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -103,24 +106,32 @@ class AttractionDetailFragment(private val location: NiLocation,
     }
 
     private fun addToFavourites() {
-        if(ExploreRepository.addFavouriteLocation(location)) {
+        if(viewModel.addFavouriteLocation(location)) {
             Toast.makeText(requireContext(), "Favourite added!",
                 Toast.LENGTH_SHORT).show()
             val item = menu.findItem(R.id.tb_favourite)
             item.setIcon(R.drawable.ic_star_filled_white_24dp)
         }
+        else {
+            Toast.makeText(requireContext(), "Error adding favourite.",
+                Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun removeFromFavourites() {
-        if(ExploreRepository.removeFavouriteLocation(location.id)) {
+        if(viewModel.removeFavouriteLocation(location.id)) {
             Toast.makeText(requireContext(), "Favourite removed!",
                 Toast.LENGTH_SHORT).show()
             val item = menu.findItem(R.id.tb_favourite)
             item.setIcon(R.drawable.ic_star_border_white_24dp)
         }
+        else {
+            Toast.makeText(requireContext(), "Error removing favourite.",
+                Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun isFavouriteLocation() : Boolean {
-        return ExploreRepository.isFavouriteLocation(location.id)
+        return viewModel.isFavouriteLocation(location.id)
     }
 }
