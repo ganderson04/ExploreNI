@@ -49,13 +49,15 @@ class InterestsActivity : AppCompatActivity() {
     }
 
     private fun getUserInterests() {
-        val userInterests = viewModel.interests
-        if(userInterests.isNotEmpty()) {
-            selectedInterests.addAll(userInterests)
-            selectedInterests.forEach { interest ->
-                val itemIndex = interests.indexOf(interest)
-                if(itemIndex != -1) {
-                    adapter.setItemChecked(itemIndex)
+        val userInterests = viewModel.interests.data
+        if(userInterests != null) {
+            if (userInterests.isNotEmpty()) {
+                selectedInterests.addAll(userInterests)
+                selectedInterests.forEach { interest ->
+                    val itemIndex = interests.indexOf(interest)
+                    if (itemIndex != -1) {
+                        adapter.setItemChecked(itemIndex)
+                    }
                 }
             }
         }

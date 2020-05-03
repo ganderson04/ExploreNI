@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.couchbase.lite.*
 import com.ganderson.exploreni.entities.Itinerary
+import com.ganderson.exploreni.entities.data.DataResult
 import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.toDataClass
 import com.ganderson.exploreni.toHashMap
@@ -14,8 +15,8 @@ class DbAccessor {
     companion object {
         private val database = DbManager.getSharedInstance().database
 
-        fun getFavouriteLocations() : LiveData<List<NiLocation>> {
-            val data = MutableLiveData<List<NiLocation>>()
+        fun getFavouriteLocations() : LiveData<DataResult<List<NiLocation>>> {
+            val data = MutableLiveData<DataResult<List<NiLocation>>>()
             val query = QueryBuilder
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
@@ -39,10 +40,16 @@ class DbAccessor {
                     locationList.add(niLocation)
                 }
 
-                data.value = locationList
+                data.value = DataResult(locationList, null)
             }
 
-            query.execute()
+            try {
+                query.execute()
+            }
+            catch(e: Exception) {
+                data.value = DataResult(null, e)
+            }
+
             return data
         }
 
@@ -54,12 +61,20 @@ class DbAccessor {
             locationMap["type"] = "location"
 
             val document = MutableDocument(locationMap)
-            database.save(document)
-            return true
+
+            try {
+                database.save(document)
+                return true
+            }
+            catch(e: Exception) {
+                return false
+            }
         }
 
         fun removeFavouriteLocation(locationId: String): Boolean {
-            // Meta.id retrieves the unique Couchbase Lite DB ID assigned to the document.
+            // Meta.id retrieves the unique Couchbase Lite DB ID assigned to the document. It is
+            // not included in "SelectResult.all()" used elsewhere in this class, and must always
+            // be requested alongside "SelectResult.all()" if it is needed.
             val query = QueryBuilder
                 .select(SelectResult.expression(Meta.id))
                 .from(DataSource.database(database))
@@ -68,8 +83,14 @@ class DbAccessor {
             val result = resultSet.next()
             val docId = result.getString("id")
             val document = database.getDocument(docId)
-            database.delete(document)
-            return true
+
+            try {
+                database.delete(document)
+                return true
+            }
+            catch (e: Exception) {
+                return false
+            }
         }
 
         fun isFavouriteLocation(locationId: String): Boolean {
@@ -79,8 +100,13 @@ class DbAccessor {
                 .select(SelectResult.all())
                 .from(DataSource.database(database))
                 .where(Expression.property("id").equalTo(Expression.string(locationId)))
-            val resultSet = query.execute()
-            return resultSet.next() != null
+            try {
+                val resultSet = query.execute()
+                return resultSet.next() != null
+            }
+            catch(e: Exception) {
+                return false
+            }
         }
 
         fun saveItinerary(itinerary: Itinerary) : Boolean {
@@ -101,8 +127,13 @@ class DbAccessor {
             // names.
             document.setString("unique_name", itinerary.name.toLowerCase(Locale.getDefault()))
 
-            database.save(document)
-            return true
+            try {
+                database.save(document)
+                return true
+            }
+            catch (e: Exception) {
+                return false
+            }
         }
 
         fun isDuplicateItineraryName(name: String) : Boolean {
@@ -111,8 +142,13 @@ class DbAccessor {
                 .from(DataSource.database(database))
                 .where(Expression.property("unique_name")
                     .equalTo(Expression.string(name.toLowerCase(Locale.getDefault()))))
-            val resultSet = query.execute()
-            return resultSet.next() != null
+            try {
+                val resultSet = query.execute()
+                return resultSet.next() != null
+            }
+            catch(e: Exception) {
+                return false
+            }
         }
 
         /**
@@ -137,8 +173,8 @@ class DbAccessor {
             return itineraryMap.toDataClass()
         }
 
-        fun getItineraries() : LiveData<List<Itinerary>> {
-            val data = MutableLiveData<List<Itinerary>>()
+        fun getItineraries() : LiveData<DataResult<List<Itinerary>>> {
+            val data = MutableLiveData<DataResult<List<Itinerary>>>()
             val query = QueryBuilder
                 .select(SelectResult.expression(Meta.id), SelectResult.all())
                 .from(DataSource.database(database))
@@ -162,16 +198,29 @@ class DbAccessor {
                     itineraryList.add(itinerary)
                 }
 
-                data.value = itineraryList
+                data.value = DataResult(itineraryList, null)
             }
 
-            query.execute()
+            try {
+                query.execute()
+            }
+            catch(e: Exception) {
+                data.value = DataResult(null, e)
+            }
+
             return data
         }
 
         fun deleteItinerary(dbId: String): Boolean {
             val document = database.getDocument(dbId)
-            if(document != null) database.delete(document)
+            if(document != null) {
+                try{
+                    database.delete(document)
+                }
+                catch(e: Exception) {
+                    return false
+                }
+            }
             return true
         }
 
@@ -182,26 +231,31 @@ class DbAccessor {
                 .from(DataSource.database(database))
                 .where(Expression.property("type")
                     .equalTo(Expression.string("interests")))
-            val resultSet = query.execute()
-            val result = resultSet.next()
+            try {
+                val resultSet = query.execute()
+                val result = resultSet.next()
 
-            // Update interests if the document already exists, otherwise create it.
-            if(result != null) {
-                document = database.getDocument(result.getString("id")).toMutable()
-                document.keys
-                document.setValue("interests", interests)
+                // Update interests if the document already exists, otherwise create it.
+                if(result != null) {
+                    document = database.getDocument(result.getString("id")).toMutable()
+                    document.setValue("interests", interests)
+                }
+                else {
+                    val interestMap = HashMap<String, Any>()
+                    interestMap["interests"] = interests
+                    interestMap["type"] = "interests"
+                    document = MutableDocument(interestMap)
+                }
             }
-            else {
-                val interestMap = HashMap<String, Any>()
-                interestMap["interests"] = interests
-                interestMap["type"] = "interests"
-                document = MutableDocument(interestMap)
+            catch(e: Exception) {
+                return false
             }
+
             database.save(document)
             return true
         }
 
-        fun getInterests() : List<String> {
+        fun getInterests() : DataResult<List<String>> {
             val interests = ArrayList<String>()
             val query = QueryBuilder
                 .select(SelectResult.all())
@@ -209,16 +263,22 @@ class DbAccessor {
                 .where(Expression.property("type")
                     .equalTo(Expression.string("interests")))
 
-            val resultSet = query.execute()
-            val result = resultSet.next()
+            try {
+                val resultSet = query.execute()
+                val result = resultSet.next()
 
-            // If there is a result, convert it to a Map, then add the interests to the above
-            // list.
-            val interestMap: Map<String, Any>? = result?.getDictionary(database.name)?.toMap()
-            interestMap?.let {
-                interests.addAll(interestMap["interests"] as List<String>)
+                // If there is a result, convert it to a Map, then add the interests to the above
+                // list.
+                val interestMap: Map<String, Any>? = result?.getDictionary(database.name)?.toMap()
+                interestMap?.let {
+                    interests.addAll(interestMap["interests"] as List<String>)
+                }
             }
-            return interests
+            catch(e: Exception) {
+                return DataResult(emptyList(), e)
+            }
+
+            return DataResult(interests, null)
         }
     }
 }

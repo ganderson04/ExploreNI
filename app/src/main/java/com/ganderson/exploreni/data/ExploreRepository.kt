@@ -53,7 +53,7 @@ class ExploreRepository {
             return ApiAccessor.getItineraryPolyline(itinerary, userLocation, apiKey)
         }
 
-        fun getFavouriteLocations() : LiveData<List<NiLocation>> {
+        fun getFavouriteLocations() : LiveData<DataResult<List<NiLocation>>> {
             return DbAccessor.getFavouriteLocations()
         }
 
@@ -84,7 +84,7 @@ class ExploreRepository {
             return DbAccessor.getItinerary(itineraryName)
         }
 
-        fun getItineraries() : LiveData<List<Itinerary>> {
+        fun getItineraries() : LiveData<DataResult<List<Itinerary>>> {
             return DbAccessor.getItineraries()
         }
 
@@ -92,7 +92,7 @@ class ExploreRepository {
             return DbAccessor.deleteItinerary(dbId)
         }
 
-        fun getInterests() : List<String> {
+        fun getInterests() : DataResult<List<String>> {
             return DbAccessor.getInterests()
         }
 

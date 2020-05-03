@@ -3,6 +3,7 @@ package com.ganderson.exploreni.ui.fragments
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -38,19 +39,25 @@ class FavouritesFragment : Fragment() {
         EspressoIdlingResource.increment()
         viewModel
             .favourites
-            .observe(viewLifecycleOwner) {
+            .observe(viewLifecycleOwner) { favouritesResult ->
                 EspressoIdlingResource.decrement()
-                val linearLayoutManager = LinearLayoutManager(requireContext())
-                val favouritesAdapter = FavouritesAdapter(requireContext(),
-                    it,
-                    object: FavouritesAdapter.OnRemoveClickListener {
-                    override fun onRemoveClick(niLocation: NiLocation) {
-                        removeFromFavourites(niLocation)
-                    }
-                })
+                if(favouritesResult.data != null) {
+                    val linearLayoutManager = LinearLayoutManager(requireContext())
+                    val favouritesAdapter = FavouritesAdapter(requireContext(),
+                        favouritesResult.data,
+                        object : FavouritesAdapter.OnRemoveClickListener {
+                            override fun onRemoveClick(niLocation: NiLocation) {
+                                removeFromFavourites(niLocation)
+                            }
+                        })
 
-                rvFavourites.layoutManager = linearLayoutManager
-                rvFavourites.adapter = favouritesAdapter
+                    rvFavourites.layoutManager = linearLayoutManager
+                    rvFavourites.adapter = favouritesAdapter
+                }
+                else {
+                    Toast.makeText(requireContext(), "Error loading favourites.",
+                        Toast.LENGTH_SHORT).show()
+                }
             }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -65,7 +72,12 @@ class FavouritesFragment : Fragment() {
             .setTitle("Confirm removal")
             .setMessage("Remove ${niLocation.name}?")
             .setCancelable(false)
-            .setPositiveButton("Yes") {_, _ -> viewModel.removeFromFavourites(niLocation) }
+            .setPositiveButton("Yes") {_, _ ->
+                if(!viewModel.removeFromFavourites(niLocation)) {
+                    Toast.makeText(requireContext(), "Error removing favourite.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
             .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
         dialog.show()
     }

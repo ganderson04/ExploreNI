@@ -226,6 +226,10 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
             if (viewModel.saveItinerary(itinerary)) {
                 Toast.makeText(requireContext(), "Itinerary saved.", Toast.LENGTH_SHORT).show()
             }
+            else {
+                Toast.makeText(requireContext(), "Error saving itinerary.",
+                    Toast.LENGTH_SHORT).show()
+            }
         }
 
         val mainActivity = activity as MainActivity

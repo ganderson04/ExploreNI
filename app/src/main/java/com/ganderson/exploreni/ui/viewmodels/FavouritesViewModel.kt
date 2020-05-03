@@ -7,7 +7,7 @@ import com.ganderson.exploreni.entities.data.api.NiLocation
 class FavouritesViewModel : ViewModel() {
     val favourites = ExploreRepository.getFavouriteLocations()
 
-    fun removeFromFavourites(niLocation: NiLocation) {
-        ExploreRepository.removeFavouriteLocation(niLocation.id)
+    fun removeFromFavourites(niLocation: NiLocation) : Boolean {
+        return ExploreRepository.removeFavouriteLocation(niLocation.id)
     }
 }

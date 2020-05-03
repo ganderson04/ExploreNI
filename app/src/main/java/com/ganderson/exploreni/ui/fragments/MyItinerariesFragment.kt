@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,15 +57,24 @@ class MyItinerariesFragment : Fragment() {
         EspressoIdlingResource.increment()
         viewModel
             .itineraries
-            .observe(viewLifecycleOwner) { list ->
-                val sortedList = list.sortedBy { itinerary -> itinerary.name }
-                val linearLayoutManager = LinearLayoutManager(this.context)
-                val itinerariesAdapter = MyItinerariesAdapter(requireContext(), sortedList,
-                    onRemoveClickListener)
-
-                rvMyItineraries.layoutManager = linearLayoutManager
-                rvMyItineraries.adapter = itinerariesAdapter
+            .observe(viewLifecycleOwner) { itinerariesResult ->
                 EspressoIdlingResource.decrement()
+                if(itinerariesResult.data != null) {
+                    val list = itinerariesResult.data
+                    val sortedList = list.sortedBy { itinerary -> itinerary.name }
+                    val linearLayoutManager = LinearLayoutManager(this.context)
+                    val itinerariesAdapter = MyItinerariesAdapter(
+                        requireContext(), sortedList,
+                        onRemoveClickListener
+                    )
+
+                    rvMyItineraries.layoutManager = linearLayoutManager
+                    rvMyItineraries.adapter = itinerariesAdapter
+                }
+                else {
+                    Toast.makeText(requireContext(), "Error loading itineraries.",
+                        Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
