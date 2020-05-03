@@ -32,6 +32,12 @@ class AttractionDetailFragmentTest {
 
     // Used to obtain a reference to the Activity onto which the Fragment under consideration will
     // be placed.
+    // When using JUnit Rules in Kotlin, it is necessary to mark them with the "@get" annotation
+    // as opposed to "@Rule" which would be used in Java. "@get" instructs the JVM to generate
+    // a getter for a specific property and is sometimes required for Java-Kotlin
+    // interoperability. Here "@get:Rule" is used to apply the "@Rule" annotation to the property
+    // so that JUnit can find it.
+    // Ref: https://kotlinlang.org/docs/reference/annotations.html#java-annotations
     @get:Rule val activityRule = ActivityTestRule(MainActivity::class.java)
 
     @Before
