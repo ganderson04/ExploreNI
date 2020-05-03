@@ -60,7 +60,7 @@ class NearbyFragment : Fragment() {
         if(viewModel.userLocation != null) {
             loadingDialog = LoadingDialog(requireContext(), "Loading locations, please wait.")
 
-            val frgMap = childFragmentManager.findFragmentById(R.id.frgMap)
+            val fcvMap = childFragmentManager.findFragmentById(R.id.fcvMap)
                     as SupportMapFragment
 
             // Set up the seekbar.
@@ -127,7 +127,7 @@ class NearbyFragment : Fragment() {
                     }
                 }
 
-            frgMap.getMapAsync {
+            fcvMap.getMapAsync {
                 this.map = it
                 map.isMyLocationEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = false

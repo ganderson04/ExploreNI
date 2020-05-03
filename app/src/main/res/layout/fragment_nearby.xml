@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.NearbyFragment">
 
-    <fragment
-        android:id="@+id/frgMap"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fcvMap"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
