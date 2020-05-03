@@ -11,7 +11,7 @@ import com.ganderson.exploreni.entities.data.api.NiLocation
 import com.ganderson.exploreni.entities.data.api.Weather
 
 /**
- * Provides access to APIs and the local DB for the ViewModels.
+ * Provides access to APIs and the local DB.
  */
 class ExploreRepository {
     // Kotlin does not support classes of static methods, or "library classes", in the same way
