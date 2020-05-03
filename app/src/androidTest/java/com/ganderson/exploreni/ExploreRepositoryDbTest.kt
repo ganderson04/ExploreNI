@@ -64,9 +64,9 @@ class ExploreRepositoryDbTest {
         val savedItinerary = ExploreRepository.getItineraries()
             .test()
             .awaitValue()
-            .value()[0]
-        assertTrue(savedItinerary.name == itineraryName)
-        ExploreRepository.deleteItinerary(savedItinerary.dbId)
+            .value().data?.get(0)
+        assertTrue(savedItinerary?.name == itineraryName)
+        ExploreRepository.deleteItinerary(savedItinerary!!.dbId)
     }
 
     @Test
@@ -76,9 +76,9 @@ class ExploreRepositoryDbTest {
         val savedItinerary = ExploreRepository.getItineraries()
             .test()
             .awaitValue()
-            .value()[0]
-        assertTrue(savedItinerary.name == itineraryName)
-        assertTrue(ExploreRepository.deleteItinerary(savedItinerary.dbId))
+            .value().data?.get(0)
+        assertTrue(savedItinerary?.name == itineraryName)
+        assertTrue(ExploreRepository.deleteItinerary(savedItinerary!!.dbId))
     }
 
     @Test
@@ -91,8 +91,8 @@ class ExploreRepositoryDbTest {
     fun getInterests() {
         assertTrue(ExploreRepository.setInterests(interests))
         val savedInterests = ExploreRepository.getInterests()
-        assertTrue(savedInterests[0] == interests[0] &&
-                savedInterests[1] == interests[1])
+        assertTrue(savedInterests.data?.get(0) == interests[0] &&
+                savedInterests.data?.get(1) == interests[1])
         ExploreRepository.setInterests((ArrayList()))
     }
 }
