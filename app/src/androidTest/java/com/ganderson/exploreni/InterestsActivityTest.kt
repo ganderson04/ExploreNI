@@ -73,7 +73,7 @@ class InterestsActivityTest {
             .perform(click())
 
         val selectedInterests = ExploreRepository.getInterests()
-        assertTrue(selectedInterests.contains(interestsArray[0]))
+        assertTrue(selectedInterests.data!!.contains(interestsArray[0]))
     }
 
     @Test
@@ -86,7 +86,7 @@ class InterestsActivityTest {
             .perform(click())
 
         val firstSelectedInterests = ExploreRepository.getInterests()
-        assertTrue(firstSelectedInterests.contains(interestsArray[0]))
+        assertTrue(firstSelectedInterests.data!!.contains(interestsArray[0]))
 
         // Re-access InterestsActivity from SettingsActivity.
         onView(withId(androidx.preference.R.id.recycler_view))
@@ -101,7 +101,7 @@ class InterestsActivityTest {
             .perform(click())
 
         val secondSelectedInterests = ExploreRepository.getInterests()
-        assertFalse(secondSelectedInterests.contains(interestsArray[0]))
+        assertFalse(secondSelectedInterests.data!!.contains(interestsArray[0]))
     }
 
     /**
