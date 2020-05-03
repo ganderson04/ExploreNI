@@ -205,15 +205,8 @@ class NearbyFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            android.R.id.home -> {
-                goBack()
-            }
+            android.R.id.home -> parentFragmentManager.popBackStack()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun goBack() {
-        val mainActivity = activity as MainActivity
-        mainActivity.supportFragmentManager.popBackStack()
     }
 }
