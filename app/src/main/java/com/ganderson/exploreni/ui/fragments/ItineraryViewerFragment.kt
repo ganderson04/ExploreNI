@@ -281,7 +281,7 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
                     .setCancelable(true)
                     .setTitle("Empty Itinerary")
                     .setMessage("You have removed all locations. Delete itinerary?")
-                    .setPositiveButton("Yes") { dialog, _ -> deleteItinerary() }
+                    .setPositiveButton("Yes") { _, _ -> deleteItinerary() }
                     .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
                     .create()
                 emptyItineraryDialog.show()
