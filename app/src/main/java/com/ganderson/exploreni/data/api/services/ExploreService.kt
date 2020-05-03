@@ -46,6 +46,8 @@ interface ExploreService {
     class LocationDeserialiser : JsonDeserializer<NiLocation> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?,
                                  context: JsonDeserializationContext?): NiLocation? {
+            // "?" performs a null-check, ".let" will run the provided lambda if the object is not
+            // null.
             json?.let {
                 val locationResponse = it.asJsonObject
                 if(!locationResponse.has("error")) {
