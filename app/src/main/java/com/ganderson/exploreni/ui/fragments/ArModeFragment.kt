@@ -29,6 +29,7 @@ import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.rendering.ViewRenderable
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_look_around.*
 import kotlinx.android.synthetic.main.layout_look_around_location.view.*
 import uk.co.appoly.arcorelocation.LocationMarker
@@ -37,6 +38,8 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
 
 class ArModeFragment : Fragment() {
+    // "by viewModels()" returns the ViewModel of the type specified, scoped to the current
+    // Fragment.
     private val viewModel: ArModeViewModel by viewModels()
 
     private lateinit var loadingDialog: LoadingDialog
@@ -65,6 +68,11 @@ class ArModeFragment : Fragment() {
                 PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission()
         }
+        else if(ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(requireContext(), "Enable location to use the AR feature.",
+                Toast.LENGTH_SHORT).show()
+        }
         else {
             startAr()
         }
@@ -72,7 +80,7 @@ class ArModeFragment : Fragment() {
 
     private fun startAr() {
         // The ARCore session is created here. This is the "main entry point to the ARCore API".
-        // https://developers.google.com/ar/reference/java/arcore/reference/com/google/ar/core/Session
+        // Ref: https://developers.google.com/ar/reference/java/arcore/reference/com/google/ar/core/Session
         if (asvLookAround.session == null) {
             val arSession = Session(this.activity)
             val config = Config(arSession)
@@ -129,7 +137,7 @@ class ArModeFragment : Fragment() {
         loadingDialog = LoadingDialog(this.requireContext(), "Loading locations, please wait.")
 
         // Begin observing changes to in-range locations. The observer lambda will run after the
-        // parameters are updated in getNearbyLocations() and the associated LiveData has been
+        // parameters are updated in "getNearbyLocations()" and the associated LiveData has been
         // updated.
         viewModel
             .nearbyLocations
@@ -313,8 +321,17 @@ class ArModeFragment : Fragment() {
         }
     }
 
+    private fun goHome() {
+        val activity = activity as MainActivity
+        activity.displayFragment(HomeFragment())
+
+        // To ensure the consistency of the bottom navigation view component, the selected item
+        // is set here. This is similar to the "onBackPressed()" method of the MainActivity.
+        bnvNavigation.selectedItemId = R.id.nav_home
+    }
+
     private fun requestCameraPermission() {
-        if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
             AlertDialog.Builder(requireContext())
                 .setTitle("Camera access requested")
                 .setMessage("Camera access is requested to enable the AR functionality.")
@@ -324,7 +341,14 @@ class ArModeFragment : Fragment() {
                         CAMERA_PERMISSION
                     )
                 }
-                .setNegativeButton("Cancel") { dialog, _ -> dialog?.dismiss() }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog?.dismiss()
+
+                    // Take the user to the "Home" screen regardless of where they came from. This
+                    // is the simplest solution to maintaining the consistency of the bottom
+                    // navigation view.
+                    goHome()
+                }
                 .create()
                 .show()
         }
@@ -343,9 +367,14 @@ class ArModeFragment : Fragment() {
                 .setCancelable(false)
                 .setPositiveButton("OK") { dialog, _ ->
                     dialog?.dismiss()
-                    parentFragmentManager.popBackStack()
+                    goHome()
                 }
                 .show()
+        }
+        else if(ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(requireContext(), "Enable location to use the AR feature.",
+                Toast.LENGTH_SHORT).show()
         }
         else {
             startAr()
