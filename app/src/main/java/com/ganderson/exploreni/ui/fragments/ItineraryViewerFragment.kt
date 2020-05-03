@@ -308,6 +308,9 @@ class ItineraryViewerFragment(private val isNew: Boolean, savedItinerary: Itiner
             viewModel.setDurationParams(itinerary, userLocation,
                 resources.getString(R.string.google_api_key))
         }
+        else if(itinerary.itemList.size == 1 && userLocation == null) {
+            tvItineraryDuration.text = "Travel time: 0 hours, 0 minutes"
+        }
     }
 
     private fun deleteItinerary() {
