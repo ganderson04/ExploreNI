@@ -100,6 +100,8 @@ class AttractionDetailFragment(private val location: NiLocation,
     }
 
     private fun openWebsite() {
+        // Intents are used to start Activities and can pass data along. In this case, the URL
+        // of the event's website.
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(location.website))
         startActivity(intent)
     }
