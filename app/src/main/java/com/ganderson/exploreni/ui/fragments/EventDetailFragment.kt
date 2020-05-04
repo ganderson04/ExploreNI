@@ -48,7 +48,8 @@ class EventDetailFragment(private val event: Event) : Fragment() {
             .error(R.drawable.placeholder_no_image_available)
             .into(ivEvent)
 
-        tvEventDesc.text = event.desc
+        val eventText = "${event.desc}\n\n${event.imgAttr}"
+        tvEventDesc.text = eventText
 
         btnWebsite.setOnClickListener {
             openWebsite()
@@ -63,8 +64,6 @@ class EventDetailFragment(private val event: Event) : Fragment() {
     }
 
     private fun openWebsite() {
-        // Intents are used to start Activities and can pass data along. In this case, the URL
-        // of the event's website.
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.website))
         startActivity(intent)
     }
