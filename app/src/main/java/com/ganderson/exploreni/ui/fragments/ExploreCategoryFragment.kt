@@ -59,6 +59,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
         // If the list is empty it must be a new instantiation of this fragment, so show the
         // loading dialog and begin observing the ViewModel's LiveData.
         if(locationList.isEmpty()) {
+            // Beginning asynchronous activity. If testing, tell Espresso to wait.
             EspressoIdlingResource.increment()
             val loadingDialog = LoadingDialog(requireContext(),
                 "Loading locations, please wait.")
@@ -69,6 +70,7 @@ class ExploreCategoryFragment(private val locationType: LocationType) : Fragment
                 .locations
                 .observe(viewLifecycleOwner) { listResult ->
                     loadingDialog.dismiss()
+                    // If testing, tell Espresso that the asynchronous activity is finished.
                     EspressoIdlingResource.decrement()
 
                     if(listResult.data != null) {
