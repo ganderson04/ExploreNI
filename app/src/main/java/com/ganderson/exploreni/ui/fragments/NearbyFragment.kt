@@ -127,8 +127,8 @@ class NearbyFragment : Fragment() {
                     }
                 }
 
-            fcvMap.getMapAsync {
-                this.map = it
+            fcvMap.getMapAsync { googleMap ->
+                this.map = googleMap
                 map.isMyLocationEnabled = true
                 map.uiSettings.isMyLocationButtonEnabled = false
 

@@ -50,8 +50,8 @@ class ItineraryMapFragment(private val itinerary: Itinerary) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val fcvMap = childFragmentManager.findFragmentById(R.id.fcvItineraryMap)
                 as SupportMapFragment
-        fcvMap.getMapAsync {
-            this.map = it
+        fcvMap.getMapAsync { googleMap ->
+            this.map = googleMap
             map.isMyLocationEnabled = true
             map.uiSettings.isMyLocationButtonEnabled = false
 

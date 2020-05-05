@@ -44,8 +44,8 @@ class AttractionMapFragment(private val location: NiLocation) : Fragment() {
                 as SupportMapFragment
 
         // Load the map. This action is asynchronous.
-        fcvMap.getMapAsync {
-            this.map = it
+        fcvMap.getMapAsync { googleMap ->
+            this.map = googleMap
             map.isMyLocationEnabled = true
             map.uiSettings.isMyLocationButtonEnabled = true
 
